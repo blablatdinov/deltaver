@@ -12,5 +12,8 @@ class VersionDelta(Protocol):
 @attrs.define(frozen=True)
 class PypiVersionDelta(VersionDelta):
 
+    _package_name: str
+    _version: str
+
     def days(self):
         return 1
