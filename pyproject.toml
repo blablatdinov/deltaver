@@ -11,9 +11,13 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.8"
 attrs = "^23.0"
+httpx = "^0.25.2"
+packaging = "^23.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "7.4.3"
+respx = "^0.20.2"
+time-machine = "^2.13.0"
 
 [build-system]
 requires = ["poetry-core"]
