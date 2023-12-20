@@ -1,11 +1,12 @@
 import datetime
-from typing import Protocol
+from typing import Protocol, final
 
 import attrs
 import httpx
 from packaging import version
 
 
+@final
 class VersionNotFoundError(Exception):
     pass
 
@@ -16,6 +17,7 @@ class VersionDelta(Protocol):
 
 
 @attrs.define(frozen=True)
+@final
 class PypiVersionDelta(VersionDelta):
 
     _package_name: str
