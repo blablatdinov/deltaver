@@ -16,9 +16,63 @@ packaging = "^23.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "7.4.3"
-respx = "^0.20.2"
-time-machine = "^2.13.0"
+respx = "0.20.2"
+time-machine = "2.13.0"
+isort = "5.13.2"
+pytest-cov = "4.1.0"
+ruff = "0.1.8"
+mypy = "1.7.1"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+line_length = 120
+multi_line_output = 3
+include_trailing_comma = true
+
+[tool.ruff]
+select = ["ALL"]
+fixable = [
+  "F401",   # Unused import
+]
+target-version = "py38"
+ignore = [
+  "D",       # TODO: write docstrings
+  "ANN101",  # Missing type annotation for `self` in method
+  "ANN102",  # Missing type annotation for `cls` in classmethod
+  "ARG001",  # Unused function argument
+  "ARG002",  # Unused method argument
+  "D203",    # no-blank-line-before-class
+  "D213",    # multi-line-summary-first-line
+  "D418",    # Function decorated with `@overload` shouldn't contain a docstring
+  "FBT001",  # Boolean-typed positional argument in function definition
+  "FBT002",  # Boolean-typed positional argument in function definition
+  "FIX002",  # Line contains TODO, consider resolving the issue
+  "FLY002",  # We not use f-strings
+  "I001",    # Conflict with isort
+  "RUF100",  # WPS primary linter
+  "RUF001",  # Project contain cyrillic symbols
+  "RUF002",  # Project contain cyrillic symbols
+  "RET505",  # Unnecessary `elif` after `return` statement
+  "RET506",  # Unnecessary `elif` after `raise` statement
+  "UP030",   # We use explicit references
+  "UP032",   # We not use f-strings
+  "UP004",   # Class `PrayerReaction` inherits from `object`
+  "TD",      # "todo" formats
+  "PLR630",  # We disrespect staticmethods
+]
+
+[tool.ruff.flake8-quotes]
+docstring-quotes = "double"
+inline-quotes = "single"
+multiline-quotes = "double"
+
+[tool.ruff.per-file-ignores]
+"tests/*" = [
+  "S101",    # use of `assert` detected
+  "PLR2004", # Magic value
+  "PLR0913", # Too many arguments to function call
+  "INP001",  # Add an `__init__.py`. Tests is closed to import
+]
