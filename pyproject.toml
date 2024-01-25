@@ -42,6 +42,7 @@ select = ["ALL"]
 fixable = [
   "F401",   # Unused import
 ]
+line-length = 120
 target-version = "py38"
 ignore = [
   "D",       # TODO: write docstrings

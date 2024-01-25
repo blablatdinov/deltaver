@@ -5,18 +5,17 @@ import pytest
 import respx
 from httpx import Response
 from typer.testing import CliRunner
-from rich import print
 
 from deltaver.__main__ import app
 
 
 @pytest.fixture()
-def runner():
+def runner() -> CliRunner:
     return CliRunner()
 
 
 @pytest.fixture()
-def _mock_pypi(respx_mock):
+def _mock_pypi(respx_mock: respx.router.MockRouter) -> None:
     for line in Path('tests/fixtures/requirements.txt').read_text().strip().splitlines():
         package_name = line.split('==')[0]
         respx_mock.get('https://pypi.org/pypi/{0}/json'.format(package_name)).mock(return_value=Response(
@@ -27,11 +26,14 @@ def _mock_pypi(respx_mock):
 
 @pytest.mark.usefixtures('_mock_pypi')
 @respx.mock(assert_all_mocked=False)
-def test(runner):
+def test(runner: CliRunner) -> None:
     got = runner.invoke(app, ['tests/fixtures/requirements.txt'])
 
     assert got.exit_code == 0
-    assert re.match(r'Scanning... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% \d:\d{2}:\d{2}', got.stdout.splitlines()[0])
+    assert re.match(
+        r'Scanning... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% \d:\d{2}:\d{2}',
+        got.stdout.splitlines()[0],
+    )
     assert got.stdout.splitlines()[1:-1] == [
         '┏━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━┓',
         '┃ Package      ┃ Version ┃ Delta (days) ┃',
