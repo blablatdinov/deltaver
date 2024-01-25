@@ -1,4 +1,5 @@
 import datetime
+from contextlib import suppress
 from typing import Protocol, final
 
 import attrs
@@ -26,14 +27,23 @@ class PypiVersionDelta(VersionDelta):
     def days(self) -> int:
         response = httpx.get('https://pypi.org/pypi/{0}/json'.format(self._package_name))
         response.raise_for_status()
+        versions = [
+            (version_number, release_info)
+            for version_number, release_info in response.json()['releases'].items()
+        ]
+        correct_versions = []
+        for version_number, release_info in versions:
+            with suppress(version.InvalidVersion):
+                if not version.parse(version_number).pre:
+                    correct_versions.append({
+                        version_number: release_info,
+                    })
         available_release_versions = sorted(
-            [
-                {version_number: release_info}
-                for version_number, release_info in response.json()['releases'].items()
-                if not version.parse(version_number).pre
-            ],
+            correct_versions,
             key=lambda release_dict: version.parse(next(iter(release_dict.keys()))),
         )
+        if not available_release_versions:
+            return 0
         if next(iter(available_release_versions[-1].keys())) == self._version:
             return 0
         start = None

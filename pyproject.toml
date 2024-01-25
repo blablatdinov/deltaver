@@ -11,8 +11,10 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.8"
 attrs = "^23.0"
-httpx = "^0.25.2"
+httpx = "^0.25"
 packaging = "^23.2"
+typer = "^0.9"
+rich = "^13.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "7.4.3"
@@ -22,6 +24,9 @@ isort = "5.13.2"
 pytest-cov = "4.1.0"
 ruff = "0.1.8"
 mypy = "1.7.1"
+
+[tool.poetry.scripts]
+deltaver = "deltaver.__main__:app"
 
 [build-system]
 requires = ["poetry-core"]

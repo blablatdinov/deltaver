@@ -4,4 +4,4 @@ lint:
 	poetry run mypy deltaver tests
 
 test:
-	poetry run pytest --cov --cov-report=term-missing:skip-covered
+	poetry run pytest --cov=deltaver --cov-report=term-missing:skip-covered

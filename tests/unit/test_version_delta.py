@@ -16,6 +16,14 @@ def _mock_pypi(respx_mock: MockRouter) -> None:
     ))
 
 
+@pytest.fixture()
+def _mock_eljson(respx_mock: MockRouter) -> None:
+    respx_mock.get('https://pypi.org/pypi/eljson/json').mock(return_value=Response(
+        200,
+        text=Path('tests/fixtures/eljson_response.json').read_text(),
+    ))
+
+
 @pytest.mark.usefixtures('_mock_pypi')
 def test_previous(time_machine: TimeMachineFixture) -> None:
     # 0.25.1 was released 2023-11-03
@@ -33,3 +41,8 @@ def test_last_version() -> None:
 def test_fake_version() -> None:
     with pytest.raises(VersionNotFoundError):
         PypiVersionDelta('httpx', '0.50.0').days()
+
+
+@pytest.mark.usefixtures('_mock_eljson')
+def test_eljson() -> None:
+    assert PypiVersionDelta('eljson', '0.0.1a1').days() == 0
