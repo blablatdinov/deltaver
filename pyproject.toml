@@ -46,7 +46,7 @@ fixable = [
   "F401",   # Unused import
 ]
 line-length = 120
-target-version = "py38"
+target-version = "py39"
 ignore = [
   "D",       # TODO: write docstrings
   "ANN101",  # Missing type annotation for `self` in method

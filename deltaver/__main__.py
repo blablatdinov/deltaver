@@ -1,12 +1,13 @@
 import enum
 from pathlib import Path
+from typing import Annotated
 
 import typer
 from rich import print
 from rich.console import Console
 from rich.progress import track
 from rich.table import Table
-from typing_extensions import Annotated, TypeAlias
+from typing_extensions import TypeAlias
 
 from deltaver.parsed_requirements import FreezedReqs, PoetryLockReqs
 from deltaver.version_delta import PypiVersionDelta, VersionsSortedBySemver
@@ -47,8 +48,7 @@ def format_output(
 @app.command()
 def main(
     path_to_requirements_file: str,
-    # file_format: Annotated[str, typer.Option('--format')] = 'freezed',
-    format: str = 'freezed',
+    file_format: Annotated[str, typer.Option('--format')] = 'freezed',
 ) -> None:
     res = 0
     max_delta = 0
@@ -56,7 +56,7 @@ def main(
     reqs_obj_ctor = {
         'freezed': FreezedReqs,
         'lock': PoetryLockReqs,
-    }[format]
+    }[file_format]
     for package, version in track(reqs_obj_ctor(Path(path_to_requirements_file)).reqs(), description='Scanning...'):
         delta = PypiVersionDelta(VersionsSortedBySemver(package), version).days()
         if delta > 0:

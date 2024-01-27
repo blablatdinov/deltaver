@@ -1,7 +1,7 @@
 import datetime
 from contextlib import suppress
 from itertools import chain
-from typing import Protocol, final, Iterable, cast
+from typing import Protocol, final
 
 import attrs
 import httpx
