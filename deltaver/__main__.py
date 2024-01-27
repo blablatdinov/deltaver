@@ -38,11 +38,11 @@ def format_output(
         table.add_row(package, version, delta)
     if len(packages) > 0:
         console.print(table)
-        print('Max delta: {0}'.format(max_delta))
-        print('Average delta: {0:.2f}'.format(sum_delta / len(packages)))
+        average_delta = '{0:.2f}'.format(sum_delta / len(packages))
     else:
-        print('Max delta: {0}'.format(max_delta))
-        print('Average delta: 0')
+        average_delta = '0'
+    print('Max delta: {0}'.format(max_delta))
+    print('Average delta: {0}'.format(average_delta))
 
 
 @app.command()
