@@ -7,7 +7,7 @@ import toml
 import typer
 from rich import print
 
-from deltaver.config import CliOrPyprojectConfig, Config, ConfigDict, PyprojectTomlConfig
+from deltaver.config import Config
 
 
 class ParsedReqs(Protocol):
@@ -41,7 +41,7 @@ class ExcludedReqs(ParsedReqs):
 
     _origin: ParsedReqs
     _config: Config
-    
+
     def reqs(self) -> list[tuple[str, str]]:
         excluded_packages_set = {package.lower() for package in self._config.value_of('excluded')}
         return [
@@ -77,4 +77,3 @@ class FileNotFoundSafeReqs(ParsedReqs):
         except FileNotFoundError:
             print('Requirements file not found')
             typer.Exit(1)
-            raise Exception

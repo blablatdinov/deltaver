@@ -36,11 +36,22 @@ def latest_requirements_file(tmp_path: Path) -> Path:
     return path
 
 
+@pytest.fixture()
+def _other_dir(tmp_path: Path) -> None:
+    origin_dir = Path.cwd()
+    copyfile('tests/fixtures/pyproject.toml', tmp_path / 'pyproject.toml')
+    copyfile('tests/fixtures/requirements.txt', tmp_path / 'requirements.txt')
+    os.chdir(tmp_path)
+    yield
+    os.chdir(origin_dir)
+
+
 @pytest.mark.usefixtures('_mock_pypi')
 @respx.mock(assert_all_mocked=False)
 def test(runner: CliRunner) -> None:
     got = runner.invoke(app, ['tests/fixtures/requirements.txt'])
 
+    print(got.stdout)
     assert got.exit_code == 0
     assert re.match(
         r'Scanning... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% \d:\d{2}:\d{2}',
@@ -70,7 +81,6 @@ def test(runner: CliRunner) -> None:
 def test_fail_by_average(runner: CliRunner) -> None:
     got = runner.invoke(app, ['tests/fixtures/requirements.txt', '--fail-on-avg', 1])
 
-    print(got.stdout)
     assert got.exit_code == 1
     assert got.stdout.splitlines()[-2:] == ['', 'Error: average delta greater than available']
 
@@ -120,12 +130,9 @@ def test_excluded(runner: CliRunner) -> None:
     ]
 
 
-@pytest.mark.usefixtures('_mock_pypi')
+@pytest.mark.usefixtures('_mock_pypi', '_other_dir')
 @respx.mock(assert_all_mocked=False)
-def test_parse_pyproject_toml(runner, tmp_path):
-    copyfile('tests/fixtures/pyproject.toml', tmp_path / 'pyproject.toml')
-    copyfile('tests/fixtures/requirements.txt', tmp_path / 'requirements.txt')
-    os.chdir(tmp_path)
+def test_parse_pyproject_toml(runner: CliRunner) -> None:
     got = runner.invoke(app, ['requirements.txt'])
 
     assert got.exit_code == 1

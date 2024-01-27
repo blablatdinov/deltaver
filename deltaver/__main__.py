@@ -1,4 +1,3 @@
-import enum
 from pathlib import Path
 from typing import Annotated
 
@@ -17,12 +16,6 @@ app = typer.Typer()
 PackageName: TypeAlias = str
 PackageVersion: TypeAlias = str
 PackageDelta: TypeAlias = str
-
-
-class Formats(enum.Enum):
-
-    freezed = 'freezed'
-    lock = 'lock'
 
 
 def results(
@@ -59,23 +52,24 @@ def main(
     file_format: Annotated[str, typer.Option('--format')] = 'freezed',
     fail_on_average: Annotated[int, typer.Option('--fail-on-avg')] = -1,
     fail_on_max: Annotated[int, typer.Option('--fail-on-max')] = -1,
-    exclude_deps: Annotated[list[str], typer.Option('--exclude')] = [],
+    exclude_deps: Annotated[list[str], typer.Option('--exclude')] = [],  # noqa: B006
 ) -> None:
     res = 0
     max_delta = 0
     packages = []
-    reqs_obj_ctor = {
-        'freezed': FreezedReqs,
-        'lock': PoetryLockReqs,
-    }[file_format]
     config = CliOrPyprojectConfig(
         PyprojectTomlConfig(Path('pyproject.toml')),
         ConfigDict({
+            'file_format': file_format,
             'fail_on_avg': fail_on_average,
             'fail_on_max': fail_on_max,
-            'exclude': exclude_deps,
-        })
+            'excluded': exclude_deps,
+        }),
     )
+    reqs_obj_ctor = {
+        'freezed': FreezedReqs,
+        'lock': PoetryLockReqs,
+    }[config.value_of('file_format')]
     dependencies = FileNotFoundSafeReqs(
         ExcludedReqs(
             reqs_obj_ctor(Path(path_to_requirements_file)),
