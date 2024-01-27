@@ -4,6 +4,10 @@ from typing import Protocol, final
 
 import attrs
 import toml
+import typer
+from rich import print
+
+from deltaver.config import Config
 
 
 class ParsedReqs(Protocol):
@@ -33,6 +37,22 @@ class FreezedReqs(ParsedReqs):
 
 @final
 @attrs.define(frozen=True)
+class ExcludedReqs(ParsedReqs):
+
+    _origin: ParsedReqs
+    _config: Config
+
+    def reqs(self) -> list[tuple[str, str]]:
+        excluded_packages_set = {package.lower() for package in self._config.value_of('excluded')}
+        return [
+            item
+            for item in self._origin.reqs()
+            if item[0].lower() not in excluded_packages_set
+        ]
+
+
+@final
+@attrs.define(frozen=True)
 class PoetryLockReqs(ParsedReqs):
 
     _path: Path
@@ -43,3 +63,17 @@ class PoetryLockReqs(ParsedReqs):
             (dependency['name'], dependency['version'])
             for dependency in data['package']
         ]
+
+
+@final
+@attrs.define(frozen=True)
+class FileNotFoundSafeReqs(ParsedReqs):
+
+    _origin: ParsedReqs
+
+    def reqs(self) -> list[tuple[str, str]]:
+        try:
+            return self._origin.reqs()
+        except FileNotFoundError:
+            print('Requirements file not found')
+            typer.Exit(1)

@@ -1,0 +1,4 @@
+[tool.deltaver]
+fail_on_avg = 6.5
+fail_on_max = 10
+excluded = ['sqlalchemy']
