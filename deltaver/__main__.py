@@ -1,13 +1,14 @@
 from __future__ import annotations
-from pathlib import Path
-from typing_extensions import TypeAlias
+
 import enum
+from pathlib import Path
 
 import typer
 from rich import print
 from rich.console import Console
 from rich.progress import track
 from rich.table import Table
+from typing_extensions import TypeAlias
 
 from deltaver.parsed_requirements import FreezedReqs, PoetryLockReqs
 from deltaver.version_delta import PypiVersionDelta
@@ -36,12 +37,14 @@ def format_output(
     table.add_column('Delta (days)')
     for package, version, delta in packages:
         table.add_row(package, version, delta)
-    console.print(table)
-    print('Max delta: {0}'.format(max_delta))
     if len(packages) > 0:
+        console.print(table)
+        print('Max delta: {0}'.format(max_delta))
         print('Average delta: {0:.2f}'.format(sum_delta / len(packages)))
     else:
+        print('Max delta: {0}'.format(max_delta))
         print('Average delta: 0')
+
 
 @app.command()
 def main(path_to_requirements_file: str, format: Formats = 'freezed') -> None:

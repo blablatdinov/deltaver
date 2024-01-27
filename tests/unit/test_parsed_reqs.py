@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Callable
+
 import pytest
 
 from deltaver.parsed_requirements import FreezedReqs, PoetryLockReqs

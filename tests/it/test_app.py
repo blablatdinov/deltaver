@@ -27,6 +27,13 @@ def _mock_pypi(respx_mock: respx.router.MockRouter, tmp_path: Path) -> None:
         ))
 
 
+@pytest.fixture()
+def latest_requirements_file(tmp_path):
+    path = (tmp_path / 'requirements.txt')
+    path.write_text('httpx==0.26.0')
+    return path
+
+
 @pytest.mark.usefixtures('_mock_pypi')
 @respx.mock(assert_all_mocked=False)
 def test(runner: CliRunner) -> None:
@@ -54,3 +61,12 @@ def test(runner: CliRunner) -> None:
         'Max delta: 366',
         'Average delta: 59.56',
     ]
+
+
+@pytest.mark.usefixtures('_mock_pypi')
+def test_zero_delta(latest_requirements_file, runner):
+    got = runner.invoke(app, [str(latest_requirements_file)])
+
+    assert got.exit_code == 0
+    assert got.stdout.splitlines()[-2] == 'Max delta: 0'
+    assert got.stdout.splitlines()[-1] == 'Average delta: 0'
