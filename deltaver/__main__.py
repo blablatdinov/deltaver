@@ -11,7 +11,7 @@ from rich.table import Table
 from typing_extensions import TypeAlias
 
 from deltaver.parsed_requirements import FreezedReqs, PoetryLockReqs
-from deltaver.version_delta import PypiVersionDelta
+from deltaver.version_delta import PypiVersionDelta, VersionsSortedBySemver
 
 app = typer.Typer()
 PackageName: TypeAlias = str
@@ -56,7 +56,7 @@ def main(path_to_requirements_file: str, format: Formats = 'freezed') -> None:
         'lock': PoetryLockReqs,
     }[format.value]
     for package, version in track(reqs_obj_ctor(Path(path_to_requirements_file)).reqs(), description='Scanning...'):
-        delta = PypiVersionDelta(package, version).days()
+        delta = PypiVersionDelta(VersionsSortedBySemver(package), version).days()
         if delta > 0:
             packages.append(
                 (package, version, str(delta)),
