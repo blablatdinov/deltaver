@@ -9,7 +9,7 @@ authors = ["Almaz Ilaletdinov <a.ilaletdinov@yandex.ru>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 attrs = "^23.0"
 httpx = "^0.25"
 packaging = "^23.2"
@@ -25,7 +25,8 @@ time-machine = "2.13.0"
 isort = "5.13.2"
 pytest-cov = "4.1.0"
 ruff = "0.1.8"
-mypy = "1.7.1"
+mypy = "1.8.0"
+types-toml = "^0.10.8.7"
 
 [tool.poetry.scripts]
 deltaver = "deltaver.__main__:app"
@@ -45,7 +46,7 @@ fixable = [
   "F401",   # Unused import
 ]
 line-length = 120
-target-version = "py38"
+target-version = "py39"
 ignore = [
   "D",       # TODO: write docstrings
   "ANN101",  # Missing type annotation for `self` in method

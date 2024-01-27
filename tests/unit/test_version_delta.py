@@ -5,7 +5,7 @@ from httpx import Response
 from respx.router import MockRouter
 from time_machine import TimeMachineFixture
 
-from deltaver.version_delta import PypiVersionDelta, VersionNotFoundError
+from deltaver.version_delta import PypiVersionDelta, VersionNotFoundError, VersionsSortedByDate, VersionsSortedBySemver
 
 
 @pytest.fixture()
@@ -37,25 +37,31 @@ def test_previous(time_machine: TimeMachineFixture) -> None:
     # 0.25.1 was released 2023-11-03
     # 0.25.2 was released 2023-11-24
     time_machine.move_to('2023-12-20')
-    assert PypiVersionDelta('httpx', '0.25.1').days() == 25
+    assert PypiVersionDelta(VersionsSortedBySemver('httpx'), '0.25.1').days() == 25
 
 
 @pytest.mark.usefixtures('_mock_pypi')
 def test_last_version() -> None:
-    assert PypiVersionDelta('httpx', '0.25.2').days() == 0
+    assert PypiVersionDelta(VersionsSortedBySemver('httpx'), '0.25.2').days() == 0
 
 
 @pytest.mark.usefixtures('_mock_pypi')
 def test_fake_version() -> None:
     with pytest.raises(VersionNotFoundError):
-        PypiVersionDelta('httpx', '0.50.0').days()
+        PypiVersionDelta(VersionsSortedBySemver('httpx'), '0.50.0').days()
 
 
 @pytest.mark.usefixtures('_mock_eljson')
 def test_eljson() -> None:
-    assert PypiVersionDelta('eljson', '0.0.1a1').days() == 0
+    assert PypiVersionDelta(VersionsSortedBySemver('eljson'), '0.0.1a1').days() == 0
 
 
 @pytest.mark.usefixtures('_mock_gitdb')
 def test_gitdb() -> None:
-    assert PypiVersionDelta('gitdb', '4.0.9').days() == 429
+    assert PypiVersionDelta(VersionsSortedBySemver('gitdb'), '4.0.9').days() == 429
+
+
+@pytest.mark.usefixtures('_mock_pypi')
+def test_date_delta(time_machine: TimeMachineFixture) -> None:
+    time_machine.move_to('2023-12-20')
+    assert PypiVersionDelta(VersionsSortedByDate('httpx'), '0.25.1').days() == 25

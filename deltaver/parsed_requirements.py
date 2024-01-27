@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import re
 from pathlib import Path
 from typing import Protocol, final
@@ -41,7 +39,7 @@ class PoetryLockReqs(ParsedReqs):
 
     def reqs(self) -> list[tuple[str, str]]:
         data = toml.loads(self._path.read_text())
-        res = []
-        for dependency in data['package']:
-            res.append((dependency['name'], dependency['version']))
-        return res
+        return [
+            (dependency['name'], dependency['version'])
+            for dependency in data['package']
+        ]

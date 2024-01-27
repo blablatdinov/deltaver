@@ -28,7 +28,7 @@ def _mock_pypi(respx_mock: respx.router.MockRouter, tmp_path: Path) -> None:
 
 
 @pytest.fixture()
-def latest_requirements_file(tmp_path):
+def latest_requirements_file(tmp_path: Path) -> Path:
     path = (tmp_path / 'requirements.txt')
     path.write_text('httpx==0.26.0')
     return path
@@ -64,7 +64,25 @@ def test(runner: CliRunner) -> None:
 
 
 @pytest.mark.usefixtures('_mock_pypi')
-def test_zero_delta(latest_requirements_file, runner):
+@respx.mock(assert_all_mocked=False)
+def test_fail_by_average(runner: CliRunner) -> None:
+    got = runner.invoke(app, ['tests/fixtures/requirements.txt', '--fail-on-avg', 1])
+
+    assert got.exit_code == 1
+    assert got.stdout.splitlines()[-2:] == ['', 'Error: average delta greater than available']
+
+
+@pytest.mark.usefixtures('_mock_pypi')
+@respx.mock(assert_all_mocked=False)
+def test_fail_by_max(runner: CliRunner) -> None:
+    got = runner.invoke(app, ['tests/fixtures/requirements.txt', '--fail-on-max', 1])
+
+    assert got.exit_code == 1
+    assert got.stdout.splitlines()[-2:] == ['', 'Error: max delta greater than available']
+
+
+@pytest.mark.usefixtures('_mock_pypi')
+def test_zero_delta(latest_requirements_file: Path, runner: CliRunner) -> None:
     got = runner.invoke(app, [str(latest_requirements_file)])
 
     assert got.exit_code == 0
