@@ -62,6 +62,6 @@ def test_gitdb() -> None:
 
 
 @pytest.mark.usefixtures('_mock_pypi')
-def test_date_delta(time_machine) -> None:
+def test_date_delta(time_machine: TimeMachineFixture) -> None:
     time_machine.move_to('2023-12-20')
     assert PypiVersionDelta(VersionsSortedByDate('httpx'), '0.25.1').days() == 25

@@ -1,11 +1,21 @@
 import datetime
 from contextlib import suppress
 from itertools import chain
-from typing import Protocol, final
+from typing import Protocol, final, Iterable, cast
 
 import attrs
 import httpx
 from packaging import version
+from typing_extensions import TypeAlias, TypedDict
+
+
+class VersionInfo(TypedDict):
+
+    upload_time: str
+
+
+VersionNumber: TypeAlias = str
+SortedVersionsList: TypeAlias = list[dict[VersionNumber, list[VersionInfo]]]
 
 
 @final
@@ -20,7 +30,7 @@ class VersionDelta(Protocol):
 
 class SortedVersions(Protocol):
 
-    def fetch(self): ...
+    def fetch(self) -> SortedVersionsList: ...
 
 
 @final
@@ -29,7 +39,7 @@ class VersionsSortedByDate(SortedVersions):
 
     _package_name: str
 
-    def fetch(self):
+    def fetch(self) -> SortedVersionsList:
         response = httpx.get('https://pypi.org/pypi/{0}/json'.format(self._package_name))
         response.raise_for_status()
         versions = list(response.json()['releases'].items())
@@ -40,20 +50,20 @@ class VersionsSortedByDate(SortedVersions):
                     correct_versions.append({
                         version_number: release_info,
                     })
-        def _sort_key(release_dict):
+        def _sort_key(release_dict: VersionInfo) -> datetime.date:
             times = []
             if not release_dict or not next(iter(list(release_dict.values()))):
                 return datetime.date(1, 1, 1)
-            for dict_ in chain.from_iterable(release_dict.values()):
-                times.append(
-                    datetime.datetime.strptime(
-                        dict_['upload_time'], '%Y-%m-%dT%H:%M:%S',
-                    ).astimezone(datetime.timezone.utc).date()
-                )
+            times = [  # type: ignore[var-annotated]
+                datetime.datetime.strptime(
+                    dict_['upload_time'], '%Y-%m-%dT%H:%M:%S',
+                ).astimezone(datetime.timezone.utc).date()
+                for dict_ in chain.from_iterable(release_dict.values())  # type: ignore[arg-type]
+            ]
             return next(iter(sorted(times)))
         return sorted(
             correct_versions,
-            key=lambda release_dict: _sort_key(release_dict),
+            key=_sort_key,  # type: ignore[arg-type]
         )
 
 @final
@@ -62,7 +72,7 @@ class VersionsSortedBySemver(SortedVersions):
 
     _package_name: str
 
-    def fetch(self):
+    def fetch(self) -> SortedVersionsList:
         response = httpx.get('https://pypi.org/pypi/{0}/json'.format(self._package_name))
         response.raise_for_status()
         versions = list(response.json()['releases'].items())

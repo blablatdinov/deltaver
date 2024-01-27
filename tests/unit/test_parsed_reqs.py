@@ -49,7 +49,7 @@ def test_not_semvar(requirements_file: Callable[[str], Path], text: str) -> None
     assert got == []
 
 
-def test_poetry_lock():
+def test_poetry_lock() -> None:
     got = PoetryLockReqs(
         Path('tests/fixtures/poetry_lock_example.lock'),
     ).reqs()

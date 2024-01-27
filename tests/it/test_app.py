@@ -28,7 +28,7 @@ def _mock_pypi(respx_mock: respx.router.MockRouter, tmp_path: Path) -> None:
 
 
 @pytest.fixture()
-def latest_requirements_file(tmp_path):
+def latest_requirements_file(tmp_path: Path) -> Path:
     path = (tmp_path / 'requirements.txt')
     path.write_text('httpx==0.26.0')
     return path
@@ -39,7 +39,6 @@ def latest_requirements_file(tmp_path):
 def test(runner: CliRunner) -> None:
     got = runner.invoke(app, ['tests/fixtures/requirements.txt'])
 
-    print(got.stdout)
     assert got.exit_code == 0
     assert re.match(
         r'Scanning... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% \d:\d{2}:\d{2}',
@@ -65,7 +64,7 @@ def test(runner: CliRunner) -> None:
 
 
 @pytest.mark.usefixtures('_mock_pypi')
-def test_zero_delta(latest_requirements_file, runner):
+def test_zero_delta(latest_requirements_file: Path, runner: CliRunner) -> None:
     got = runner.invoke(app, [str(latest_requirements_file)])
 
     assert got.exit_code == 0
