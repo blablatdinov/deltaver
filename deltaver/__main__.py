@@ -24,11 +24,11 @@ class Formats(enum.Enum):
     lock = 'lock'
 
 
-def format_output(
+def results(
     packages: list[tuple[PackageName, PackageVersion, PackageDelta]],
     sum_delta: int,
     max_delta: int,
-) -> None:
+) -> tuple[int, float]:
     console = Console()
     table = Table(show_header=True, header_style='bold magenta')
     table.add_column('Package')
@@ -43,12 +43,15 @@ def format_output(
         average_delta = '0'
     print('Max delta: {0}'.format(max_delta))
     print('Average delta: {0}'.format(average_delta))
+    return max_delta, float(average_delta)
 
 
 @app.command()
 def main(
     path_to_requirements_file: str,
     file_format: Annotated[str, typer.Option('--format')] = 'freezed',
+    fail_on_average: Annotated[int, typer.Option('--fail-on-avg')] = -1,
+    fail_on_max: Annotated[int, typer.Option('--fail-on-max')] = -1,
 ) -> None:
     res = 0
     max_delta = 0
@@ -66,7 +69,13 @@ def main(
         res += delta
         max_delta = max(max_delta, delta)
     packages = sorted(packages, key=lambda x: int(x[2]), reverse=True)
-    format_output(packages, res, max_delta)
+    max_delta, average_delta = results(packages, res, max_delta)
+    if fail_on_average > -1 and average_delta >= fail_on_average:
+        print('\n[red]Error: average delta greater than available[/red]')
+        raise typer.Exit(code=1)
+    if fail_on_max > -1 and max_delta >= fail_on_max:
+        print('\n[red]Error: max delta greater than available[/red]')
+        raise typer.Exit(code=1)
 
 
 if __name__ == '__main__':
