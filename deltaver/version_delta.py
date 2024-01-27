@@ -27,10 +27,7 @@ class PypiVersionDelta(VersionDelta):
     def days(self) -> int:
         response = httpx.get('https://pypi.org/pypi/{0}/json'.format(self._package_name))
         response.raise_for_status()
-        versions = [
-            (version_number, release_info)
-            for version_number, release_info in response.json()['releases'].items()
-        ]
+        versions = list(response.json()['releases'].items())
         correct_versions = []
         for version_number, release_info in versions:
             with suppress(version.InvalidVersion):
@@ -49,7 +46,8 @@ class PypiVersionDelta(VersionDelta):
         start = None
         next_available_release = None
         flag = False
-        for release_number in response.json()['releases']:
+        for release_info in available_release_versions:
+            release_number = next(iter(release_info.keys()))
             if flag:
                 next_available_release = release_number
                 break

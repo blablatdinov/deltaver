@@ -1,0 +1,31 @@
+from __future__ import annotations
+import re
+from pathlib import Path
+from typing import Protocol, final
+
+import attrs
+
+
+class ParsedReqs(Protocol):
+
+    def reqs(self) -> list[tuple[str, str]]: ...
+
+
+@final
+@attrs.define(frozen=True)
+class FreezedReqs(ParsedReqs):
+
+    _path: Path
+
+    def reqs(self) -> list[tuple[str, str]]:
+        res = []
+        lines = self._path.read_text().strip().splitlines()
+        expected_splitted_line_len = 2
+        for line in lines:
+            splitted_line = line.split(';')[0].split('==')
+            if len(splitted_line) != expected_splitted_line_len:
+                continue
+            package, version = splitted_line
+            package = re.sub(r'\[.*?\]', '', package)
+            res.append((package, version.strip()))
+        return res

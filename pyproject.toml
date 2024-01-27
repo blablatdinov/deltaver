@@ -15,6 +15,7 @@ httpx = "^0.25"
 packaging = "^23.2"
 typer = "^0.9"
 rich = "^13.0"
+typing-extensions = "^4.9.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "7.4.3"
@@ -68,6 +69,7 @@ ignore = [
   "UP004",   # Class `PrayerReaction` inherits from `object`
   "TD",      # "todo" formats
   "PLR630",  # We disrespect staticmethods
+  "TCH003",  # Move standard library import `...` into a type-checking block
 ]
 
 [tool.ruff.flake8-quotes]
