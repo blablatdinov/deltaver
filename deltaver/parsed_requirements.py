@@ -1,4 +1,5 @@
 from __future__ import annotations
+import toml
 import re
 from pathlib import Path
 from typing import Protocol, final
@@ -28,4 +29,20 @@ class FreezedReqs(ParsedReqs):
             package, version = splitted_line
             package = re.sub(r'\[.*?\]', '', package)
             res.append((package, version.strip()))
+        return res
+
+
+@final
+@attrs.define(frozen=True)
+class PoetryLockReqs(ParsedReqs):
+
+    _path: Path
+
+    def reqs(self) -> list[tuple[str, str]]:
+        # from pprint import pprint
+        # pprint()
+        data = toml.loads(self._path.read_text())
+        res = []
+        for dependency in data['package']:
+            res.append((dependency['name'], dependency['version']))
         return res

@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Callable
 import pytest
 
-from deltaver.parsed_requirements import FreezedReqs
+from deltaver.parsed_requirements import FreezedReqs, PoetryLockReqs
 
 
 @pytest.fixture()
@@ -46,3 +46,24 @@ def test_not_semvar(requirements_file: Callable[[str], Path], text: str) -> None
     ).reqs()
 
     assert got == []
+
+
+def test_poetry_lock():
+    got = PoetryLockReqs(
+        Path('tests/fixtures/poetry_lock_example.lock'),
+    ).reqs()
+
+    assert got == [
+        ('anyio', '4.2.0'),
+        ('certifi', '2023.11.17'),
+        ('colorama', '0.4.6'),
+        ('h11', '0.14.0'),
+        ('httpcore', '1.0.2'),
+        ('httpx', '0.26.0'),
+        ('idna', '3.6'),
+        ('iniconfig', '2.0.0'),
+        ('packaging', '23.2'),
+        ('pluggy', '1.3.0'),
+        ('pytest', '7.4.4'),
+        ('sniffio', '1.3.0'),
+    ]
