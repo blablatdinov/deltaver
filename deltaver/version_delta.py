@@ -79,7 +79,8 @@ class VersionsSortedBySemver(SortedVersions):
         correct_versions = []
         for version_number, release_info in versions:
             with suppress(version.InvalidVersion):
-                if not version.parse(version_number).pre:
+                v = version.parse(version_number)
+                if not v.pre and not v.dev:
                     correct_versions.append({
                         version_number: release_info,
                     })

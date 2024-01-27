@@ -32,6 +32,14 @@ def _mock_gitdb(respx_mock: MockRouter) -> None:
     ))
 
 
+@pytest.fixture()
+def _mock_cryptography(respx_mock: MockRouter) -> None:
+    respx_mock.get('https://pypi.org/pypi/cryptography/json').mock(return_value=Response(
+        200,
+        text=Path('tests/fixtures/cryptography_response.json').read_text(),
+    ))
+
+
 @pytest.mark.usefixtures('_mock_pypi')
 def test_previous(time_machine: TimeMachineFixture) -> None:
     # 0.25.1 was released 2023-11-03
@@ -65,3 +73,9 @@ def test_gitdb() -> None:
 def test_date_delta(time_machine: TimeMachineFixture) -> None:
     time_machine.move_to('2023-12-20')
     assert PypiVersionDelta(VersionsSortedByDate('httpx'), '0.25.1').days() == 25
+
+
+@pytest.mark.usefixtures('_mock_cryptography')
+def test_cryptography(time_machine: TimeMachineFixture) -> None:
+    time_machine.move_to('2024-01-28')
+    assert PypiVersionDelta(VersionsSortedBySemver('cryptography'), '42.0.1').days() == 0

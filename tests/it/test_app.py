@@ -51,7 +51,6 @@ def _other_dir(tmp_path: Path) -> None:
 def test(runner: CliRunner) -> None:
     got = runner.invoke(app, ['tests/fixtures/requirements.txt'])
 
-    print(got.stdout)
     assert got.exit_code == 0
     assert re.match(
         r'Scanning... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% \d:\d{2}:\d{2}',
