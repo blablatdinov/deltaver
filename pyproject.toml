@@ -11,7 +11,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.9"
 attrs = "^23.0"
-httpx = "^0.25"
+httpx = "^0"
 packaging = "^23.2"
 typer = "^0.9"
 rich = "^13.0"
