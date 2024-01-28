@@ -45,28 +45,29 @@ def test_previous(time_machine: TimeMachineFixture) -> None:
     # 0.25.1 was released 2023-11-03
     # 0.25.2 was released 2023-11-24
     time_machine.move_to('2023-12-20')
-    assert PypiVersionDelta(VersionsSortedBySemver('httpx'), '0.25.1').days() == 25
+    assert PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'httpx'), '0.25.1').days() == 25
 
 
 @pytest.mark.usefixtures('_mock_pypi')
 def test_last_version() -> None:
-    assert PypiVersionDelta(VersionsSortedBySemver('httpx'), '0.25.2').days() == 0
+    assert PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'httpx'), '0.25.2').days() == 0
 
 
 @pytest.mark.usefixtures('_mock_pypi')
 def test_fake_version() -> None:
     with pytest.raises(VersionNotFoundError):
-        PypiVersionDelta(VersionsSortedBySemver('httpx'), '0.50.0').days()
+        PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'httpx'), '0.50.0').days()
 
 
 @pytest.mark.usefixtures('_mock_eljson')
 def test_eljson() -> None:
-    assert PypiVersionDelta(VersionsSortedBySemver('eljson'), '0.0.1a1').days() == 0
+    assert PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'eljson'), '0.0.1a1').days() == 0
 
 
 @pytest.mark.usefixtures('_mock_gitdb')
-def test_gitdb() -> None:
-    assert PypiVersionDelta(VersionsSortedBySemver('gitdb'), '4.0.9').days() == 429
+def test_gitdb(time_machine: TimeMachineFixture) -> None:
+    time_machine.move_to('2024-01-28')
+    assert PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'gitdb'), '4.0.9').days() == 429
 
 
 @pytest.mark.usefixtures('_mock_pypi')
@@ -78,4 +79,4 @@ def test_date_delta(time_machine: TimeMachineFixture) -> None:
 @pytest.mark.usefixtures('_mock_cryptography')
 def test_cryptography(time_machine: TimeMachineFixture) -> None:
     time_machine.move_to('2024-01-28')
-    assert PypiVersionDelta(VersionsSortedBySemver('cryptography'), '42.0.1').days() == 0
+    assert PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'cryptography'), '42.0.1').days() == 0
