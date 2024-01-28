@@ -47,11 +47,12 @@ def results(
 
 
 @app.command()
-def main(
+def main(  # noqa: PLR0913
     path_to_requirements_file: str,
     file_format: Annotated[str, typer.Option('--format')] = 'freezed',
     fail_on_average: Annotated[int, typer.Option('--fail-on-avg')] = -1,
     fail_on_max: Annotated[int, typer.Option('--fail-on-max')] = -1,
+    artifactory_domain: Annotated[str, typer.Option('--artifactory-domain')] = 'https://pypi.org',
     exclude_deps: Annotated[list[str], typer.Option('--exclude')] = [],  # noqa: B006
 ) -> None:
     res = 0
@@ -63,6 +64,7 @@ def main(
             'file_format': file_format,
             'fail_on_avg': fail_on_average,
             'fail_on_max': fail_on_max,
+            'artifactory_domain': artifactory_domain,
             'excluded': exclude_deps,
         }),
     )
@@ -77,7 +79,13 @@ def main(
         ),
     ).reqs()
     for package, version in track(dependencies, description='Scanning...'):
-        delta = PypiVersionDelta(VersionsSortedBySemver(package), version).days()
+        delta = PypiVersionDelta(
+            VersionsSortedBySemver(
+                config.value_of('artifactory_domain'),
+                package,
+            ),
+            version,
+        ).days()
         if delta > 0:
             packages.append(
                 (package, version, str(delta)),

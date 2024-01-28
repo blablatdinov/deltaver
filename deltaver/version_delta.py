@@ -70,10 +70,13 @@ class VersionsSortedByDate(SortedVersions):
 @attrs.define(frozen=True)
 class VersionsSortedBySemver(SortedVersions):
 
+    _artifactory_domain: str
     _package_name: str
 
     def fetch(self) -> SortedVersionsList:
-        response = httpx.get('https://pypi.org/pypi/{0}/json'.format(self._package_name))
+        response = httpx.get(
+            httpx.URL(self._artifactory_domain).join('pypi/{0}/json'.format(self._package_name)),
+        )
         response.raise_for_status()
         versions = list(response.json()['releases'].items())
         correct_versions = []

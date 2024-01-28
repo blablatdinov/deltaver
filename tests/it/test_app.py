@@ -1,3 +1,4 @@
+import datetime
 import os
 import re
 import zipfile
@@ -8,6 +9,7 @@ import pytest
 import respx
 from httpx import Response
 from typer.testing import CliRunner
+from time_machine import TimeMachineFixture
 
 from deltaver.__main__ import app
 
@@ -48,7 +50,8 @@ def _other_dir(tmp_path: Path) -> None:
 
 @pytest.mark.usefixtures('_mock_pypi')
 @respx.mock(assert_all_mocked=False)
-def test(runner: CliRunner) -> None:
+def test(runner: CliRunner, time_machine: TimeMachineFixture) -> None:
+    time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
     got = runner.invoke(app, ['tests/fixtures/requirements.txt'])
 
     assert got.exit_code == 0
@@ -65,13 +68,13 @@ def test(runner: CliRunner) -> None:
         '│ jsonschema   │ 4.21.0  │ 8            │',
         '│ MarkupSafe   │ 2.1.3   │ 8            │',
         '│ diff_cover   │ 8.0.2   │ 7            │',
-        '│ cryptography │ 41.0.7  │ 5            │',
         '│ bandit       │ 1.7.6   │ 4            │',
+        '│ cryptography │ 41.0.7  │ 4            │',
         '│ pluggy       │ 1.3.0   │ 3            │',
         '│ refurb       │ 1.27.0  │ 3            │',
         '└──────────────┴─────────┴──────────────┘',
         'Max delta: 366',
-        'Average delta: 59.56',
+        'Average delta: 59.44',
     ]
 
 
@@ -104,7 +107,8 @@ def test_zero_delta(latest_requirements_file: Path, runner: CliRunner) -> None:
 
 @pytest.mark.usefixtures('_mock_pypi')
 @respx.mock(assert_all_mocked=False)
-def test_excluded(runner: CliRunner) -> None:
+def test_excluded(runner: CliRunner, time_machine: TimeMachineFixture) -> None:
+    time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
     got = runner.invoke(app, ['tests/fixtures/requirements.txt', '--exclude', 'sqlalchemy', '--exclude', 'bandit'])
 
     assert got.exit_code == 0
@@ -120,18 +124,19 @@ def test_excluded(runner: CliRunner) -> None:
         '│ jsonschema   │ 4.21.0  │ 8            │',
         '│ MarkupSafe   │ 2.1.3   │ 8            │',
         '│ diff_cover   │ 8.0.2   │ 7            │',
-        '│ cryptography │ 41.0.7  │ 5            │',
+        '│ cryptography │ 41.0.7  │ 4            │',
         '│ pluggy       │ 1.3.0   │ 3            │',
         '│ refurb       │ 1.27.0  │ 3            │',
         '└──────────────┴─────────┴──────────────┘',
         'Max delta: 132',
-        'Average delta: 23.71',
+        'Average delta: 23.57',
     ]
 
 
 @pytest.mark.usefixtures('_mock_pypi', '_other_dir')
 @respx.mock(assert_all_mocked=False)
-def test_parse_pyproject_toml(runner: CliRunner) -> None:
+def test_parse_pyproject_toml(runner: CliRunner, time_machine: TimeMachineFixture) -> None:
+    time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
     got = runner.invoke(app, ['requirements.txt'])
 
     assert got.exit_code == 1
@@ -143,13 +148,13 @@ def test_parse_pyproject_toml(runner: CliRunner) -> None:
         '│ jsonschema   │ 4.21.0  │ 8            │',
         '│ MarkupSafe   │ 2.1.3   │ 8            │',
         '│ diff_cover   │ 8.0.2   │ 7            │',
-        '│ cryptography │ 41.0.7  │ 5            │',
         '│ bandit       │ 1.7.6   │ 4            │',
+        '│ cryptography │ 41.0.7  │ 4            │',
         '│ pluggy       │ 1.3.0   │ 3            │',
         '│ refurb       │ 1.27.0  │ 3            │',
         '└──────────────┴─────────┴──────────────┘',
         'Max delta: 132',
-        'Average delta: 21.25',
+        'Average delta: 21.12',
         '',
         'Error: average delta greater than available',
     ]

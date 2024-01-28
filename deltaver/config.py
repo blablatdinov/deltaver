@@ -24,6 +24,7 @@ class ConfigDict(TypedDict):
     file_format: Formats
     fail_on_avg: int
     fail_on_max: int
+    artifactory_domain: str
     excluded: list[str]
 
 
