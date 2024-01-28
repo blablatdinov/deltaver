@@ -1,3 +1,4 @@
+import datetime
 import os
 import re
 import zipfile
@@ -50,7 +51,7 @@ def _other_dir(tmp_path: Path) -> None:
 @pytest.mark.usefixtures('_mock_pypi')
 @respx.mock(assert_all_mocked=False)
 def test(runner: CliRunner, time_machine: TimeMachineFixture) -> None:
-    time_machine.move_to('2024-01-28')
+    time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
     got = runner.invoke(app, ['tests/fixtures/requirements.txt'])
 
     assert got.exit_code == 0
@@ -107,7 +108,7 @@ def test_zero_delta(latest_requirements_file: Path, runner: CliRunner) -> None:
 @pytest.mark.usefixtures('_mock_pypi')
 @respx.mock(assert_all_mocked=False)
 def test_excluded(runner: CliRunner, time_machine: TimeMachineFixture) -> None:
-    time_machine.move_to('2024-01-28')
+    time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
     got = runner.invoke(app, ['tests/fixtures/requirements.txt', '--exclude', 'sqlalchemy', '--exclude', 'bandit'])
 
     assert got.exit_code == 0
@@ -135,7 +136,7 @@ def test_excluded(runner: CliRunner, time_machine: TimeMachineFixture) -> None:
 @pytest.mark.usefixtures('_mock_pypi', '_other_dir')
 @respx.mock(assert_all_mocked=False)
 def test_parse_pyproject_toml(runner: CliRunner, time_machine: TimeMachineFixture) -> None:
-    time_machine.move_to('2024-01-28')
+    time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
     got = runner.invoke(app, ['requirements.txt'])
 
     assert got.exit_code == 1

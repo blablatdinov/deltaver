@@ -1,3 +1,4 @@
+import datetime
 from pathlib import Path
 
 import pytest
@@ -44,7 +45,7 @@ def _mock_cryptography(respx_mock: MockRouter) -> None:
 def test_previous(time_machine: TimeMachineFixture) -> None:
     # 0.25.1 was released 2023-11-03
     # 0.25.2 was released 2023-11-24
-    time_machine.move_to('2023-12-20')
+    time_machine.move_to(datetime.datetime(2023, 12, 19, tzinfo=datetime.timezone.utc))
     assert PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'httpx'), '0.25.1').days() == 25
 
 
@@ -66,17 +67,17 @@ def test_eljson() -> None:
 
 @pytest.mark.usefixtures('_mock_gitdb')
 def test_gitdb(time_machine: TimeMachineFixture) -> None:
-    time_machine.move_to('2024-01-28')
+    time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
     assert PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'gitdb'), '4.0.9').days() == 429
 
 
 @pytest.mark.usefixtures('_mock_pypi')
 def test_date_delta(time_machine: TimeMachineFixture) -> None:
-    time_machine.move_to('2023-12-20')
+    time_machine.move_to(datetime.datetime(2023, 12, 19, tzinfo=datetime.timezone.utc))
     assert PypiVersionDelta(VersionsSortedByDate('httpx'), '0.25.1').days() == 25
 
 
 @pytest.mark.usefixtures('_mock_cryptography')
 def test_cryptography(time_machine: TimeMachineFixture) -> None:
-    time_machine.move_to('2024-01-28')
+    time_machine.move_to(datetime.datetime(2024, 1, 28, tzinfo=datetime.timezone.utc))
     assert PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'cryptography'), '42.0.1').days() == 0
