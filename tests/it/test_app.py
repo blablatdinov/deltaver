@@ -68,13 +68,13 @@ def test(runner: CliRunner, time_machine: TimeMachineFixture) -> None:
         '│ jsonschema   │ 4.21.0  │ 8            │',
         '│ MarkupSafe   │ 2.1.3   │ 8            │',
         '│ diff_cover   │ 8.0.2   │ 7            │',
-        '│ cryptography │ 41.0.7  │ 5            │',
         '│ bandit       │ 1.7.6   │ 4            │',
+        '│ cryptography │ 41.0.7  │ 4            │',
         '│ pluggy       │ 1.3.0   │ 3            │',
         '│ refurb       │ 1.27.0  │ 3            │',
         '└──────────────┴─────────┴──────────────┘',
         'Max delta: 366',
-        'Average delta: 59.56',
+        'Average delta: 59.44',
     ]
 
 
@@ -124,12 +124,12 @@ def test_excluded(runner: CliRunner, time_machine: TimeMachineFixture) -> None:
         '│ jsonschema   │ 4.21.0  │ 8            │',
         '│ MarkupSafe   │ 2.1.3   │ 8            │',
         '│ diff_cover   │ 8.0.2   │ 7            │',
-        '│ cryptography │ 41.0.7  │ 5            │',
+        '│ cryptography │ 41.0.7  │ 4            │',
         '│ pluggy       │ 1.3.0   │ 3            │',
         '│ refurb       │ 1.27.0  │ 3            │',
         '└──────────────┴─────────┴──────────────┘',
         'Max delta: 132',
-        'Average delta: 23.71',
+        'Average delta: 23.57',
     ]
 
 
@@ -148,13 +148,13 @@ def test_parse_pyproject_toml(runner: CliRunner, time_machine: TimeMachineFixtur
         '│ jsonschema   │ 4.21.0  │ 8            │',
         '│ MarkupSafe   │ 2.1.3   │ 8            │',
         '│ diff_cover   │ 8.0.2   │ 7            │',
-        '│ cryptography │ 41.0.7  │ 5            │',
         '│ bandit       │ 1.7.6   │ 4            │',
+        '│ cryptography │ 41.0.7  │ 4            │',
         '│ pluggy       │ 1.3.0   │ 3            │',
         '│ refurb       │ 1.27.0  │ 3            │',
         '└──────────────┴─────────┴──────────────┘',
         'Max delta: 132',
-        'Average delta: 21.25',
+        'Average delta: 21.12',
         '',
         'Error: average delta greater than available',
     ]
