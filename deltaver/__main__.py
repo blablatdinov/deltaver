@@ -15,7 +15,7 @@ from deltaver.version_delta import PypiVersionDelta, VersionsSortedBySemver
 app = typer.Typer()
 PackageName: TypeAlias = str
 PackageVersion: TypeAlias = str
-PackageDelta: TypeAlias = str
+PackageDelta: TypeAlias = float
 
 
 def results(
@@ -30,7 +30,8 @@ def results(
     table.add_column('Version')
     table.add_column('Delta (days)')
     for package, version, delta in packages:
-        table.add_row(package, version, delta)
+        if delta != 0:
+            table.add_row(package, version, str(delta))
     if len(packages) > 0:
         console.print(table)
         average_delta = '{0:.2f}'.format(sum_delta / len(packages))
@@ -86,10 +87,9 @@ def main(  # noqa: PLR0913
             ),
             version,
         ).days()
-        if delta > 0:
-            packages.append(
-                (package, version, str(delta)),
-            )
+        packages.append(
+            (package, version, delta),
+        )
         res += delta
         max_delta = max(max_delta, delta)
     packages = sorted(packages, key=lambda x: int(x[2]), reverse=True)

@@ -8,8 +8,8 @@ from shutil import copyfile
 import pytest
 import respx
 from httpx import Response
-from typer.testing import CliRunner
 from time_machine import TimeMachineFixture
+from typer.testing import CliRunner
 
 from deltaver.__main__ import app
 
@@ -74,7 +74,7 @@ def test(runner: CliRunner, time_machine: TimeMachineFixture) -> None:
         '│ refurb       │ 1.27.0  │ 3            │',
         '└──────────────┴─────────┴──────────────┘',
         'Max delta: 366',
-        'Average delta: 59.44',
+        'Average delta: 3.93',
     ]
 
 
@@ -102,7 +102,7 @@ def test_zero_delta(latest_requirements_file: Path, runner: CliRunner) -> None:
 
     assert got.exit_code == 0
     assert got.stdout.splitlines()[-2] == 'Max delta: 0'
-    assert got.stdout.splitlines()[-1] == 'Average delta: 0'
+    assert got.stdout.splitlines()[-1] == 'Average delta: 0.00'
 
 
 @pytest.mark.usefixtures('_mock_pypi')
@@ -129,7 +129,7 @@ def test_excluded(runner: CliRunner, time_machine: TimeMachineFixture) -> None:
         '│ refurb       │ 1.27.0  │ 3            │',
         '└──────────────┴─────────┴──────────────┘',
         'Max delta: 132',
-        'Average delta: 23.57',
+        'Average delta: 1.23',
     ]
 
 
@@ -154,7 +154,7 @@ def test_parse_pyproject_toml(runner: CliRunner, time_machine: TimeMachineFixtur
         '│ refurb       │ 1.27.0  │ 3            │',
         '└──────────────┴─────────┴──────────────┘',
         'Max delta: 132',
-        'Average delta: 21.12',
+        'Average delta: 1.25',
         '',
         'Error: average delta greater than available',
     ]
