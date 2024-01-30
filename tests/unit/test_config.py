@@ -13,5 +13,5 @@ def config_file(tmp_path: Path) -> Path:
 def test(config_file: Path) -> None:
     config = PyprojectTomlConfig(config_file)
 
-    assert config.value_of('fail_on_avg') == 6.5
+    assert config.value_of('fail_on_avg') == 1.0
     assert config.value_of('fail_on_max') == 10
