@@ -24,7 +24,7 @@ class FkVersionDelta(VersionDelta):
 
     _value: list
 
-    def fetch(self):
+    def fetch(self) -> list:
         return self._value
 
 
@@ -106,12 +106,12 @@ def test_tail_loss_by_date() -> None:
     got = TailLossDateVersions(
         FkVersionDelta([
             {
-                "0.1.0": [
+                '0.1.0': [
                     {'upload_time': '2019-07-19T14:23:35'},
                 ],
             },
             {
-                "0.2.0": [
+                '0.2.0': [
                     {'upload_time': '2020-07-19T14:23:35'},
                 ],
             },
@@ -126,7 +126,7 @@ def test_tail_loss_by_date_null_version_info() -> None:
     TailLossDateVersions(
         FkVersionDelta([
             {
-                "0.0.1": [],
+                '0.0.1': [],
             },
         ]),
         datetime.date(2020, 5, 1),

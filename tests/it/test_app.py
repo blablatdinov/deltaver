@@ -54,7 +54,7 @@ def test(runner: CliRunner, time_machine: TimeMachineFixture) -> None:
     time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
     got = runner.invoke(app, ['tests/fixtures/requirements.txt'])
 
-    assert got.exit_code == 0
+    assert got.exit_code == 0, got.stdout
     assert re.match(
         r'Scanning... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% \d:\d{2}:\d{2}',
         got.stdout.splitlines()[0],
@@ -83,7 +83,7 @@ def test(runner: CliRunner, time_machine: TimeMachineFixture) -> None:
 def test_fail_by_average(runner: CliRunner) -> None:
     got = runner.invoke(app, ['tests/fixtures/requirements.txt', '--fail-on-avg', 1])
 
-    assert got.exit_code == 1
+    assert got.exit_code == 1, got.stdout
     assert got.stdout.splitlines()[-2:] == ['', 'Error: average delta greater than available']
 
 
@@ -92,7 +92,7 @@ def test_fail_by_average(runner: CliRunner) -> None:
 def test_fail_by_max(runner: CliRunner) -> None:
     got = runner.invoke(app, ['tests/fixtures/requirements.txt', '--fail-on-max', 1])
 
-    assert got.exit_code == 1
+    assert got.exit_code == 1, got.stdout
     assert got.stdout.splitlines()[-2:] == ['', 'Error: max delta greater than available']
 
 
@@ -100,7 +100,7 @@ def test_fail_by_max(runner: CliRunner) -> None:
 def test_zero_delta(latest_requirements_file: Path, runner: CliRunner) -> None:
     got = runner.invoke(app, [str(latest_requirements_file)])
 
-    assert got.exit_code == 0
+    assert got.exit_code == 0, got.stdout
     assert got.stdout.splitlines()[-2] == 'Max delta: 0'
     assert got.stdout.splitlines()[-1] == 'Average delta: 0.00'
 
@@ -111,7 +111,7 @@ def test_excluded(runner: CliRunner, time_machine: TimeMachineFixture) -> None:
     time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
     got = runner.invoke(app, ['tests/fixtures/requirements.txt', '--exclude', 'sqlalchemy', '--exclude', 'bandit'])
 
-    assert got.exit_code == 0
+    assert got.exit_code == 0, got.stdout
     assert re.match(
         r'Scanning... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% \d:\d{2}:\d{2}',
         got.stdout.splitlines()[0],
@@ -139,7 +139,7 @@ def test_parse_pyproject_toml(runner: CliRunner, time_machine: TimeMachineFixtur
     time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
     got = runner.invoke(app, ['requirements.txt'])
 
-    assert got.exit_code == 1
+    assert got.exit_code == 1, got.stdout
     assert got.stdout.splitlines()[1:] == [
         '┏━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━┓',
         '┃ Package      ┃ Version ┃ Delta (days) ┃',

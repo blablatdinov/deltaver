@@ -104,16 +104,16 @@ class TailLossDateVersions(VersionDelta):
     def fetch(self) -> SortedVersionsList:
         versions = self._origin.fetch()
         res = []
-        for version in versions:
-            version_info = next(iter(list(version.values())))
+        for ver in versions:
+            version_info = next(iter(list(ver.values())))
             if not version_info:
                 continue
             upload_date = datetime.datetime.strptime(
-                next(iter(list(version.values())))[0]['upload_time'],
-                '%Y-%m-%dT%H:%M:%S'
-            ).date()
+                next(iter(list(ver.values())))[0]['upload_time'],
+                '%Y-%m-%dT%H:%M:%S',
+            ).replace(tzinfo=datetime.timezone.utc).date()
             if upload_date < self._limit_date:
-                res.append(version)
+                res.append(ver)
         return res
 
 
