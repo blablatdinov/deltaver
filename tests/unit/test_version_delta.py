@@ -1,12 +1,31 @@
 import datetime
 from pathlib import Path
+from typing import final
 
+import attrs
 import pytest
 from httpx import Response
 from respx.router import MockRouter
 from time_machine import TimeMachineFixture
 
-from deltaver.version_delta import PypiVersionDelta, VersionNotFoundError, VersionsSortedByDate, VersionsSortedBySemver
+from deltaver.version_delta import (
+    PypiVersionDelta,
+    TailLossDateVersions,
+    VersionDelta,
+    VersionNotFoundError,
+    VersionsSortedByDate,
+    VersionsSortedBySemver,
+)
+
+
+@final
+@attrs.define(frozen=True)
+class FkVersionDelta(VersionDelta):
+
+    _value: list
+
+    def fetch(self) -> list:
+        return self._value
 
 
 @pytest.fixture()
@@ -81,3 +100,34 @@ def test_date_delta(time_machine: TimeMachineFixture) -> None:
 def test_cryptography(time_machine: TimeMachineFixture) -> None:
     time_machine.move_to(datetime.datetime(2024, 1, 28, tzinfo=datetime.timezone.utc))
     assert PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'cryptography'), '42.0.1').days() == 0
+
+
+def test_tail_loss_by_date() -> None:
+    got = TailLossDateVersions(
+        FkVersionDelta([
+            {
+                '0.1.0': [
+                    {'upload_time': '2019-07-19T14:23:35'},
+                ],
+            },
+            {
+                '0.2.0': [
+                    {'upload_time': '2020-07-19T14:23:35'},
+                ],
+            },
+        ]),
+        datetime.date(2020, 5, 1),
+    ).fetch()
+
+    assert got == [{'0.1.0': [{'upload_time': '2019-07-19T14:23:35'}]}]
+
+
+def test_tail_loss_by_date_null_version_info() -> None:
+    TailLossDateVersions(
+        FkVersionDelta([
+            {
+                '0.0.1': [],
+            },
+        ]),
+        datetime.date(2020, 5, 1),
+    ).fetch()

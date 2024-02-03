@@ -1,3 +1,4 @@
+import datetime
 import enum
 from pathlib import Path
 from typing import Protocol, TypedDict, TypeVar, final
@@ -26,6 +27,7 @@ class ConfigDict(TypedDict):
     fail_on_max: int
     artifactory_domain: str
     excluded: list[str]
+    for_date: datetime.date
 
 
 class Config(Protocol):
