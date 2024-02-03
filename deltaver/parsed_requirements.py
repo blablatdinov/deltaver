@@ -76,4 +76,4 @@ class FileNotFoundSafeReqs(ParsedReqs):
             return self._origin.reqs()
         except FileNotFoundError:
             print('Requirements file not found')
-            typer.Exit(1)
+            raise typer.Exit(1)

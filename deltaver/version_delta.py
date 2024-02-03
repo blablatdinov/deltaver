@@ -119,6 +119,20 @@ class TailLossDateVersions(VersionDelta):
 
 @final
 @attrs.define(frozen=True)
+class OvertakingSafeVersionDelta(VersionDelta):
+
+    _origin: VersionDelta
+    _enable: bool
+
+    def days(self) -> int:
+        try:
+            return self._origin.days()
+        except VersionNotFoundError:
+            return 0
+
+
+@final
+@attrs.define(frozen=True)
 class PypiVersionDelta(VersionDelta):
 
     _sorted_versions: SortedVersions
