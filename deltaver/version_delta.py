@@ -66,6 +66,7 @@ class VersionsSortedByDate(SortedVersions):
             key=_sort_key,  # type: ignore[arg-type]
         )
 
+
 @final
 @attrs.define(frozen=True)
 class VersionsSortedBySemver(SortedVersions):
@@ -91,6 +92,29 @@ class VersionsSortedBySemver(SortedVersions):
             correct_versions,
             key=lambda release_dict: version.parse(next(iter(release_dict.keys()))),
         )
+
+
+@final
+@attrs.define(frozen=True)
+class TailLossDateVersions(VersionDelta):
+
+    _origin: VersionDelta
+    _limit_date: datetime.date
+
+    def fetch(self) -> SortedVersionsList:
+        versions = self._origin.fetch()
+        res = []
+        for version in versions:
+            version_info = next(iter(list(version.values())))
+            if not version_info:
+                continue
+            upload_date = datetime.datetime.strptime(
+                next(iter(list(version.values())))[0]['upload_time'],
+                '%Y-%m-%dT%H:%M:%S'
+            ).date()
+            if upload_date < self._limit_date:
+                res.append(version)
+        return res
 
 
 @final
