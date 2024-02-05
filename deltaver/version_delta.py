@@ -1,6 +1,5 @@
 import datetime
 import json
-import os
 from contextlib import suppress
 from itertools import chain
 from pathlib import Path
@@ -104,10 +103,16 @@ class CachedSortedVersions(SortedVersions):
 
     def fetch(self) -> SortedVersionsList:
         cache_dir = Path('.deltaver_cache')
-        os.makedirs(cache_dir / self._package_name, exist_ok=True)
+        (cache_dir / self._package_name).mkdir(exist_ok=True, parents=True)
         if cache_dir.exists():
-            not_today_cache = [os.remove(x) for x in cache_dir.glob('**/*.json') if x != datetime.datetime.now().strftime('%Y-%m-%d')]
-        cache_path = cache_dir / self._package_name / '{0}.json'.format(datetime.datetime.now().date())
+            [
+                x.unlink()
+                for x in cache_dir.glob('**/*.json')
+                if x != datetime.datetime.now(tz=datetime.timezone.utc).strftime('%Y-%m-%d')
+            ]
+        cache_path = cache_dir / self._package_name / '{0}.json'.format(
+            datetime.datetime.now(tz=datetime.timezone.utc).date(),
+        )
         if cache_path.exists():
             return json.loads(cache_path.read_text())
         origin_val = self._origin.fetch()

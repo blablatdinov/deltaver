@@ -149,12 +149,12 @@ def test_negative_decr_delta(time_machine: TimeMachineFixture) -> None:
 
 
 @pytest.mark.usefixtures('_mock_pypi')
-def test_cached_version_delta(other_dir: Path, time_machine: TimeMachineFixture):
+def test_cached_version_delta(other_dir: Path, time_machine: TimeMachineFixture) -> None:
     sorted_versions = FkSortedVersions([
         {
             '0.1.1': [
                 {
-                    'upload_time': '2020-01-01'
+                    'upload_time': '2020-01-01',
                 },
             ],
         },
