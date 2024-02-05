@@ -1,4 +1,5 @@
 import datetime
+import os
 from pathlib import Path
 
 import pytest
@@ -7,14 +8,14 @@ from respx.router import MockRouter
 from time_machine import TimeMachineFixture
 
 from deltaver.version_delta import (
+    CachedSortedVersions,
     DecrDelta,
+    FkSortedVersions,
     FkVersionDelta,
     PypiVersionDelta,
     TargetGreaterLastError,
     VersionsSortedByDate,
     VersionsSortedBySemver,
-    CachedSortedVersions,
-    FkSortedVersions,
 )
 
 
@@ -119,6 +120,14 @@ def test_release_candidate(time_machine: TimeMachineFixture) -> None:
     PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'greenlet'), '3.0.0rc3').days()
 
 
+@pytest.fixture()
+def other_dir(tmp_path: Path) -> None:
+    origin_dir = Path.cwd()
+    os.chdir(tmp_path)
+    yield tmp_path
+    os.chdir(origin_dir)
+
+
 def test_decr_delta(time_machine: TimeMachineFixture) -> None:
     time_machine.move_to(datetime.datetime(2024, 2, 5, tzinfo=datetime.timezone.utc))
     got = DecrDelta(
@@ -140,7 +149,24 @@ def test_negative_decr_delta(time_machine: TimeMachineFixture) -> None:
 
 
 @pytest.mark.usefixtures('_mock_pypi')
-def test_cached_version_delta():
-    CachedSortedVersions(FkSortedVersions(
+def test_cached_version_delta(other_dir: Path, time_machine: TimeMachineFixture):
+    sorted_versions = FkSortedVersions([
+        {
+            '0.1.1': [
+                {
+                    'upload_time': '2020-01-01'
+                },
+            ],
+        },
+    ])
+    time_machine.move_to(datetime.datetime(2024, 2, 5, tzinfo=datetime.timezone.utc))
+    CachedSortedVersions(sorted_versions, 'httpx').fetch()
 
-    ))
+    assert other_dir / '.deltaver_cache/httpx/2024-02-05.json' in other_dir.glob('**/*')
+
+    time_machine.move_to(datetime.datetime(2023, 5, 18, tzinfo=datetime.timezone.utc))
+    CachedSortedVersions(sorted_versions, 'httpx').fetch()
+
+    assert other_dir / '.deltaver_cache/httpx/2023-05-18.json' in other_dir.glob('**/*')
+    assert other_dir / '.deltaver_cache/httpx/2024-02-05.json' not in other_dir.glob('**/*')
+    assert len(list(other_dir.glob('**/*'))) == 3

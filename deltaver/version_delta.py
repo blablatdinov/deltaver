@@ -41,6 +41,8 @@ class SortedVersions(Protocol):
     def fetch(self) -> SortedVersionsList: ...
 
 
+@final
+@attrs.define(frozen=True)
 class FkSortedVersions(SortedVersions):
 
     _value: SortedVersionsList
@@ -103,6 +105,8 @@ class CachedSortedVersions(SortedVersions):
     def fetch(self) -> SortedVersionsList:
         cache_dir = Path('.deltaver_cache')
         os.makedirs(cache_dir / self._package_name, exist_ok=True)
+        if cache_dir.exists():
+            not_today_cache = [os.remove(x) for x in cache_dir.glob('**/*.json') if x != datetime.datetime.now().strftime('%Y-%m-%d')]
         cache_path = cache_dir / self._package_name / '{0}.json'.format(datetime.datetime.now().date())
         if cache_path.exists():
             return json.loads(cache_path.read_text())
