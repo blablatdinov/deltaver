@@ -13,6 +13,8 @@ from deltaver.version_delta import (
     TargetGreaterLastError,
     VersionsSortedByDate,
     VersionsSortedBySemver,
+    CachedSortedVersions,
+    FkSortedVersions,
 )
 
 
@@ -90,6 +92,12 @@ def test_cryptography(time_machine: TimeMachineFixture) -> None:
     assert PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'cryptography'), '42.0.1').days() == 0
 
 
+# @pytest.mark.usefixtures('_mock_cryptography')
+def test_atomicwrites(time_machine: TimeMachineFixture) -> None:
+    time_machine.move_to(datetime.datetime(2024, 1, 28, tzinfo=datetime.timezone.utc))
+    assert PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'atomicwrites'), '1.4.0').days() == 569
+
+
 @pytest.mark.usefixtures('_mock_pypi')
 def test_target_greater_than_last(time_machine: TimeMachineFixture) -> None:
     time_machine.move_to(datetime.datetime(2023, 12, 19, tzinfo=datetime.timezone.utc))
@@ -115,3 +123,10 @@ def test_negative_decr_delta(time_machine: TimeMachineFixture) -> None:
     ).days()
 
     assert got == 0
+
+
+@pytest.mark.usefixtures('_mock_pypi')
+def test_cached_version_delta():
+    CachedSortedVersions(FkSortedVersions(
+
+    ))

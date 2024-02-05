@@ -1,6 +1,9 @@
 import datetime
+import json
+import os
 from contextlib import suppress
 from itertools import chain
+from pathlib import Path
 from typing import Protocol, final
 
 import attrs
@@ -36,6 +39,14 @@ class VersionDelta(Protocol):
 class SortedVersions(Protocol):
 
     def fetch(self) -> SortedVersionsList: ...
+
+
+class FkSortedVersions(SortedVersions):
+
+    _value: SortedVersionsList
+
+    def fetch(self) -> SortedVersionsList:
+        return self._value
 
 
 @final
@@ -80,6 +91,24 @@ class VersionsSortedByDate(SortedVersions):
             correct_versions,
             key=_sort_key,  # type: ignore[arg-type]
         )
+
+
+@final
+@attrs.define(frozen=True)
+class CachedSortedVersions(SortedVersions):
+
+    _origin: SortedVersions
+    _package_name: str
+
+    def fetch(self) -> SortedVersionsList:
+        cache_dir = Path('.deltaver_cache')
+        os.makedirs(cache_dir / self._package_name, exist_ok=True)
+        cache_path = cache_dir / self._package_name / '{0}.json'.format(datetime.datetime.now().date())
+        if cache_path.exists():
+            return json.loads(cache_path.read_text())
+        origin_val = self._origin.fetch()
+        cache_path.write_text(json.dumps(origin_val))
+        return origin_val
 
 
 @final
