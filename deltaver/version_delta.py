@@ -130,11 +130,11 @@ class PypiVersionDelta(VersionDelta):
     _sorted_versions: SortedVersions
     _version: str
 
-    def days(self) -> int:
+    def days(self) -> int:  # noqa: C901. TODO
         sorted_versions = self._sorted_versions.fetch()
         if not sorted_versions:
             return 0
-        last_version_number = version.parse(list(sorted_versions[-1].keys())[0])
+        last_version_number = version.parse(next(iter(list(sorted_versions[-1].keys()))))
         if version.parse(self._version) > last_version_number:
             raise TargetGreaterLastError
         if next(iter(sorted_versions[-1].keys())) == self._version:

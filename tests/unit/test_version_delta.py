@@ -94,24 +94,24 @@ def test_cryptography(time_machine: TimeMachineFixture) -> None:
 def test_target_greater_than_last(time_machine: TimeMachineFixture) -> None:
     time_machine.move_to(datetime.datetime(2023, 12, 19, tzinfo=datetime.timezone.utc))
     with pytest.raises(TargetGreaterLastError):
-        PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'httpx'), '0.27.0').days() == 25
+        PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'httpx'), '0.27.0').days()
 
 
-def test_decr_delta(time_machine: TimeMachineFixture):
+def test_decr_delta(time_machine: TimeMachineFixture) -> None:
     time_machine.move_to(datetime.datetime(2024, 2, 5, tzinfo=datetime.timezone.utc))
     got = DecrDelta(
         FkVersionDelta(15),
-        datetime.datetime(2024, 2, 1).date(),
+        datetime.datetime(2024, 2, 1, tzinfo=datetime.timezone.utc).date(),
     ).days()
 
     assert got == 11
 
 
-def test_negative_decr_delta(time_machine: TimeMachineFixture):
+def test_negative_decr_delta(time_machine: TimeMachineFixture) -> None:
     time_machine.move_to(datetime.datetime(2024, 2, 5, tzinfo=datetime.timezone.utc))
     got = DecrDelta(
         FkVersionDelta(15),
-        datetime.datetime(2020, 2, 1).date(),
+        datetime.datetime(2020, 2, 1, tzinfo=datetime.timezone.utc).date(),
     ).days()
 
     assert got == 0
