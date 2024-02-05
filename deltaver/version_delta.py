@@ -160,6 +160,9 @@ class PypiVersionDelta(VersionDelta):
     _version: str
 
     def days(self) -> int:  # noqa: C901. TODO
+        v = version.parse(self._version)
+        if v.pre or v.dev:
+            return 0
         sorted_versions = self._sorted_versions.fetch()
         if not sorted_versions:
             return 0
