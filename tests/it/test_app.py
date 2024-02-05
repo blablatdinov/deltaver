@@ -163,8 +163,8 @@ def test_parse_pyproject_toml(runner: CliRunner, time_machine: TimeMachineFixtur
 @pytest.mark.usefixtures('_mock_pypi')
 @respx.mock(assert_all_mocked=False)
 def test_for_date_arg(runner: CliRunner, time_machine: TimeMachineFixture) -> None:
-    time_machine.move_to(datetime.datetime(2024, 1, 26, tzinfo=datetime.timezone.utc))
-    got = runner.invoke(app, ['tests/fixtures/requirements.txt'])
+    time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
+    got = runner.invoke(app, ['tests/fixtures/requirements.txt', '--for-date', '2024-01-26'])
 
     assert got.exit_code == 0, got.stdout
     assert re.match(
@@ -175,18 +175,18 @@ def test_for_date_arg(runner: CliRunner, time_machine: TimeMachineFixture) -> No
         '┏━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━┓',
         '┃ Package      ┃ Version ┃ Delta (days) ┃',
         '┡━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━┩',
-        '│ SQLAlchemy   │ 1.4.51  │ 366          │',
-        '│ smmap        │ 5.0.1   │ 132          │',
-        '│ jsonschema   │ 4.21.0  │ 8            │',
-        '│ MarkupSafe   │ 2.1.3   │ 8            │',
-        '│ diff_cover   │ 8.0.2   │ 7            │',
-        '│ bandit       │ 1.7.6   │ 4            │',
-        '│ cryptography │ 41.0.7  │ 4            │',
-        '│ pluggy       │ 1.3.0   │ 3            │',
-        '│ refurb       │ 1.27.0  │ 3            │',
+        '│ SQLAlchemy   │ 1.4.51  │ 365          │',
+        '│ smmap        │ 5.0.1   │ 131          │',
+        '│ jsonschema   │ 4.21.0  │ 7            │',
+        '│ MarkupSafe   │ 2.1.3   │ 7            │',
+        '│ diff_cover   │ 8.0.2   │ 6            │',
+        '│ bandit       │ 1.7.6   │ 3            │',
+        '│ cryptography │ 41.0.7  │ 3            │',
+        '│ pluggy       │ 1.3.0   │ 2            │',
+        '│ refurb       │ 1.27.0  │ 2            │',
         '└──────────────┴─────────┴──────────────┘',
-        'Max delta: 366',
-        'Average delta: 3.93',
+        'Max delta: 365',
+        'Average delta: 3.87',
     ]
 
 

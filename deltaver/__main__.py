@@ -11,7 +11,13 @@ from typing_extensions import TypeAlias
 
 from deltaver.config import CliOrPyprojectConfig, Config, ConfigDict, PyprojectTomlConfig
 from deltaver.parsed_requirements import ExcludedReqs, FileNotFoundSafeReqs, FreezedReqs, PoetryLockReqs
-from deltaver.version_delta import PypiVersionDelta, TailLossDateVersions, VersionsSortedBySemver, OvertakingSafeVersionDelta
+from deltaver.version_delta import (
+    DecrDelta,
+    OvertakingSafeVersionDelta,
+    PypiVersionDelta,
+    TailLossDateVersions,
+    VersionsSortedBySemver,
+)
 
 app = typer.Typer()
 PackageName: TypeAlias = str
@@ -93,15 +99,15 @@ def main(  # noqa: PLR0913
     ).reqs()
     for package, version in track(dependencies, description='Scanning...'):
         delta = OvertakingSafeVersionDelta(
-            PypiVersionDelta(
-                TailLossDateVersions(
+            DecrDelta(
+                PypiVersionDelta(
                     VersionsSortedBySemver(
                         config.value_of('artifactory_domain'),
                         package,
                     ),
-                    config.value_of('for_date'),
+                    version,
                 ),
-                version,
+                config.value_of('for_date'),
             ),
             for_date_param.date() == FIRST_DATE,
         ).days()

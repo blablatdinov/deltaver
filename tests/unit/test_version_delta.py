@@ -9,23 +9,25 @@ from respx.router import MockRouter
 from time_machine import TimeMachineFixture
 
 from deltaver.version_delta import (
+    DecrDelta,
+    FkVersionDelta,
     PypiVersionDelta,
     TailLossDateVersions,
+    TargetGreaterLastError,
     VersionDelta,
     VersionNotFoundError,
     VersionsSortedByDate,
     VersionsSortedBySemver,
 )
 
-
-@final
-@attrs.define(frozen=True)
-class FkVersionDelta(VersionDelta):
-
-    _value: list
-
-    def fetch(self) -> list:
-        return self._value
+# @final
+# @attrs.define(frozen=True)
+# class FkVersionDelta(VersionDelta):
+#
+#     _value: list
+#
+#     def fetch(self) -> list:
+#         return self._value
 
 
 @pytest.fixture()
@@ -75,7 +77,7 @@ def test_last_version() -> None:
 
 @pytest.mark.usefixtures('_mock_pypi')
 def test_fake_version() -> None:
-    with pytest.raises(VersionNotFoundError):
+    with pytest.raises(TargetGreaterLastError):
         PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'httpx'), '0.50.0').days()
 
 
@@ -131,3 +133,30 @@ def test_tail_loss_by_date_null_version_info() -> None:
         ]),
         datetime.date(2020, 5, 1),
     ).fetch()
+
+
+@pytest.mark.usefixtures('_mock_pypi')
+def test_target_greater_than_last(time_machine: TimeMachineFixture) -> None:
+    time_machine.move_to(datetime.datetime(2023, 12, 19, tzinfo=datetime.timezone.utc))
+    with pytest.raises(TargetGreaterLastError):
+        PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'httpx'), '0.27.0').days() == 25
+
+
+def test_decr_delta(time_machine: TimeMachineFixture):
+    time_machine.move_to(datetime.datetime(2024, 2, 5, tzinfo=datetime.timezone.utc))
+    got = DecrDelta(
+        FkVersionDelta(15),
+        datetime.datetime(2024, 2, 1).date(),
+    ).days()
+
+    assert got == 11
+
+
+def test_negative_decr_delta(time_machine: TimeMachineFixture):
+    time_machine.move_to(datetime.datetime(2024, 2, 5, tzinfo=datetime.timezone.utc))
+    got = DecrDelta(
+        FkVersionDelta(15),
+        datetime.datetime(2020, 2, 1).date(),
+    ).days()
+
+    assert got == 0

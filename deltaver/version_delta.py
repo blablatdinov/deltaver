@@ -23,6 +23,11 @@ class VersionNotFoundError(Exception):
     pass
 
 
+@final
+class TargetGreaterLastError(Exception):
+    pass
+
+
 class VersionDelta(Protocol):
 
     def days(self) -> int: ...
@@ -31,6 +36,16 @@ class VersionDelta(Protocol):
 class SortedVersions(Protocol):
 
     def fetch(self) -> SortedVersionsList: ...
+
+
+@final
+@attrs.define(frozen=True)
+class FkVersionDelta(VersionDelta):
+
+    _value: int
+
+    def days(self) -> int:
+        return self._value
 
 
 @final
@@ -114,6 +129,7 @@ class TailLossDateVersions(VersionDelta):
             ).replace(tzinfo=datetime.timezone.utc).date()
             if upload_date < self._limit_date:
                 res.append(ver)
+        print(len(versions) == len(res))
         return res
 
 
@@ -127,7 +143,7 @@ class OvertakingSafeVersionDelta(VersionDelta):
     def days(self) -> int:
         try:
             return self._origin.days()
-        except VersionNotFoundError:
+        except TargetGreaterLastError:
             return 0
 
 
@@ -142,6 +158,9 @@ class PypiVersionDelta(VersionDelta):
         sorted_versions = self._sorted_versions.fetch()
         if not sorted_versions:
             return 0
+        last_version_number = version.parse(list(sorted_versions[-1].keys())[0])
+        if version.parse(self._version) > last_version_number:
+            raise TargetGreaterLastError
         if next(iter(sorted_versions[-1].keys())) == self._version:
             return 0
         start = None
@@ -167,3 +186,16 @@ class PypiVersionDelta(VersionDelta):
         if not start:
             raise VersionNotFoundError
         return (datetime.datetime.now(tz=datetime.timezone.utc).date() - start).days
+
+
+@final
+@attrs.define(frozen=True)
+class DecrDelta(VersionDelta):
+
+    _origin: VersionDelta
+    _for_date: datetime.date
+
+    def days(self) -> int:
+        today = datetime.datetime.now(tz=datetime.timezone.utc).date()
+        recalculated_days = self._origin.days() - (today - self._for_date).days
+        return 0 if recalculated_days < 0 else recalculated_days
