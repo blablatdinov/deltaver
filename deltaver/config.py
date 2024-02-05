@@ -22,6 +22,7 @@ class Formats(enum.Enum):
 
 class ConfigDict(TypedDict):
 
+    path_to_requirements_file: Path
     file_format: Formats
     fail_on_avg: int
     fail_on_max: int
@@ -33,6 +34,16 @@ class ConfigDict(TypedDict):
 class Config(Protocol):
 
     def value_of(self, value: str) -> ConfigValueT: ...
+
+
+@final
+@attrs.define(frozen=True)
+class DictConfig(Config):
+
+    _dict: ConfigDict
+
+    def value_of(self, value: str) -> ConfigValueT:
+        return self._dict[value]
 
 
 @final

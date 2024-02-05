@@ -11,12 +11,7 @@ from typing_extensions import TypeAlias
 
 from deltaver.config import CliOrPyprojectConfig, Config, ConfigDict, PyprojectTomlConfig
 from deltaver.parsed_requirements import ExcludedReqs, FileNotFoundSafeReqs, FreezedReqs, PoetryLockReqs
-from deltaver.version_delta import (
-    DecrDelta,
-    OvertakingSafeVersionDelta,
-    PypiVersionDelta,
-    VersionsSortedBySemver,
-)
+from deltaver.version_delta import DecrDelta, OvertakingSafeVersionDelta, PypiVersionDelta, VersionsSortedBySemver
 
 app = typer.Typer()
 PackageName: TypeAlias = str
@@ -57,42 +52,24 @@ def results(
         raise typer.Exit(code=1)
 
 
-@app.command()
-def main(  # noqa: PLR0913
-    path_to_requirements_file: str,
-    file_format: Annotated[str, typer.Option('--format')] = 'freezed',
-    fail_on_average: Annotated[int, typer.Option('--fail-on-avg')] = -1,
-    fail_on_max: Annotated[int, typer.Option('--fail-on-max')] = -1,
-    artifactory_domain: Annotated[str, typer.Option('--artifactory-domain')] = 'https://pypi.org',
-    exclude_deps: Annotated[list[str], typer.Option('--exclude')] = [],  # noqa: B006
-    # Use unreal date because time_machine.move_to fixture not work for datetime.datetime.now() here
-    for_date_param: Annotated[datetime.datetime, typer.Option('--for-date')] = FIRST_DATE_STR,
-) -> None:
-    if for_date_param.date() == FIRST_DATE:
-        for_date = datetime.datetime.now(tz=datetime.timezone.utc)
-    else:
-        for_date = for_date_param
-    res = 0
+def controller(
+    config: Config,
+) -> tuple[
+    list[tuple[PackageName, PackageVersion, PackageDelta]],
+    int,
+    int,
+    Config,
+]:
+    sum_delta = 0
     max_delta = 0
     packages = []
-    config = CliOrPyprojectConfig(
-        PyprojectTomlConfig(Path('pyproject.toml')),
-        ConfigDict({
-            'file_format': file_format,
-            'fail_on_avg': fail_on_average,
-            'fail_on_max': fail_on_max,
-            'artifactory_domain': artifactory_domain,
-            'excluded': exclude_deps,
-            'for_date': for_date.date(),
-        }),
-    )
     reqs_obj_ctor = {
         'freezed': FreezedReqs,
         'lock': PoetryLockReqs,
     }[config.value_of('file_format')]
     dependencies = FileNotFoundSafeReqs(
         ExcludedReqs(
-            reqs_obj_ctor(Path(path_to_requirements_file)),
+            reqs_obj_ctor(config.value_of('path_to_requirements_file')),
             config,
         ),
     ).reqs()
@@ -108,15 +85,50 @@ def main(  # noqa: PLR0913
                 ),
                 config.value_of('for_date'),
             ),
-            for_date_param.date() == FIRST_DATE,
+            config.value_of('for_date') == FIRST_DATE,
         ).days()
         packages.append(
             (package, version, delta),
         )
-        res += delta
+        sum_delta += delta
         max_delta = max(max_delta, delta)
-    packages = sorted(packages, key=lambda x: int(x[2]), reverse=True)
-    results(packages, res, max_delta, config)
+    return (
+        sorted(packages, key=lambda x: int(x[2]), reverse=True),
+        sum_delta,
+        max_delta,
+        config,
+    )
+
+
+@app.command()
+def main(  # noqa: PLR0913
+    path_to_requirements_file: str,
+    file_format: Annotated[str, typer.Option('--format')] = 'freezed',
+    fail_on_average: Annotated[int, typer.Option('--fail-on-avg')] = -1,
+    fail_on_max: Annotated[int, typer.Option('--fail-on-max')] = -1,
+    artifactory_domain: Annotated[str, typer.Option('--artifactory-domain')] = 'https://pypi.org',
+    exclude_deps: Annotated[list[str], typer.Option('--exclude')] = [],  # noqa: B006
+    # Use unreal date because time_machine.move_to fixture not work for datetime.datetime.now() here
+    for_date_param: Annotated[datetime.datetime, typer.Option('--for-date')] = FIRST_DATE_STR,
+) -> None:
+
+    if for_date_param.date() == FIRST_DATE:
+        for_date = datetime.datetime.now(tz=datetime.timezone.utc)
+    else:
+        for_date = for_date_param
+    config = CliOrPyprojectConfig(
+        PyprojectTomlConfig(Path('pyproject.toml')),
+        ConfigDict({
+            'path_to_requirements_file': Path(path_to_requirements_file),
+            'file_format': file_format,
+            'fail_on_avg': fail_on_average,
+            'fail_on_max': fail_on_max,
+            'artifactory_domain': artifactory_domain,
+            'excluded': exclude_deps,
+            'for_date': for_date.date(),
+        }),
+    )
+    results(*controller(config))
 
 
 if __name__ == '__main__':
