@@ -74,6 +74,6 @@ class FileNotFoundSafeReqs(ParsedReqs):
     def reqs(self) -> list[tuple[str, str]]:
         try:
             return self._origin.reqs()
-        except FileNotFoundError:
+        except FileNotFoundError as err:
             print('Requirements file not found')
-            typer.Exit(1)
+            raise typer.Exit(1) from err

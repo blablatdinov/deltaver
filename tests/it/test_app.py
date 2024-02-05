@@ -158,3 +158,50 @@ def test_parse_pyproject_toml(runner: CliRunner, time_machine: TimeMachineFixtur
         '',
         'Error: average delta greater than available',
     ]
+
+
+@pytest.mark.usefixtures('_mock_pypi')
+@respx.mock(assert_all_mocked=False)
+def test_for_date_arg(runner: CliRunner, time_machine: TimeMachineFixture) -> None:
+    time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
+    got = runner.invoke(app, ['tests/fixtures/requirements.txt', '--for-date', '2024-01-26'])
+
+    assert got.exit_code == 0, got.stdout
+    assert re.match(
+        r'Scanning... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% \d:\d{2}:\d{2}',
+        got.stdout.splitlines()[0],
+    )
+    assert got.stdout.splitlines()[1:] == [
+        '┏━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━┓',
+        '┃ Package      ┃ Version ┃ Delta (days) ┃',
+        '┡━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━┩',
+        '│ SQLAlchemy   │ 1.4.51  │ 365          │',
+        '│ smmap        │ 5.0.1   │ 131          │',
+        '│ jsonschema   │ 4.21.0  │ 7            │',
+        '│ MarkupSafe   │ 2.1.3   │ 7            │',
+        '│ diff_cover   │ 8.0.2   │ 6            │',
+        '│ bandit       │ 1.7.6   │ 3            │',
+        '│ cryptography │ 41.0.7  │ 3            │',
+        '│ pluggy       │ 1.3.0   │ 2            │',
+        '│ refurb       │ 1.27.0  │ 2            │',
+        '└──────────────┴─────────┴──────────────┘',
+        'Max delta: 365',
+        'Average delta: 3.87',
+    ]
+
+
+@pytest.mark.usefixtures('_mock_pypi')
+@respx.mock(assert_all_mocked=False)
+def test_for_date_arg_overtaking(runner: CliRunner, time_machine: TimeMachineFixture) -> None:
+    time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
+    got = runner.invoke(app, ['tests/fixtures/requirements.txt', '--for-date', '2020-01-01'])
+
+    assert got.exit_code == 0, got.stdout
+    assert got.stdout.splitlines()[1:] == [
+        '┏━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━┓',
+        '┃ Package ┃ Version ┃ Delta (days) ┃',
+        '┡━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━┩',
+        '└─────────┴─────────┴──────────────┘',
+        'Max delta: 0',
+        'Average delta: 0.00',
+    ]

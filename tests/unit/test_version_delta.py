@@ -1,31 +1,19 @@
 import datetime
 from pathlib import Path
-from typing import final
 
-import attrs
 import pytest
 from httpx import Response
 from respx.router import MockRouter
 from time_machine import TimeMachineFixture
 
 from deltaver.version_delta import (
+    DecrDelta,
+    FkVersionDelta,
     PypiVersionDelta,
-    TailLossDateVersions,
-    VersionDelta,
-    VersionNotFoundError,
+    TargetGreaterLastError,
     VersionsSortedByDate,
     VersionsSortedBySemver,
 )
-
-
-@final
-@attrs.define(frozen=True)
-class FkVersionDelta(VersionDelta):
-
-    _value: list
-
-    def fetch(self) -> list:
-        return self._value
 
 
 @pytest.fixture()
@@ -75,7 +63,7 @@ def test_last_version() -> None:
 
 @pytest.mark.usefixtures('_mock_pypi')
 def test_fake_version() -> None:
-    with pytest.raises(VersionNotFoundError):
+    with pytest.raises(TargetGreaterLastError):
         PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'httpx'), '0.50.0').days()
 
 
@@ -102,32 +90,28 @@ def test_cryptography(time_machine: TimeMachineFixture) -> None:
     assert PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'cryptography'), '42.0.1').days() == 0
 
 
-def test_tail_loss_by_date() -> None:
-    got = TailLossDateVersions(
-        FkVersionDelta([
-            {
-                '0.1.0': [
-                    {'upload_time': '2019-07-19T14:23:35'},
-                ],
-            },
-            {
-                '0.2.0': [
-                    {'upload_time': '2020-07-19T14:23:35'},
-                ],
-            },
-        ]),
-        datetime.date(2020, 5, 1),
-    ).fetch()
-
-    assert got == [{'0.1.0': [{'upload_time': '2019-07-19T14:23:35'}]}]
+@pytest.mark.usefixtures('_mock_pypi')
+def test_target_greater_than_last(time_machine: TimeMachineFixture) -> None:
+    time_machine.move_to(datetime.datetime(2023, 12, 19, tzinfo=datetime.timezone.utc))
+    with pytest.raises(TargetGreaterLastError):
+        PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'httpx'), '0.27.0').days()
 
 
-def test_tail_loss_by_date_null_version_info() -> None:
-    TailLossDateVersions(
-        FkVersionDelta([
-            {
-                '0.0.1': [],
-            },
-        ]),
-        datetime.date(2020, 5, 1),
-    ).fetch()
+def test_decr_delta(time_machine: TimeMachineFixture) -> None:
+    time_machine.move_to(datetime.datetime(2024, 2, 5, tzinfo=datetime.timezone.utc))
+    got = DecrDelta(
+        FkVersionDelta(15),
+        datetime.datetime(2024, 2, 1, tzinfo=datetime.timezone.utc).date(),
+    ).days()
+
+    assert got == 11
+
+
+def test_negative_decr_delta(time_machine: TimeMachineFixture) -> None:
+    time_machine.move_to(datetime.datetime(2024, 2, 5, tzinfo=datetime.timezone.utc))
+    got = DecrDelta(
+        FkVersionDelta(15),
+        datetime.datetime(2020, 2, 1, tzinfo=datetime.timezone.utc).date(),
+    ).days()
+
+    assert got == 0

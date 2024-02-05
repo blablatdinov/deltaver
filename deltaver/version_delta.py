@@ -23,6 +23,11 @@ class VersionNotFoundError(Exception):
     pass
 
 
+@final
+class TargetGreaterLastError(Exception):
+    pass
+
+
 class VersionDelta(Protocol):
 
     def days(self) -> int: ...
@@ -31,6 +36,16 @@ class VersionDelta(Protocol):
 class SortedVersions(Protocol):
 
     def fetch(self) -> SortedVersionsList: ...
+
+
+@final
+@attrs.define(frozen=True)
+class FkVersionDelta(VersionDelta):
+
+    _value: int
+
+    def days(self) -> int:
+        return self._value
 
 
 @final
@@ -96,25 +111,16 @@ class VersionsSortedBySemver(SortedVersions):
 
 @final
 @attrs.define(frozen=True)
-class TailLossDateVersions(VersionDelta):
+class OvertakingSafeVersionDelta(VersionDelta):
 
     _origin: VersionDelta
-    _limit_date: datetime.date
+    _enable: bool
 
-    def fetch(self) -> SortedVersionsList:
-        versions = self._origin.fetch()
-        res = []
-        for ver in versions:
-            version_info = next(iter(list(ver.values())))
-            if not version_info:
-                continue
-            upload_date = datetime.datetime.strptime(
-                next(iter(list(ver.values())))[0]['upload_time'],
-                '%Y-%m-%dT%H:%M:%S',
-            ).replace(tzinfo=datetime.timezone.utc).date()
-            if upload_date < self._limit_date:
-                res.append(ver)
-        return res
+    def days(self) -> int:
+        try:
+            return self._origin.days()
+        except TargetGreaterLastError:
+            return 0
 
 
 @final
@@ -124,10 +130,13 @@ class PypiVersionDelta(VersionDelta):
     _sorted_versions: SortedVersions
     _version: str
 
-    def days(self) -> int:
+    def days(self) -> int:  # noqa: C901. TODO
         sorted_versions = self._sorted_versions.fetch()
         if not sorted_versions:
             return 0
+        last_version_number = version.parse(next(iter(list(sorted_versions[-1].keys()))))
+        if version.parse(self._version) > last_version_number:
+            raise TargetGreaterLastError
         if next(iter(sorted_versions[-1].keys())) == self._version:
             return 0
         start = None
@@ -153,3 +162,16 @@ class PypiVersionDelta(VersionDelta):
         if not start:
             raise VersionNotFoundError
         return (datetime.datetime.now(tz=datetime.timezone.utc).date() - start).days
+
+
+@final
+@attrs.define(frozen=True)
+class DecrDelta(VersionDelta):
+
+    _origin: VersionDelta
+    _for_date: datetime.date
+
+    def days(self) -> int:
+        today = datetime.datetime.now(tz=datetime.timezone.utc).date()
+        recalculated_days = self._origin.days() - (today - self._for_date).days
+        return 0 if recalculated_days < 0 else recalculated_days

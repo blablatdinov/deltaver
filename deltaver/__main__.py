@@ -11,7 +11,12 @@ from typing_extensions import TypeAlias
 
 from deltaver.config import CliOrPyprojectConfig, Config, ConfigDict, PyprojectTomlConfig
 from deltaver.parsed_requirements import ExcludedReqs, FileNotFoundSafeReqs, FreezedReqs, PoetryLockReqs
-from deltaver.version_delta import PypiVersionDelta, TailLossDateVersions, VersionsSortedBySemver
+from deltaver.version_delta import (
+    DecrDelta,
+    OvertakingSafeVersionDelta,
+    PypiVersionDelta,
+    VersionsSortedBySemver,
+)
 
 app = typer.Typer()
 PackageName: TypeAlias = str
@@ -61,10 +66,12 @@ def main(  # noqa: PLR0913
     artifactory_domain: Annotated[str, typer.Option('--artifactory-domain')] = 'https://pypi.org',
     exclude_deps: Annotated[list[str], typer.Option('--exclude')] = [],  # noqa: B006
     # Use unreal date because time_machine.move_to fixture not work for datetime.datetime.now() here
-    for_date: Annotated[datetime.datetime, typer.Option('--for-date')] = FIRST_DATE_STR,
+    for_date_param: Annotated[datetime.datetime, typer.Option('--for-date')] = FIRST_DATE_STR,
 ) -> None:
-    if for_date.date() == FIRST_DATE:
+    if for_date_param.date() == FIRST_DATE:
         for_date = datetime.datetime.now(tz=datetime.timezone.utc)
+    else:
+        for_date = for_date_param
     res = 0
     max_delta = 0
     packages = []
@@ -90,15 +97,18 @@ def main(  # noqa: PLR0913
         ),
     ).reqs()
     for package, version in track(dependencies, description='Scanning...'):
-        delta = PypiVersionDelta(
-            TailLossDateVersions(
-                VersionsSortedBySemver(
-                    config.value_of('artifactory_domain'),
-                    package,
+        delta = OvertakingSafeVersionDelta(
+            DecrDelta(
+                PypiVersionDelta(
+                    VersionsSortedBySemver(
+                        config.value_of('artifactory_domain'),
+                        package,
+                    ),
+                    version,
                 ),
                 config.value_of('for_date'),
             ),
-            version,
+            for_date_param.date() == FIRST_DATE,
         ).days()
         packages.append(
             (package, version, delta),
