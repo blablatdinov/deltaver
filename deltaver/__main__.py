@@ -11,7 +11,13 @@ from typing_extensions import TypeAlias
 
 from deltaver.config import CliOrPyprojectConfig, Config, ConfigDict, PyprojectTomlConfig
 from deltaver.parsed_requirements import ExcludedReqs, FileNotFoundSafeReqs, FreezedReqs, PoetryLockReqs
-from deltaver.version_delta import DecrDelta, OvertakingSafeVersionDelta, PypiVersionDelta, VersionsSortedBySemver
+from deltaver.version_delta import (
+    CachedSortedVersions,
+    DecrDelta,
+    OvertakingSafeVersionDelta,
+    PypiVersionDelta,
+    VersionsSortedBySemver,
+)
 
 app = typer.Typer()
 PackageName: TypeAlias = str
@@ -77,8 +83,11 @@ def controller(
         delta = OvertakingSafeVersionDelta(
             DecrDelta(
                 PypiVersionDelta(
-                    VersionsSortedBySemver(
-                        config.value_of('artifactory_domain'),
+                    CachedSortedVersions(
+                        VersionsSortedBySemver(
+                            config.value_of('artifactory_domain'),
+                            package,
+                        ),
                         package,
                     ),
                     version,
