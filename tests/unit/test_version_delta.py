@@ -48,6 +48,14 @@ def _mock_cryptography(respx_mock: MockRouter) -> None:
     ))
 
 
+@pytest.fixture()
+def _mock_greenlet(respx_mock: MockRouter) -> None:
+    respx_mock.get('https://pypi.org/pypi/greenlet/json').mock(return_value=Response(
+        200,
+        text=Path('tests/fixtures/greenlet_response.json').read_text(),
+    ))
+
+
 @pytest.mark.usefixtures('_mock_pypi')
 def test_previous(time_machine: TimeMachineFixture) -> None:
     # 0.25.1 was released 2023-11-03
@@ -95,6 +103,12 @@ def test_target_greater_than_last(time_machine: TimeMachineFixture) -> None:
     time_machine.move_to(datetime.datetime(2023, 12, 19, tzinfo=datetime.timezone.utc))
     with pytest.raises(TargetGreaterLastError):
         PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'httpx'), '0.27.0').days()
+
+
+@pytest.mark.usefixtures('_mock_greenlet')
+def test_release_candidate(time_machine: TimeMachineFixture) -> None:
+    time_machine.move_to(datetime.datetime(2023, 12, 19, tzinfo=datetime.timezone.utc))
+    PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'greenlet'), '3.0.0rc3').days()
 
 
 def test_decr_delta(time_machine: TimeMachineFixture) -> None:
