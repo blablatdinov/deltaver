@@ -15,7 +15,6 @@ from deltaver.version_delta import (
     DecrDelta,
     OvertakingSafeVersionDelta,
     PypiVersionDelta,
-    TailLossDateVersions,
     VersionsSortedBySemver,
 )
 

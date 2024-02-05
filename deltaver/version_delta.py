@@ -111,30 +111,6 @@ class VersionsSortedBySemver(SortedVersions):
 
 @final
 @attrs.define(frozen=True)
-class TailLossDateVersions(VersionDelta):
-
-    _origin: VersionDelta
-    _limit_date: datetime.date
-
-    def fetch(self) -> SortedVersionsList:
-        versions = self._origin.fetch()
-        res = []
-        for ver in versions:
-            version_info = next(iter(list(ver.values())))
-            if not version_info:
-                continue
-            upload_date = datetime.datetime.strptime(
-                next(iter(list(ver.values())))[0]['upload_time'],
-                '%Y-%m-%dT%H:%M:%S',
-            ).replace(tzinfo=datetime.timezone.utc).date()
-            if upload_date < self._limit_date:
-                res.append(ver)
-        print(len(versions) == len(res))
-        return res
-
-
-@final
-@attrs.define(frozen=True)
 class OvertakingSafeVersionDelta(VersionDelta):
 
     _origin: VersionDelta
