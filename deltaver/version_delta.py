@@ -108,7 +108,7 @@ class CachedSortedVersions(SortedVersions):
             [
                 x.unlink()
                 for x in cache_dir.glob('**/*.json')
-                if x != datetime.datetime.now(tz=datetime.timezone.utc).strftime('%Y-%m-%d')
+                if x.name != '{0}.json'.format(datetime.datetime.now(tz=datetime.timezone.utc).strftime('%Y-%m-%d'))
             ]
         cache_path = cache_dir / self._package_name / '{0}.json'.format(
             datetime.datetime.now(tz=datetime.timezone.utc).date(),

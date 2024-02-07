@@ -1,7 +1,9 @@
 import datetime
 import os
 from pathlib import Path
+from shutil import copyfile
 
+import httpx
 import pytest
 from httpx import Response
 from respx.router import MockRouter
@@ -10,7 +12,6 @@ from time_machine import TimeMachineFixture
 from deltaver.version_delta import (
     CachedSortedVersions,
     DecrDelta,
-    FkSortedVersions,
     FkVersionDelta,
     PypiVersionDelta,
     TargetGreaterLastError,
@@ -101,12 +102,6 @@ def test_cryptography(time_machine: TimeMachineFixture) -> None:
     assert PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'cryptography'), '42.0.1').days() == 0
 
 
-# @pytest.mark.usefixtures('_mock_cryptography')
-def test_atomicwrites(time_machine: TimeMachineFixture) -> None:
-    time_machine.move_to(datetime.datetime(2024, 1, 28, tzinfo=datetime.timezone.utc))
-    assert PypiVersionDelta(VersionsSortedBySemver('https://pypi.org/', 'atomicwrites'), '1.4.0').days() == 569
-
-
 @pytest.mark.usefixtures('_mock_pypi')
 def test_target_greater_than_last(time_machine: TimeMachineFixture) -> None:
     time_machine.move_to(datetime.datetime(2023, 12, 19, tzinfo=datetime.timezone.utc))
@@ -148,25 +143,39 @@ def test_negative_decr_delta(time_machine: TimeMachineFixture) -> None:
     assert got == 0
 
 
-@pytest.mark.usefixtures('_mock_pypi')
-def test_cached_version_delta(other_dir: Path, time_machine: TimeMachineFixture) -> None:
-    sorted_versions = FkSortedVersions([
-        {
-            '0.1.1': [
-                {
-                    'upload_time': '2020-01-01',
-                },
-            ],
-        },
-    ])
+@pytest.fixture()
+def exist_cache(tmp_path: Path, time_machine: TimeMachineFixture, _mock_pypi: None) -> Path:
+    origin_dir = Path.cwd()
     time_machine.move_to(datetime.datetime(2024, 2, 5, tzinfo=datetime.timezone.utc))
-    CachedSortedVersions(sorted_versions, 'httpx').fetch()
+    httpx_cache_dir = tmp_path / '.deltaver_cache/httpx'
+    httpx_cache_dir.mkdir(exist_ok=True, parents=True)
+    copyfile('tests/fixtures/httpx_pypi_response.json', httpx_cache_dir / '2024-02-05.json')
+    os.chdir(tmp_path)
+    yield tmp_path
+    os.chdir(origin_dir)
 
+
+@pytest.mark.usefixtures('_mock_pypi')
+def test_cached_version_delta(other_dir: Path, time_machine: TimeMachineFixture, respx_mock: MockRouter) -> None:
+    time_machine.move_to(datetime.datetime(2024, 2, 5, tzinfo=datetime.timezone.utc))
+    CachedSortedVersions(VersionsSortedBySemver('https://pypi.org/', 'httpx'), 'httpx').fetch()
+    def se(request: httpx.Request) -> None:
+        raise AssertionError
+    respx_mock.get('https://pypi.org/pypi/httpx/json').mock(side_effect=se)
+    CachedSortedVersions(VersionsSortedBySemver('https://pypi.org/', 'httpx'), 'httpx').fetch()
+
+    assert len(list(other_dir.glob('**/*'))) == 3
     assert other_dir / '.deltaver_cache/httpx/2024-02-05.json' in other_dir.glob('**/*')
 
-    time_machine.move_to(datetime.datetime(2023, 5, 18, tzinfo=datetime.timezone.utc))
-    CachedSortedVersions(sorted_versions, 'httpx').fetch()
 
-    assert other_dir / '.deltaver_cache/httpx/2023-05-18.json' in other_dir.glob('**/*')
-    assert other_dir / '.deltaver_cache/httpx/2024-02-05.json' not in other_dir.glob('**/*')
-    assert len(list(other_dir.glob('**/*'))) == 3
+def test_remove_old_cache(exist_cache: Path, time_machine: TimeMachineFixture, respx_mock: MockRouter) -> None:
+    time_machine.move_to(datetime.datetime(2024, 2, 6, tzinfo=datetime.timezone.utc))
+    CachedSortedVersions(VersionsSortedBySemver('https://pypi.org/', 'httpx'), 'httpx').fetch()
+    def se(request: httpx.Request) -> None:
+        raise AssertionError
+    respx_mock.get('https://pypi.org/pypi/httpx/json').mock(side_effect=se)
+    CachedSortedVersions(VersionsSortedBySemver('https://pypi.org/', 'httpx'), 'httpx').fetch()
+
+    assert len(list(exist_cache.glob('**/*'))) == 3
+    assert exist_cache / '.deltaver_cache/httpx/2024-02-05.json' not in exist_cache.glob('**/*')
+    assert exist_cache / '.deltaver_cache/httpx/2024-02-06.json' in exist_cache.glob('**/*')
