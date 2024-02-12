@@ -1,6 +1,6 @@
 lint:
 	poetry run isort deltaver tests
-	poetry run ruff check deltaver tests
+	poetry run ruff check deltaver tests --fix
 	poetry run mypy deltaver tests
 
 test:

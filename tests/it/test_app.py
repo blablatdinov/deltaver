@@ -2,9 +2,9 @@ import datetime
 import os
 import re
 import zipfile
+from collections.abc import Generator
 from pathlib import Path
 from shutil import copyfile
-from collections.abc import Generator
 
 import pytest
 import respx
