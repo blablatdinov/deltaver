@@ -105,11 +105,9 @@ class CachedSortedVersions(SortedVersions):
         cache_dir = Path('.deltaver_cache')
         (cache_dir / self._package_name).mkdir(exist_ok=True, parents=True)
         if cache_dir.exists():
-            [
-                x.unlink()
-                for x in cache_dir.glob('**/*.json')
-                if x.name != '{0}.json'.format(datetime.datetime.now(tz=datetime.timezone.utc).strftime('%Y-%m-%d'))
-            ]
+            for x in cache_dir.glob('**/*.json'):
+                if x.name != '{0}.json'.format(datetime.datetime.now(tz=datetime.timezone.utc).strftime('%Y-%m-%d')):
+                    x.unlink()
         cache_path = cache_dir / self._package_name / '{0}.json'.format(
             datetime.datetime.now(tz=datetime.timezone.utc).date(),
         )

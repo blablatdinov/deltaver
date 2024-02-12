@@ -86,5 +86,5 @@ jobs:
         run: .venv/bin/ruff check deltaver tests
     # - name: flake8
     #   run: flake8 pyeo tests
-    # - name: mypy
-    #   run: mypy pyeo tests
+      - name: mypy
+        run: .venv/bin/mypy deltaver tests

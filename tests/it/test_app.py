@@ -4,6 +4,7 @@ import re
 import zipfile
 from pathlib import Path
 from shutil import copyfile
+from collections.abc import Generator
 
 import pytest
 import respx
@@ -39,7 +40,7 @@ def latest_requirements_file(tmp_path: Path) -> Path:
 
 
 @pytest.fixture()
-def _other_dir(tmp_path: Path) -> None:
+def _other_dir(tmp_path: Path) -> Generator[None, None, None]:
     origin_dir = Path.cwd()
     copyfile('tests/fixtures/pyproject.toml', tmp_path / 'pyproject.toml')
     copyfile('tests/fixtures/requirements.txt', tmp_path / 'requirements.txt')
@@ -81,7 +82,7 @@ def test(runner: CliRunner, time_machine: TimeMachineFixture) -> None:
 @pytest.mark.usefixtures('_mock_pypi')
 @respx.mock(assert_all_mocked=False)
 def test_fail_by_average(runner: CliRunner) -> None:
-    got = runner.invoke(app, ['tests/fixtures/requirements.txt', '--fail-on-avg', 1])
+    got = runner.invoke(app, ['tests/fixtures/requirements.txt', '--fail-on-avg', '1'])
 
     assert got.exit_code == 1, got.stdout
     assert got.stdout.splitlines()[-2:] == ['', 'Error: average delta greater than available']
@@ -90,7 +91,7 @@ def test_fail_by_average(runner: CliRunner) -> None:
 @pytest.mark.usefixtures('_mock_pypi')
 @respx.mock(assert_all_mocked=False)
 def test_fail_by_max(runner: CliRunner) -> None:
-    got = runner.invoke(app, ['tests/fixtures/requirements.txt', '--fail-on-max', 1])
+    got = runner.invoke(app, ['tests/fixtures/requirements.txt', '--fail-on-max', '1'])
 
     assert got.exit_code == 1, got.stdout
     assert got.stdout.splitlines()[-2:] == ['', 'Error: max delta greater than available']

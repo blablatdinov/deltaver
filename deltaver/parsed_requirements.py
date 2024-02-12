@@ -7,7 +7,7 @@ import toml
 import typer
 from rich import print
 
-from deltaver.config import Config
+from deltaver.config import ConfigDict
 
 
 class ParsedReqs(Protocol):
@@ -40,10 +40,10 @@ class FreezedReqs(ParsedReqs):
 class ExcludedReqs(ParsedReqs):
 
     _origin: ParsedReqs
-    _config: Config
+    _config: ConfigDict
 
     def reqs(self) -> list[tuple[str, str]]:
-        excluded_packages_set = {package.lower() for package in self._config.value_of('excluded')}
+        excluded_packages_set = {package.lower() for package in self._config['excluded']}
         return [
             item
             for item in self._origin.reqs()

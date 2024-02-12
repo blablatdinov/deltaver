@@ -2,6 +2,7 @@ import datetime
 from pathlib import Path
 from typing import Annotated, Final
 
+import toml
 import typer
 from rich import print
 from rich.console import Console
@@ -9,7 +10,7 @@ from rich.progress import track
 from rich.table import Table
 from typing_extensions import TypeAlias
 
-from deltaver.config import CliOrPyprojectConfig, Config, ConfigDict, PyprojectTomlConfig
+from deltaver.config import ConfigDict, Formats
 from deltaver.parsed_requirements import ExcludedReqs, FileNotFoundSafeReqs, FreezedReqs, PoetryLockReqs
 from deltaver.version_delta import (
     CachedSortedVersions,
@@ -33,8 +34,8 @@ def results(
     packages: list[tuple[PackageName, PackageVersion, PackageDelta]],
     sum_delta: int,
     max_delta: int,
-    config: Config,
-) -> tuple[int, float]:
+    config: ConfigDict,
+) -> None:
     console = Console()
     table = Table(show_header=True, header_style='bold magenta')
     table.add_column('Package')
@@ -50,21 +51,21 @@ def results(
         average_delta = '0'
     print('Max delta: {0}'.format(max_delta))
     print('Average delta: {0}'.format(average_delta))
-    if config.value_of('fail_on_avg') > -1 and float(average_delta) >= config.value_of('fail_on_avg'):
+    if config['fail_on_avg'] > -1 and float(average_delta) >= config['fail_on_avg']:
         print('\n[red]Error: average delta greater than available[/red]')
         raise typer.Exit(code=1)
-    if config.value_of('fail_on_max') > -1 and max_delta >= config.value_of('fail_on_max'):
+    if config['fail_on_max'] > -1 and max_delta >= config['fail_on_max']:
         print('\n[red]Error: max delta greater than available[/red]')
         raise typer.Exit(code=1)
 
 
 def controller(
-    config: Config,
+    config: ConfigDict,
 ) -> tuple[
     list[tuple[PackageName, PackageVersion, PackageDelta]],
     int,
     int,
-    Config,
+    ConfigDict,
 ]:
     sum_delta = 0
     max_delta = 0
@@ -72,10 +73,10 @@ def controller(
     reqs_obj_ctor = {
         'freezed': FreezedReqs,
         'lock': PoetryLockReqs,
-    }[config.value_of('file_format')]
+    }[config['file_format'].value]
     dependencies = FileNotFoundSafeReqs(
         ExcludedReqs(
-            reqs_obj_ctor(config.value_of('path_to_requirements_file')),
+            reqs_obj_ctor(config['path_to_requirements_file']),
             config,
         ),
     ).reqs()
@@ -85,16 +86,16 @@ def controller(
                 PypiVersionDelta(
                     CachedSortedVersions(
                         VersionsSortedBySemver(
-                            config.value_of('artifactory_domain'),
+                            config['artifactory_domain'],
                             package,
                         ),
                         package,
                     ),
                     version,
                 ),
-                config.value_of('for_date'),
+                config['for_date'],
             ),
-            config.value_of('for_date') == FIRST_DATE,
+            config['for_date'] == FIRST_DATE,
         ).days()
         packages.append(
             (package, version, delta),
@@ -118,25 +119,30 @@ def main(  # noqa: PLR0913
     artifactory_domain: Annotated[str, typer.Option('--artifactory-domain')] = 'https://pypi.org',
     exclude_deps: Annotated[list[str], typer.Option('--exclude')] = [],  # noqa: B006
     # Use unreal date because time_machine.move_to fixture not work for datetime.datetime.now() here
-    for_date_param: Annotated[datetime.datetime, typer.Option('--for-date')] = FIRST_DATE_STR,
+    for_date_param: Annotated[datetime.datetime, typer.Option('--for-date')] = FIRST_DATE_STR,  # type: ignore[assignment]
 ) -> None:
 
     if for_date_param.date() == FIRST_DATE:
         for_date = datetime.datetime.now(tz=datetime.timezone.utc)
     else:
         for_date = for_date_param
-    config = CliOrPyprojectConfig(
-        PyprojectTomlConfig(Path('pyproject.toml')),
-        ConfigDict({
-            'path_to_requirements_file': Path(path_to_requirements_file),
-            'file_format': file_format,
-            'fail_on_avg': fail_on_average,
-            'fail_on_max': fail_on_max,
-            'artifactory_domain': artifactory_domain,
-            'excluded': exclude_deps,
-            'for_date': for_date.date(),
-        }),
-    )
+    pyproject_config_path = Path('pyproject.toml')
+    if not pyproject_config_path.exists():
+        pyproject_config = {}
+    else:
+        pyproject_config = toml.loads(pyproject_config_path.read_text()).get('tool', {}).get('deltaver', {})
+    config = ConfigDict({
+        'path_to_requirements_file': (
+            pyproject_config.get('path_to_requirements_file')
+            or Path(path_to_requirements_file)
+        ),
+        'file_format': Formats(file_format),
+        'fail_on_avg': pyproject_config.get('fail_on_avg') or fail_on_average,
+        'fail_on_max': pyproject_config.get('fail_on_max') or fail_on_max,
+        'artifactory_domain': pyproject_config.get('artifactory_domain') or artifactory_domain,
+        'excluded': pyproject_config.get('excluded') or exclude_deps,
+        'for_date': pyproject_config.get('for_date') or for_date.date(),
+    })
     results(*controller(config))
 
 

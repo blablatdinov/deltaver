@@ -2,6 +2,7 @@ import datetime
 import os
 from pathlib import Path
 from shutil import copyfile
+from collections.abc import Generator
 
 import httpx
 import pytest
@@ -116,7 +117,7 @@ def test_release_candidate(time_machine: TimeMachineFixture) -> None:
 
 
 @pytest.fixture()
-def other_dir(tmp_path: Path) -> None:
+def other_dir(tmp_path: Path) -> Generator[Path, None, None]:
     origin_dir = Path.cwd()
     os.chdir(tmp_path)
     yield tmp_path
@@ -144,7 +145,7 @@ def test_negative_decr_delta(time_machine: TimeMachineFixture) -> None:
 
 
 @pytest.fixture()
-def exist_cache(tmp_path: Path, time_machine: TimeMachineFixture, _mock_pypi: None) -> Path:
+def exist_cache(tmp_path: Path, time_machine: TimeMachineFixture, _mock_pypi: None) -> Generator[Path, None, None]:
     origin_dir = Path.cwd()
     time_machine.move_to(datetime.datetime(2024, 2, 5, tzinfo=datetime.timezone.utc))
     httpx_cache_dir = tmp_path / '.deltaver_cache/httpx'
