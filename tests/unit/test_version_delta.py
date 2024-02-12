@@ -1,8 +1,8 @@
 import datetime
 import os
+from collections.abc import Generator
 from pathlib import Path
 from shutil import copyfile
-from collections.abc import Generator
 
 import httpx
 import pytest
@@ -159,14 +159,15 @@ def exist_cache(tmp_path: Path, time_machine: TimeMachineFixture, _mock_pypi: No
 @pytest.mark.usefixtures('_mock_pypi')
 def test_cached_version_delta(other_dir: Path, time_machine: TimeMachineFixture, respx_mock: MockRouter) -> None:
     time_machine.move_to(datetime.datetime(2024, 2, 5, tzinfo=datetime.timezone.utc))
-    CachedSortedVersions(VersionsSortedBySemver('https://pypi.org/', 'httpx'), 'httpx').fetch()
+    http_fetched_value = CachedSortedVersions(VersionsSortedBySemver('https://pypi.org/', 'httpx'), 'httpx').fetch()
     def se(request: httpx.Request) -> None:
         raise AssertionError
     respx_mock.get('https://pypi.org/pypi/httpx/json').mock(side_effect=se)
-    CachedSortedVersions(VersionsSortedBySemver('https://pypi.org/', 'httpx'), 'httpx').fetch()
+    got = CachedSortedVersions(VersionsSortedBySemver('https://pypi.org/', 'httpx'), 'httpx').fetch()
 
     assert len(list(other_dir.glob('**/*'))) == 3
     assert other_dir / '.deltaver_cache/httpx/2024-02-05.json' in other_dir.glob('**/*')
+    assert got == http_fetched_value
 
 
 def test_remove_old_cache(exist_cache: Path, time_machine: TimeMachineFixture, respx_mock: MockRouter) -> None:

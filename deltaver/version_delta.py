@@ -1,23 +1,17 @@
 import datetime
 import json
 from contextlib import suppress
-from itertools import chain
 from pathlib import Path
 from typing import Protocol, final
 
 import attrs
 import httpx
 from packaging import version
-from typing_extensions import TypeAlias, TypedDict
-
-
-class VersionInfo(TypedDict):
-
-    upload_time: str
-
+from typing_extensions import TypeAlias
 
 VersionNumber: TypeAlias = str
-SortedVersionsList: TypeAlias = list[dict[VersionNumber, list[VersionInfo]]]
+UploadTime: TypeAlias = datetime.date
+SortedVersionsList: TypeAlias = list[dict[VersionNumber, UploadTime]]
 
 
 @final
@@ -72,25 +66,21 @@ class VersionsSortedByDate(SortedVersions):
         versions = list(response.json()['releases'].items())
         correct_versions = []
         for version_number, release_info in versions:
-            with suppress(version.InvalidVersion):
+            with suppress(version.InvalidVersion, IndexError):
                 if not version.parse(version_number).pre:
                     correct_versions.append({
-                        version_number: release_info,
+                        version_number: datetime.datetime.strptime(
+                            release_info[0]['upload_time'], '%Y-%m-%dT%H:%M:%S',
+                        ).astimezone(datetime.timezone.utc).date(),
                     })
-        def _sort_key(release_dict: VersionInfo) -> datetime.date:
-            times = []
+        def _sort_key(release_dict: dict[VersionNumber, UploadTime]) -> datetime.date:
             if not release_dict or not next(iter(list(release_dict.values()))):
                 return datetime.date(1, 1, 1)
-            times = [  # type: ignore[var-annotated]
-                datetime.datetime.strptime(
-                    dict_['upload_time'], '%Y-%m-%dT%H:%M:%S',
-                ).astimezone(datetime.timezone.utc).date()
-                for dict_ in chain.from_iterable(release_dict.values())  # type: ignore[arg-type]
-            ]
+            times: list[UploadTime] = list(release_dict.values())
             return next(iter(sorted(times)))
         return sorted(
             correct_versions,
-            key=_sort_key,  # type: ignore[arg-type]
+            key=_sort_key,
         )
 
 
@@ -112,9 +102,20 @@ class CachedSortedVersions(SortedVersions):
             datetime.datetime.now(tz=datetime.timezone.utc).date(),
         )
         if cache_path.exists():
-            return json.loads(cache_path.read_text())
+            return [
+                {
+                    next(iter(elem.keys())): datetime.datetime.strptime(
+                        next(iter(elem.values())),
+                        '%Y-%m-%dT%H:%M:%S',
+                    ).astimezone(datetime.timezone.utc).date(),
+                }
+                for elem  in json.loads(cache_path.read_text())
+            ]
         origin_val = self._origin.fetch()
-        cache_path.write_text(json.dumps(origin_val))
+        cache_path.write_text(json.dumps([
+            {next(iter(dict_.keys())): next(iter(dict_.values())).strftime('%Y-%m-%dT%H:%M:%S')}
+            for dict_ in origin_val
+        ]))
         return origin_val
 
 
@@ -133,11 +134,13 @@ class VersionsSortedBySemver(SortedVersions):
         versions = list(response.json()['releases'].items())
         correct_versions = []
         for version_number, release_info in versions:
-            with suppress(version.InvalidVersion):
+            with suppress(version.InvalidVersion, IndexError):
                 v = version.parse(version_number)
                 if not v.pre and not v.dev:
                     correct_versions.append({
-                        version_number: release_info,
+                        version_number: datetime.datetime.strptime(
+                            release_info[0]['upload_time'], '%Y-%m-%dT%H:%M:%S',
+                        ).astimezone(datetime.timezone.utc).date(),
                     })
         return sorted(
             correct_versions,
@@ -189,13 +192,7 @@ class PypiVersionDelta(VersionDelta):
             if release_number == self._version:
                 flag = True
         for item in sorted_versions:
-            release = next(iter(item.keys()))
-            item_values = list(chain.from_iterable(item.values()))
-            if not item_values:
-                continue
-            upload_time = datetime.datetime.strptime(
-                item_values[0]['upload_time'], '%Y-%m-%dT%H:%M:%S',
-            ).astimezone(datetime.timezone.utc).date()
+            release, upload_time = next(iter(item.items()))
             if release == next_available_release:
                 start = upload_time
         if not start:
