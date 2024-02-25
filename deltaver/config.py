@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import TypedDict
 
 
+@enum.unique
 class Formats(enum.Enum):
 
     freezed = 'freezed'
