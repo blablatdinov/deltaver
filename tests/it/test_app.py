@@ -4,7 +4,7 @@ import re
 import zipfile
 from collections.abc import Generator
 from pathlib import Path
-from shutil import copyfile
+from shutil import copyfile, rmtree
 
 import pytest
 import respx
@@ -19,6 +19,11 @@ from deltaver.parsed_requirements import PackageLockReqs
 @pytest.fixture()
 def runner() -> CliRunner:
     return CliRunner()
+
+
+@pytest.fixture(autouse=True)
+def _removed_cache() -> None:
+    rmtree(Path('.deltaver_cache/'), ignore_errors=True)
 
 
 @pytest.fixture()
@@ -38,7 +43,7 @@ def _mock_npmjs(respx_mock: respx.router.MockRouter, tmp_path: Path) -> None:
     with zipfile.ZipFile('tests/fixtures/npm_mock.zip', 'r') as zip_ref:
         zip_ref.extractall(tmp_path)
     for package_name, _ in PackageLockReqs(Path('tests/fixtures/package-lock-example.json')).reqs():
-        respx_mock.get('https://registry.npmjs.org/immediate/{0}'.format(package_name)).mock(return_value=Response(
+        respx_mock.get('https://registry.npmjs.org/{0}'.format(package_name)).mock(return_value=Response(
             200,
             text=Path(tmp_path / 'npm/{0}.json'.format(package_name)).read_text(),
         ))
