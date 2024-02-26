@@ -121,7 +121,7 @@ class CachedSortedVersions(SortedVersions):
 
 @final
 @attrs.define(frozen=True)
-class VersionsSortedBySemver(SortedVersions):
+class PypiVersionsSortedBySemver(SortedVersions):
 
     _artifactory_domain: str
     _package_name: str
@@ -141,6 +141,36 @@ class VersionsSortedBySemver(SortedVersions):
                         version_number: datetime.datetime.strptime(
                             release_info[0]['upload_time'], '%Y-%m-%dT%H:%M:%S',
                         ).astimezone(datetime.timezone.utc).date(),
+                    })
+        return sorted(
+            correct_versions,
+            key=lambda release_dict: version.parse(next(iter(release_dict.keys()))),
+        )
+
+
+@final
+@attrs.define(frozen=True)
+class NpmjsVersionsSortedBySemver(SortedVersions):
+
+    _artifactory_domain: str
+    _package_name: str
+
+    def fetch(self) -> SortedVersionsList:
+        response = httpx.get(
+            httpx.URL(self._artifactory_domain).join(self._package_name),
+        )
+        response.raise_for_status()
+        versions = response.json()['time'].items()
+        correct_versions = []
+        for version_number, release_time in versions:
+            with suppress(version.InvalidVersion, IndexError, KeyError):
+                parsed_version = version.parse(version_number)
+                if not parsed_version.is_prerelease and not parsed_version.is_devrelease:
+                    parsed_release_time = datetime.datetime.strptime(
+                        release_time, '%Y-%m-%dT%H:%M:%S.%f%z',
+                    ).astimezone(datetime.timezone.utc).date()
+                    correct_versions.append({
+                        version_number: parsed_release_time,
                     })
         return sorted(
             correct_versions,

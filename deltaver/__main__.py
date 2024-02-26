@@ -17,7 +17,7 @@ from deltaver.version_delta import (
     DecrDelta,
     OvertakingSafeVersionDelta,
     PypiVersionDelta,
-    VersionsSortedBySemver,
+    PypiVersionsSortedBySemver,
 )
 
 app = typer.Typer()
@@ -85,7 +85,7 @@ def controller(
             DecrDelta(
                 PypiVersionDelta(
                     CachedSortedVersions(
-                        VersionsSortedBySemver(
+                        PypiVersionsSortedBySemver(
                             config['artifactory_domain'],
                             package,
                         ),
