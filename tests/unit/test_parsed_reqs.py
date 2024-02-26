@@ -75,7 +75,8 @@ def test_package_lock() -> None:
         Path('tests/fixtures/package-lock-example.json'),
     ).reqs()
 
-    assert len(got) == 224
+    assert len(got) == 171
     assert got[0] == ('@sinonjs/commons', '1.8.2')
+    assert [name for name, _ in got].count('camelcase-keys/camelcase') == 0
     assert got[-1] == ('yocto-queue', '0.1.0')
-    assert got[215] == ('wrap-ansi/color-convert', '2.0.1')
+    assert got[143] == ('spdx-correct', '3.1.0')

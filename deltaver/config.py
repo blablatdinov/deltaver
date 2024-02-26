@@ -5,6 +5,13 @@ from typing import TypedDict
 
 
 @enum.unique
+class Langs(enum.Enum):
+
+    python = 'py'
+    javascript = 'js'
+
+
+@enum.unique
 class Formats(enum.Enum):
 
     freezed = 'freezed'
@@ -20,3 +27,4 @@ class ConfigDict(TypedDict):
     artifactory_domain: str
     excluded: list[str]
     for_date: datetime.date
+    lang: Langs
