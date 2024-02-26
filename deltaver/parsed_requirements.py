@@ -1,3 +1,4 @@
+import json
 import re
 from pathlib import Path
 from typing import Protocol, final
@@ -77,3 +78,18 @@ class FileNotFoundSafeReqs(ParsedReqs):
         except FileNotFoundError as err:
             print('Requirements file not found')
             raise typer.Exit(1) from err
+
+
+@final
+@attrs.define(frozen=True)
+class PackageLockReqs(ParsedReqs):
+
+    _path: Path
+
+    def reqs(self) -> list[tuple[str, str]]:
+        data = json.loads(self._path.read_text())
+        return [
+            (name.replace('node_modules/', ''), version_info['version'])
+            for name, version_info in data['packages'].items()
+            if name != ''
+        ]
