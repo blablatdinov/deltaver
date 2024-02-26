@@ -3,7 +3,7 @@ from typing import Callable
 
 import pytest
 
-from deltaver.parsed_requirements import FreezedReqs, PoetryLockReqs
+from deltaver.parsed_requirements import FreezedReqs, PackageLockReqs, PoetryLockReqs
 
 
 @pytest.fixture()
@@ -68,3 +68,14 @@ def test_poetry_lock() -> None:
         ('pytest', '7.4.4'),
         ('sniffio', '1.3.0'),
     ]
+
+
+def test_package_lock() -> None:
+    got = PackageLockReqs(
+        Path('tests/fixtures/package-lock-example.json'),
+    ).reqs()
+
+    assert len(got) == 224
+    assert got[0] == ('@sinonjs/commons', '1.8.2')
+    assert got[-1] == ('yocto-queue', '0.1.0')
+    assert got[215] == ('wrap-ansi/color-convert', '2.0.1')
