@@ -27,3 +27,4 @@ class ConfigDict(TypedDict):
     artifactory_domain: str
     excluded: list[str]
     for_date: datetime.date
+    lang: Langs

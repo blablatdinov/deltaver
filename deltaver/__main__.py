@@ -11,14 +11,20 @@ from rich.table import Table
 from typing_extensions import TypeAlias
 
 from deltaver.config import ConfigDict, Formats, Langs
-from deltaver.parsed_requirements import ExcludedReqs, FileNotFoundSafeReqs, FreezedReqs, PoetryLockReqs, PackageLockReqs
+from deltaver.parsed_requirements import (
+    ExcludedReqs,
+    FileNotFoundSafeReqs,
+    FreezedReqs,
+    PackageLockReqs,
+    PoetryLockReqs,
+)
 from deltaver.version_delta import (
     CachedSortedVersions,
     DecrDelta,
+    NpmjsVersionsSortedBySemver,
     OvertakingSafeVersionDelta,
     PypiVersionDelta,
     PypiVersionsSortedBySemver,
-    NpmjsVersionsSortedBySemver,
 )
 
 app = typer.Typer()
@@ -71,7 +77,7 @@ def controller(
     sum_delta = 0
     max_delta = 0
     packages = []
-    reqs_obj_ctor, sorted_versions_ctor = {
+    lang_format = {
         'js': {
             'lock': (PackageLockReqs, NpmjsVersionsSortedBySemver),
         },
@@ -79,7 +85,8 @@ def controller(
             'freezed': (FreezedReqs, PypiVersionsSortedBySemver),
             'lock': (PoetryLockReqs, PypiVersionsSortedBySemver),
         },
-    }[config['lang'].value][config['file_format'].value]
+    }[config['lang'].value]
+    reqs_obj_ctor, sorted_versions_ctor = lang_format[config['file_format'].value]  # type: ignore [index]
     dependencies = FileNotFoundSafeReqs(
         ExcludedReqs(
             reqs_obj_ctor(config['path_to_requirements_file']),

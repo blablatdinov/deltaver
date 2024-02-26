@@ -12,8 +12,8 @@ from httpx import Response
 from time_machine import TimeMachineFixture
 from typer.testing import CliRunner
 
-from deltaver.parsed_requirements import FreezedReqs, PackageLockReqs, PoetryLockReqs
 from deltaver.__main__ import app
+from deltaver.parsed_requirements import PackageLockReqs
 
 
 @pytest.fixture()
