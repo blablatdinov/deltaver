@@ -89,7 +89,6 @@ class PackageLockReqs(ParsedReqs):
     def reqs(self) -> list[tuple[str, str]]:
         data = json.loads(self._path.read_text())
         return [
-            (name.replace('node_modules/', ''), version_info['version'])
-            for name, version_info in data['packages'].items()
-            if name != ''
+            (name, version_info['version'])
+            for name, version_info in data['dependencies'].items()
         ]

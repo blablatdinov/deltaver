@@ -5,6 +5,13 @@ from typing import TypedDict
 
 
 @enum.unique
+class Langs(enum.Enum):
+
+    python = 'py'
+    javascript = 'js'
+
+
+@enum.unique
 class Formats(enum.Enum):
 
     freezed = 'freezed'

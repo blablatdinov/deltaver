@@ -10,14 +10,15 @@ from rich.progress import track
 from rich.table import Table
 from typing_extensions import TypeAlias
 
-from deltaver.config import ConfigDict, Formats
-from deltaver.parsed_requirements import ExcludedReqs, FileNotFoundSafeReqs, FreezedReqs, PoetryLockReqs
+from deltaver.config import ConfigDict, Formats, Langs
+from deltaver.parsed_requirements import ExcludedReqs, FileNotFoundSafeReqs, FreezedReqs, PoetryLockReqs, PackageLockReqs
 from deltaver.version_delta import (
     CachedSortedVersions,
     DecrDelta,
     OvertakingSafeVersionDelta,
     PypiVersionDelta,
     PypiVersionsSortedBySemver,
+    NpmjsVersionsSortedBySemver,
 )
 
 app = typer.Typer()
@@ -70,10 +71,15 @@ def controller(
     sum_delta = 0
     max_delta = 0
     packages = []
-    reqs_obj_ctor = {
-        'freezed': FreezedReqs,
-        'lock': PoetryLockReqs,
-    }[config['file_format'].value]
+    reqs_obj_ctor, sorted_versions_ctor = {
+        'js': {
+            'lock': (PackageLockReqs, NpmjsVersionsSortedBySemver),
+        },
+        'py': {
+            'freezed': (FreezedReqs, PypiVersionsSortedBySemver),
+            'lock': (PoetryLockReqs, PypiVersionsSortedBySemver),
+        },
+    }[config['lang'].value][config['file_format'].value]
     dependencies = FileNotFoundSafeReqs(
         ExcludedReqs(
             reqs_obj_ctor(config['path_to_requirements_file']),
@@ -85,7 +91,7 @@ def controller(
             DecrDelta(
                 PypiVersionDelta(
                     CachedSortedVersions(
-                        PypiVersionsSortedBySemver(
+                        sorted_versions_ctor(
                             config['artifactory_domain'],
                             package,
                         ),
@@ -120,8 +126,8 @@ def main(  # noqa: PLR0913
     exclude_deps: Annotated[list[str], typer.Option('--exclude')] = [],  # noqa: B006
     # Use unreal date because time_machine.move_to fixture not work for datetime.datetime.now() here
     for_date_param: Annotated[datetime.datetime, typer.Option('--for-date')] = FIRST_DATE_STR,  # type: ignore[assignment]
+    lang: Annotated[str, typer.Option('--lang')] = 'py',
 ) -> None:
-
     if for_date_param.date() == FIRST_DATE:
         for_date = datetime.datetime.now(tz=datetime.timezone.utc)
     else:
@@ -136,10 +142,14 @@ def main(  # noqa: PLR0913
             pyproject_config.get('path_to_requirements_file')
             or Path(path_to_requirements_file)
         ),
+        'lang': Langs(lang),
         'file_format': Formats(file_format),
         'fail_on_avg': pyproject_config.get('fail_on_avg') or fail_on_average,
         'fail_on_max': pyproject_config.get('fail_on_max') or fail_on_max,
-        'artifactory_domain': pyproject_config.get('artifactory_domain') or artifactory_domain,
+        'artifactory_domain': pyproject_config.get(
+            'artifactory_domain',
+            {'js': 'https://registry.npmjs.org', 'py': 'https://pypi.org'}.get(lang),
+        ) or artifactory_domain,
         'excluded': pyproject_config.get('excluded') or exclude_deps,
         'for_date': pyproject_config.get('for_date') or for_date.date(),
     })
