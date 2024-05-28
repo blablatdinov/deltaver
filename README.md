@@ -6,17 +6,17 @@ The "Deltaver" is a Python project designed to calculate the lag or delay in dep
 
 ## Features:
 
- - **Dependency Lag Calculation**: The tool analyzes the timestamp of the current dependency version and compares it with the latest available version, providing the time lag in days.
- - **Security Insights**: Identify outdated dependencies to prioritize updates based on security considerations.
- - **Customization**: Configure the tool to focus on specific dependencies or categories, allowing for flexibility in analysis.
+- **Dependency Lag Calculation**: The tool analyzes the timestamp of the current dependency version and compares it with the latest available version, providing the time lag in days.
+- **Security Insights**: Identify outdated dependencies to prioritize updates based on security considerations.
+- **Customization**: Configure the tool to focus on specific dependencies or categories, allowing for flexibility in analysis.
 
 ## Getting Started
 ### Prerequisites
 
 Make sure you have the following installed:
 
- - Python 3.x
- - Pip (Python package installer)
+- Python 3.x
+- Pip (Python package installer)
 
 ### Installation
 
