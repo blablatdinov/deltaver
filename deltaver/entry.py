@@ -23,11 +23,20 @@
 """Python project designed to calculate the lag or delay in dependencies in terms of days."""
 
 from pathlib import Path
+from enum import Enum
 
 import typer
 from rich import print as rich_print
 
 app = typer.Typer()
+
+
+class Formats(Enum):
+    """Dependencies file format."""
+
+    pip_freeze = 'pip-freeze'
+    poetry_lock = 'poetry-lock'
+    npm_lock = 'npm-lock'
 
 
 @app.command()
@@ -39,6 +48,12 @@ def main(
         ' - ./poetry.lock',
         ' - /home/user/code/deltaver/poetry.lock',
     ])),
+    file_format: Formats = typer.Option(  # noqa: B008, WPS404. Typer API
+        Formats.pip_freeze.value,
+        '--format',
+        help='Dependencies file format',
+    ),
 ) -> None:
     """Python project designed to calculate the lag or delay in dependencies in terms of days."""
     rich_print('Content length: {0}'.format(len(path_to_file.read_text())))
+    rich_print('Format: {0}'.format(file_format))

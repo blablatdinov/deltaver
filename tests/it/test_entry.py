@@ -59,9 +59,11 @@ def test(current_dir: Path) -> None:
         stdout=subprocess.PIPE,
         check=False,
     )
+    stdout = got.stdout.decode('utf-8').strip().splitlines()
 
     assert got.returncode == 0, got.stderr
     assert re.match(
         r'Content length: \d+',
-        got.stdout.decode('utf-8').strip(),
+        stdout[0],
     )
+    assert stdout[1] == 'Format: Formats.pip_freeze'
