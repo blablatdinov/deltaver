@@ -63,6 +63,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Checkout master
+        run: git fetch origin master:master
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -83,9 +85,9 @@ jobs:
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --no-interaction
       - name: lint via ruff
-        run: .venv/bin/ruff check deltaver tests
-    # - name: flake8
-    #   run: flake8 pyeo tests
+        run: .venv/bin/ruff check deltaver tests | .venv/bin/ondivi
+      - name: flake8
+        run: .venv/bin/flake8 deltaver tests | .venv/bin/ondivi
       - name: mypy
         run: .venv/bin/mypy deltaver tests
       - name: Checking files for compliance with editorconfig
