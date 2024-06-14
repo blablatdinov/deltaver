@@ -22,6 +22,8 @@
 
 """Python project designed to calculate the lag or delay in dependencies in terms of days."""
 
+from pathlib import Path
+
 import typer
 from rich import print as rich_print
 
@@ -29,6 +31,14 @@ app = typer.Typer()
 
 
 @app.command()
-def main() -> None:
-    """Entrypoint."""
-    rich_print('Hello')
+def main(
+    path_to_file: Path = typer.Argument(help='\n\n'.join([  # noqa: B008, WPS404. Typer API
+        'Path to file which specified project dependencies.',
+        'Examples:',
+        ' - requirements.txt',
+        ' - ./poetry.lock',
+        ' - /home/user/code/deltaver/poetry.lock',
+    ])),
+) -> None:
+    """Python project designed to calculate the lag or delay in dependencies in terms of days."""
+    rich_print('Content length: {0}'.format(len(path_to_file.read_text())))

@@ -22,6 +22,7 @@
 
 """Integration test with installing."""
 
+import re
 import os
 import subprocess
 from collections.abc import Generator
@@ -51,12 +52,16 @@ def _tmp_directory(tmpdir_factory: TempdirFactory, current_dir: str) -> Generato
 
 
 @pytest.mark.usefixtures('_tmp_directory')
-def test() -> None:
+def test(current_dir: Path) -> None:
     """Test run command."""
     got = subprocess.run(
-        ['venv/bin/deltaver_new'],
+        ['venv/bin/deltaver_new', str(current_dir / 'tests/fixtures/requirements.txt')],
         stdout=subprocess.PIPE,
         check=False,
     )
 
-    assert got.stdout.decode('utf-8').strip() == 'Hello'
+    assert got.returncode == 0, got.stderr
+    assert re.match(
+        r'Content length: \d+',
+        got.stdout.decode('utf-8').strip(),
+    )
