@@ -20,11 +20,10 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Integration test with installing and check on real git repo."""
+"""Integration test with installing."""
 
 import os
 import subprocess
-import zipfile
 from collections.abc import Generator
 from pathlib import Path
 
@@ -40,20 +39,21 @@ def current_dir() -> Path:
 
 # flake8: noqa: S603, S607. Not a production code
 @pytest.fixture(scope='module')
-def tmp_directory(tmpdir_factory: TempdirFactory, current_dir: str) -> Generator[None, None, None]:
+def _tmp_directory(tmpdir_factory: TempdirFactory, current_dir: str) -> Generator[None, None, None]:
     """Temporary directory for test."""
     tmp_path = tmpdir_factory.mktemp('test')
     os.chdir(tmp_path)
     subprocess.run(['python', '-m', 'venv', 'venv'], check=True)
     subprocess.run(['venv/bin/pip', 'install', 'pip', '-U'], check=True)
     subprocess.run(['venv/bin/pip', 'install', str(current_dir)], check=True)
-    yield tmp_path
+    yield
     os.chdir(current_dir)
 
 
-def test(tmp_directory):
+@pytest.mark.usefixtures('_tmp_directory')
+def test() -> None:
+    """Test run command."""
     got = subprocess.run(
-        # ['venv/bin/deltaver_new', str(tmp_directory)],
         ['venv/bin/deltaver_new'],
         stdout=subprocess.PIPE,
         check=False,

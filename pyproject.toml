@@ -28,6 +28,8 @@ ruff = "0.4.8"
 mypy = "1.10.0"
 types-toml = "0.10.8.20240310"
 pytest-randomly = "3.15.0"
+ondivi = "0.4.1"
+wemake-python-styleguide = "0.19.2"
 
 [tool.poetry.scripts]
 deltaver = "deltaver.__main__:app"
@@ -50,7 +52,6 @@ fixable = [
 line-length = 120
 target-version = "py39"
 ignore = [
-  "D",       # TODO: write docstrings
   "ANN101",  # Missing type annotation for `self` in method
   "ANN102",  # Missing type annotation for `cls` in classmethod
   "ARG001",  # Unused function argument
@@ -58,6 +59,7 @@ ignore = [
   "D203",    # no-blank-line-before-class
   "D213",    # multi-line-summary-first-line
   "D418",    # Function decorated with `@overload` shouldn't contain a docstring
+  "D401",    # First line of docstring should be in imperative mood
   "FBT001",  # Boolean-typed positional argument in function definition
   "FBT002",  # Boolean-typed positional argument in function definition
   "FIX002",  # Line contains TODO, consider resolving the issue

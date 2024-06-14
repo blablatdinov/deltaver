@@ -20,12 +20,15 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
+"""Python project designed to calculate the lag or delay in dependencies in terms of days."""
+
 import typer
-from rich import print
+from rich import print as rich_print
 
 app = typer.Typer()
 
 
 @app.command()
-def main():
-    print('Hello')
+def main() -> None:
+    """Entrypoint."""
+    rich_print('Hello')
