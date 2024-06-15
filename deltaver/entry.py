@@ -22,8 +22,8 @@
 
 """Python project designed to calculate the lag or delay in dependencies in terms of days."""
 
-from pathlib import Path
 from enum import Enum
+from pathlib import Path
 
 import typer
 from rich import print as rich_print
