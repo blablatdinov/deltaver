@@ -50,7 +50,7 @@ ruff = "0.4.10"
 mypy = "1.10.0"
 types-toml = "0.10.8.20240310"
 pytest-randomly = "3.15.0"
-ondivi = "0.4.1"
+ondivi = "0.5.0"
 wemake-python-styleguide = "0.19.2"
 
 [tool.poetry.scripts]
