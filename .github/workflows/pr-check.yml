@@ -20,7 +20,7 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-name: Check pull request
+name: CI
 
 on:
   pull_request:
@@ -33,7 +33,7 @@ jobs:
   tests:
     strategy:
       matrix:
-        python_version: [ "3.9", "3.12", "3.13.0-beta.1" ]
+        python_version: [ "3.9", "3.12", "3.13.0-beta.2" ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -68,7 +68,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12.1"
+          python-version: "3.12"
       - name: Install Poetry
         uses: snok/install-poetry@v1.3.4
         with:

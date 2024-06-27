@@ -34,7 +34,7 @@ from _pytest.legacypath import TempdirFactory
 
 @pytest.fixture(scope='module')
 def current_dir() -> Path:
-    """Current directory for installing actual ondivi."""
+    """Current directory for installing actual deltaver."""
     return Path().absolute()
 
 
