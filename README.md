@@ -1,5 +1,10 @@
 # Deltaver (Dependency Lag Calculator)
 
+[![PyPI version](https://badge.fury.io/py/deltaver.svg)](https://badge.fury.io/py/deltaver)
+![CI status](https://github.com/blablatdinov/deltaver/actions/workflows/pr-check.yml/badge.svg?branch=master)
+[![Lines of code](https://tokei.rs/b1/github/blablatdinov/deltaver?type=python)](https://github.com/XAMPPRocky/tokei_rs)
+[![Hits-of-Code](https://hitsofcode.com/github/blablatdinov/deltaver)](https://hitsofcode.com/github/blablatdinov/deltaver/view)
+
 ## Overview
 
 The "Deltaver" is a Python project designed to calculate the lag or delay in dependencies in terms of days. It provides insights into how outdated your project dependencies are, helping you stay up-to-date with the latest developments and security patches.
