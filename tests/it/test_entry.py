@@ -54,8 +54,9 @@ def _tmp_directory(tmpdir_factory: TempdirFactory, current_dir: str) -> Generato
 @pytest.mark.usefixtures('_tmp_directory')
 def test(current_dir: Path) -> None:
     """Test run command."""
+    Path('req.txt').write_text('httpx==0.25.0')
     got = subprocess.run(
-        ['venv/bin/deltaver_new', str(current_dir / 'tests/fixtures/requirements.txt')],
+        ['venv/bin/deltaver_new', 'req.txt'],
         stdout=subprocess.PIPE,
         check=False,
     )
