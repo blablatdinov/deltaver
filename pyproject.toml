@@ -69,6 +69,7 @@ include_trailing_comma = true
 [tool.ruff]
 line-length = 120
 target-version = "py39"
+output-format = "concise"
 
 [tool.ruff.lint]
 select = ["ALL"]
