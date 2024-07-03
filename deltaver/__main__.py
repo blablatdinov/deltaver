@@ -1,6 +1,7 @@
 import datetime
 from pathlib import Path
-from typing import Annotated, Final
+from typing import Final
+from typing_extensions import Annotated
 
 import toml
 import typer

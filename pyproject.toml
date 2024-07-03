@@ -31,7 +31,7 @@ authors = ["Almaz Ilaletdinov <a.ilaletdinov@yandex.ru>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.8"
 attrs = "^23.0"
 httpx = "^0"
 packaging = ">=23,<25"
@@ -50,8 +50,8 @@ ruff = "0.5.0"
 mypy = "1.10.1"
 types-toml = "0.10.8.20240310"
 pytest-randomly = "3.15.0"
-ondivi = "0.5.0"
-wemake-python-styleguide = "0.19.2"
+# ondivi = "0.5.0"
+# wemake-python-styleguide = "0.19.2"
 
 [tool.poetry.scripts]
 deltaver = "deltaver.__main__:app"
