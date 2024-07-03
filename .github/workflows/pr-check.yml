@@ -35,7 +35,7 @@ jobs:
   tests:
     strategy:
       matrix:
-        python_version: [ "3.9", "3.12", "3.13.0-beta.3" ]
+        python_version: [ "3.8", "3.12", "3.13.0-beta.3" ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -85,7 +85,7 @@ jobs:
           key: venv-3.12-${{ hashFiles('**/poetry.lock') }}
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --no-interaction
+        run: poetry install --no-interaction && poetry run pip install -r lint_requirements.txt
       - name: lint via ruff
         run: .venv/bin/ruff check deltaver tests | .venv/bin/ondivi
       - name: flake8
