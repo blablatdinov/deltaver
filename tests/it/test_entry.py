@@ -62,9 +62,5 @@ def test(current_dir: Path) -> None:
     )
     stdout = got.stdout.decode('utf-8').strip().splitlines()
 
-    assert got.returncode == 0, got.stderr
-    assert re.match(
-        r'Content length: \d+',
-        stdout[0],
-    )
-    assert stdout[1] == 'Format: Formats.pip_freeze'
+    assert got.returncode == 0, got.stderr or stdout
+    assert stdout == ''

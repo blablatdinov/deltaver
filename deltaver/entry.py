@@ -124,14 +124,11 @@ def main(
     max_delta = 0
     for name, version in track(dependencies, description='Scanning...'):
         delta = DaysDelta(
-            PypiPackage(  # FIXME PypiPackage object must be returned from FreezedReqs
-                name,
-                version,
-                CachedPackageList.ctor(
-                    SortedPackageList(
-                        FilteredPackageList(
-                            PypiPackageList(name),
-                        ),
+            version,
+            CachedPackageList.ctor(
+                SortedPackageList(
+                    FilteredPackageList(
+                        PypiPackageList(name),
                     ),
                 ),
             ),
