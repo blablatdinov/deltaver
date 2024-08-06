@@ -32,7 +32,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-attrs = "^23.0"
+attrs = "^24.0.0"
 httpx = "^0"
 packaging = ">=23,<25"
 typer = "^0"
