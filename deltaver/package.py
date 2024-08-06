@@ -15,7 +15,6 @@ from deltaver.exceptions import NextVersionNotFoundError
 class Package(Protocol):
 
     def version(self) -> Version: pass
-    def next(self) -> 'Package': pass
     def name(self) -> str: pass
     def release_date(self) -> datetime.datetime: pass
 
@@ -50,9 +49,6 @@ class FkPackage(Package):
 
     def version(self) -> Version:
         return parse(self._version)
-
-    def next(self) -> Package:
-        return self._next
 
     def name(self) -> str:
         return self._name
@@ -145,15 +141,6 @@ class PypiPackage(Package):
 
     def version(self) -> Version:
         return parse(self._version)
-
-    def next(self) -> Package:
-        flag = False
-        for package in self._version_list.as_list():
-            if flag:
-                return package
-            if package.version() == self.version():
-                flag = True
-        raise NextVersionNotFoundError
 
     def name(self) -> str:
         return self._name
