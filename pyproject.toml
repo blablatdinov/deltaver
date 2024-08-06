@@ -43,7 +43,7 @@ toml = "^0.10.2"
 [tool.poetry.group.dev.dependencies]
 pytest = "8.3.2"
 respx = "0.21.1"
-time-machine = "2.14.2"
+time-machine = "2.15.0"
 isort = "5.13.2"
 pytest-cov = "5.0.0"
 ruff = "0.5.6"
