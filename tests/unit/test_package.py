@@ -15,13 +15,13 @@ from deltaver.package import (
 
 @pytest.fixture()
 def httpx_27_package():
-    return FkPackage.without_next_ctor('httpx', '0.27.0', datetime.date(2024, 2, 21))
+    return FkPackage('httpx', '0.27.0', datetime.date(2024, 2, 21))
 
 
 @pytest.fixture()
 def package_list(httpx_27_package):
-    httpx_0_26_0 = FkPackage('httpx', '0.26.0', datetime.date(2023, 12, 20), httpx_27_package)
-    httpx_0_25_2 = FkPackage('httpx', '0.25.2', datetime.date(2023, 11, 24), httpx_0_26_0)
+    httpx_0_26_0 = FkPackage('httpx', '0.26.0', datetime.date(2023, 12, 20))
+    httpx_0_25_2 = FkPackage('httpx', '0.25.2', datetime.date(2023, 11, 24))
     return FkVersionList([httpx_0_25_2, httpx_0_26_0, httpx_27_package])
 
 
@@ -33,29 +33,18 @@ def test(package_list):
     )
 
     assert package.release_date() == datetime.date(2023, 11, 24)
-    assert package.next().release_date() == datetime.date(2023, 12, 20)
-    assert str(package.next().version()) == '0.26.0'
-
-
-def test_last_version(package_list):
-    with pytest.raises(NextVersionNotFoundError):
-        PypiPackage(
-            'httpx',
-            '0.27.0',
-            package_list,
-        ).next()
 
 
 def test_package_list(httpx_27_package):
-    PypiPackageList().as_list(httpx_27_package)
+    PypiPackageList('httpx').as_list()
 
     # FIXME: assert
 
 
 def test_filtered_package_list(httpx_27_package):
     package_list = FilteredPackageList(
-        PypiPackageList(),
-    ).as_list(httpx_27_package)
+        PypiPackageList('httpx'),
+    ).as_list()
 
     assert [
         str(package.version())
@@ -130,9 +119,9 @@ def test_filtered_package_list(httpx_27_package):
 def test_sorted_package_list(httpx_27_package):
     package_list = SortedPackageList(
         FilteredPackageList(
-            PypiPackageList(),
+            PypiPackageList('httpx'),
         ),
-    ).as_list(httpx_27_package)
+    ).as_list()
 
     assert [
         str(package.version())
