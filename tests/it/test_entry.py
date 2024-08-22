@@ -63,4 +63,13 @@ def test(current_dir: Path) -> None:
     stdout = got.stdout.decode('utf-8').strip().splitlines()
 
     assert got.returncode == 0, got.stderr or stdout
-    assert stdout == ''
+    assert stdout == [
+        'Scanning... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00',
+        '┏━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━┓',
+        '┃ Package ┃ Version ┃ Delta (days) ┃',
+        '┡━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━┩',
+        '│ httpx   │ 0.25.0  │ 293          │',
+        '└─────────┴─────────┴──────────────┘',
+        'Max delta: 293',
+        'Average delta: 293.00',
+    ]
