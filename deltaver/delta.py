@@ -24,7 +24,7 @@ class DaysDelta(Delta):
 
     def days(self) -> int:
         flag = False
-        next_version_release_date = datetime.date(0, 0, 0)
+        next_version_release_date = datetime.date(1, 1, 1)
         for package in self._packages.as_list():
             if flag:
                 next_version_release_date = package.release_date()
