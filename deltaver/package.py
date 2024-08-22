@@ -28,6 +28,16 @@ class VersionList(Protocol):
 @attrs.define(frozen=True)
 class FkVersionList(VersionList):
 
+    _packages: list[Package]
+
+    def as_list(self) -> list[Package]:
+        return self._packages
+
+
+@final
+@attrs.define(frozen=True)
+class FkVersionList(VersionList):
+
     _origin: list[Package]
 
     def as_list(self) -> list[Package]:
@@ -41,11 +51,6 @@ class FkPackage(Package):
     _name: str
     _version: str
     _release_date: datetime.date
-    _next: Package | None
-
-    @classmethod
-    def without_next_ctor(cls, name: str, version: str, release_date: datetime.date):
-        return cls(name, version, release_date, None)
 
     def version(self) -> Version:
         return parse(self._version)

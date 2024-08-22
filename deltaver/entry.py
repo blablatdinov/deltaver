@@ -86,8 +86,7 @@ def config_ctor(
         'fail_on_max': fail_on_max,
     }
     if file_format == Formats.default:
-        with suppress(KeyError):
-            config['file_format'] = toml.load(Path('pyproject.toml'))['tool']['deltaver']['file_format']
+        file_format = Formats.pip_freeze
     return config
 
 
