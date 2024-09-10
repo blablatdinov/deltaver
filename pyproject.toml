@@ -41,7 +41,7 @@ typing-extensions = "^4.9"
 toml = "^0.10.2"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "8.3.2"
+pytest = "8.3.3"
 respx = "0.21.1"
 time-machine = "2.15.0"
 isort = "5.13.2"
