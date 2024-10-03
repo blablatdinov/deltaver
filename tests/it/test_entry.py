@@ -54,16 +54,22 @@ def _tmp_directory(tmpdir_factory: TempdirFactory, current_dir: str) -> Generato
 @pytest.mark.usefixtures('_tmp_directory')
 def test(current_dir: Path) -> None:
     """Test run command."""
+    Path('req.txt').write_text('httpx==0.25.0')
     got = subprocess.run(
-        ['venv/bin/deltaver_new', str(current_dir / 'tests/fixtures/requirements.txt')],
+        ['venv/bin/deltaver_new', 'req.txt'],
         stdout=subprocess.PIPE,
         check=False,
     )
     stdout = got.stdout.decode('utf-8').strip().splitlines()
 
-    assert got.returncode == 0, got.stderr
-    assert re.match(
-        r'Content length: \d+',
-        stdout[0],
-    )
-    assert stdout[1] == 'Format: Formats.pip_freeze'
+    assert got.returncode == 0, got.stderr or stdout
+    assert stdout == [
+        'Scanning... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00',
+        '┏━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━┓',
+        '┃ Package ┃ Version ┃ Delta (days) ┃',
+        '┡━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━┩',
+        '│ httpx   │ 0.25.0  │ 293          │',
+        '└─────────┴─────────┴──────────────┘',
+        'Max delta: 293',
+        'Average delta: 293.00',
+    ]
