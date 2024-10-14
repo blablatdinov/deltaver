@@ -30,11 +30,9 @@ from deltaver.package import (
     FilteredPackageList,
     FkPackage,
     FkVersionList,
-    Package,
     PypiPackage,
     PypiPackageList,
     SortedPackageList,
-    VersionList,
 )
 
 
@@ -47,19 +45,19 @@ def test() -> None:
             FkPackage('httpx', '0.25.2', datetime.date(2023, 11, 24)),
             FkPackage('httpx', '0.26.0', datetime.date(2023, 12, 20)),
             FkPackage('httpx', '0.27.0', datetime.date(2024, 2, 21)),
-        ])
+        ]),
     )
 
     assert package.release_date() == datetime.date(2023, 11, 24)
 
 
-@pytest.mark.skip()
+@pytest.mark.skip
 def test_package_list() -> None:
     """Test package list.
-    
+
     TODO: implement mock and write assert
     """
-    got = PypiPackageList('httpx').as_list()
+    PypiPackageList('httpx').as_list()
 
 
 def test_filtered_package_list() -> None:
