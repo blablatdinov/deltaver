@@ -22,7 +22,7 @@ from deltaver.version_delta import (
 )
 
 
-@pytest.fixture()
+@pytest.fixture
 def _mock_pypi(respx_mock: MockRouter) -> None:
     respx_mock.get('https://pypi.org/pypi/httpx/json').mock(return_value=Response(
         200,
@@ -30,7 +30,7 @@ def _mock_pypi(respx_mock: MockRouter) -> None:
     ))
 
 
-@pytest.fixture()
+@pytest.fixture
 def _mock_eljson(respx_mock: MockRouter) -> None:
     respx_mock.get('https://pypi.org/pypi/eljson/json').mock(return_value=Response(
         200,
@@ -38,7 +38,7 @@ def _mock_eljson(respx_mock: MockRouter) -> None:
     ))
 
 
-@pytest.fixture()
+@pytest.fixture
 def _mock_gitdb(respx_mock: MockRouter) -> None:
     respx_mock.get('https://pypi.org/pypi/gitdb/json').mock(return_value=Response(
         200,
@@ -46,7 +46,7 @@ def _mock_gitdb(respx_mock: MockRouter) -> None:
     ))
 
 
-@pytest.fixture()
+@pytest.fixture
 def _mock_cryptography(respx_mock: MockRouter) -> None:
     respx_mock.get('https://pypi.org/pypi/cryptography/json').mock(return_value=Response(
         200,
@@ -54,7 +54,7 @@ def _mock_cryptography(respx_mock: MockRouter) -> None:
     ))
 
 
-@pytest.fixture()
+@pytest.fixture
 def _mock_greenlet(respx_mock: MockRouter) -> None:
     respx_mock.get('https://pypi.org/pypi/greenlet/json').mock(return_value=Response(
         200,
@@ -62,7 +62,7 @@ def _mock_greenlet(respx_mock: MockRouter) -> None:
     ))
 
 
-@pytest.fixture()
+@pytest.fixture
 def _mock_vue(respx_mock: MockRouter) -> None:
     respx_mock.get('https://registry.npmjs.org/vue').mock(return_value=Response(
         200,
@@ -125,7 +125,7 @@ def test_release_candidate(time_machine: TimeMachineFixture) -> None:
     PypiVersionDelta(PypiVersionsSortedBySemver('https://pypi.org/', 'greenlet'), '3.0.0rc3').days()
 
 
-@pytest.fixture()
+@pytest.fixture
 def other_dir(tmp_path: Path) -> Generator[Path, None, None]:
     origin_dir = Path.cwd()
     os.chdir(tmp_path)
@@ -153,7 +153,7 @@ def test_negative_decr_delta(time_machine: TimeMachineFixture) -> None:
     assert got == 0
 
 
-@pytest.fixture()
+@pytest.fixture
 def exist_cache(tmp_path: Path, time_machine: TimeMachineFixture, _mock_pypi: None) -> Generator[Path, None, None]:
     origin_dir = Path.cwd()
     time_machine.move_to(datetime.datetime(2024, 2, 5, tzinfo=datetime.timezone.utc))

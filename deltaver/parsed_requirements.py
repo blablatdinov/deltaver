@@ -8,8 +8,6 @@ import toml
 import typer
 from rich import print
 
-from deltaver.config import ConfigDict
-
 
 class ParsedReqs(Protocol):
 

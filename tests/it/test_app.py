@@ -16,7 +16,7 @@ from deltaver.__main__ import app
 from deltaver.parsed_requirements import PackageLockReqs
 
 
-@pytest.fixture()
+@pytest.fixture
 def runner() -> CliRunner:
     return CliRunner()
 
@@ -26,7 +26,7 @@ def _removed_cache() -> None:
     rmtree(Path('.deltaver_cache/'), ignore_errors=True)
 
 
-@pytest.fixture()
+@pytest.fixture
 def _mock_pypi(respx_mock: respx.router.MockRouter, tmp_path: Path) -> None:
     with zipfile.ZipFile('tests/fixtures/pypi_mock.zip', 'r') as zip_ref:
         zip_ref.extractall(tmp_path)
@@ -38,7 +38,7 @@ def _mock_pypi(respx_mock: respx.router.MockRouter, tmp_path: Path) -> None:
         ))
 
 
-@pytest.fixture()
+@pytest.fixture
 def _mock_npmjs(respx_mock: respx.router.MockRouter, tmp_path: Path) -> None:
     with zipfile.ZipFile('tests/fixtures/npm_mock.zip', 'r') as zip_ref:
         zip_ref.extractall(tmp_path)
@@ -49,14 +49,14 @@ def _mock_npmjs(respx_mock: respx.router.MockRouter, tmp_path: Path) -> None:
         ))
 
 
-@pytest.fixture()
+@pytest.fixture
 def latest_requirements_file(tmp_path: Path) -> Path:
     path = (tmp_path / 'requirements.txt')
     path.write_text('httpx==0.26.0')
     return path
 
 
-@pytest.fixture()
+@pytest.fixture
 def _other_dir(tmp_path: Path) -> Generator[None, None, None]:
     origin_dir = Path.cwd()
     copyfile('tests/fixtures/pyproject.toml', tmp_path / 'pyproject.toml')

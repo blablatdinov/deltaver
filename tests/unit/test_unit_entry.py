@@ -20,6 +20,8 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
+"""Unit test of entry."""
+
 import datetime
 import zipfile
 from pathlib import Path
@@ -32,35 +34,36 @@ from time_machine import TimeMachineFixture
 from deltaver.entry import logic
 
 
-@pytest.fixture()
+@pytest.fixture
 def _mock_pypi(respx_mock: respx.router.MockRouter, tmp_path: Path) -> None:
-    with zipfile.ZipFile("tests/fixtures/pypi_mock.zip", "r") as zip_ref:
+    with zipfile.ZipFile('tests/fixtures/pypi_mock.zip', 'r') as zip_ref:
         zip_ref.extractall(tmp_path)
-    for line in Path("tests/fixtures/requirements.txt").read_text().strip().splitlines():
-        package_name = line.split("==")[0]
-        respx_mock.get("https://pypi.org/pypi/{0}/json".format(package_name)).mock(
+    for line in Path('tests/fixtures/requirements.txt').read_text().strip().splitlines():
+        package_name = line.split('==')[0]
+        respx_mock.get('https://pypi.org/pypi/{0}/json'.format(package_name)).mock(
             return_value=httpx.Response(
                 200,
-                text=Path(tmp_path / "fixtures/{0}_pypi_response.json".format(package_name)).read_text(),
-            )
+                text=Path(tmp_path / 'fixtures/{0}_pypi_response.json'.format(package_name)).read_text(),
+            ),
         )
 
 
-@pytest.mark.usefixtures("_mock_pypi")
+@pytest.mark.usefixtures('_mock_pypi')
 def test(time_machine: TimeMachineFixture) -> None:
+    """Test logic function."""
     time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
-    packages, sum_delta, max_delta = logic(Path("tests/fixtures/requirements.txt").read_text(), [])
+    packages, sum_delta, max_delta = logic(Path('tests/fixtures/requirements.txt').read_text(), [])
 
     assert [(name, version, delta) for name, version, delta in packages if delta > 0] == [
-        ("SQLAlchemy", "1.4.51", 366),
-        ("smmap", "5.0.1", 132),
-        ("jsonschema", "4.21.0", 8),
-        ("MarkupSafe", "2.1.3", 8),
-        ("diff_cover", "8.0.2", 7),
-        ("bandit", "1.7.6", 4),
-        ("cryptography", "41.0.7", 4),
-        ("pluggy", "1.3.0", 3),
-        ("refurb", "1.27.0", 3),
+        ('SQLAlchemy', '1.4.51', 366),
+        ('smmap', '5.0.1', 132),
+        ('jsonschema', '4.21.0', 8),
+        ('MarkupSafe', '2.1.3', 8),
+        ('diff_cover', '8.0.2', 7),
+        ('bandit', '1.7.6', 4),
+        ('cryptography', '41.0.7', 4),
+        ('pluggy', '1.3.0', 3),
+        ('refurb', '1.27.0', 3),
     ]
     assert sum_delta == 535
     assert max_delta == 366
@@ -69,20 +72,21 @@ def test(time_machine: TimeMachineFixture) -> None:
 @pytest.mark.usefixtures('_mock_pypi')
 @respx.mock(assert_all_mocked=False)
 def test_excluded(time_machine: TimeMachineFixture) -> None:
+    """Test excluded param."""
     time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
     packages, sum_delta, max_delta = logic(
-        Path("tests/fixtures/requirements.txt").read_text(),
+        Path('tests/fixtures/requirements.txt').read_text(),
         ['sqlalchemy', 'bandit'],
     )
 
     assert [(name, version, delta) for name, version, delta in packages if delta > 0] == [
-        ("smmap", "5.0.1", 132),
-        ("jsonschema", "4.21.0", 8),
-        ("MarkupSafe", "2.1.3", 8),
-        ("diff_cover", "8.0.2", 7),
-        ("cryptography", "41.0.7", 4),
-        ("pluggy", "1.3.0", 3),
-        ("refurb", "1.27.0", 3),
+        ('smmap', '5.0.1', 132),
+        ('jsonschema', '4.21.0', 8),
+        ('MarkupSafe', '2.1.3', 8),
+        ('diff_cover', '8.0.2', 7),
+        ('cryptography', '41.0.7', 4),
+        ('pluggy', '1.3.0', 3),
+        ('refurb', '1.27.0', 3),
     ]
     assert sum_delta == 165
     assert max_delta == 132
