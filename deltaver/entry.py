@@ -24,7 +24,9 @@
 
 from __future__ import annotations
 
+import sys
 import datetime
+import traceback
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
@@ -125,22 +127,7 @@ def logic(  # noqa: WPS210, WPS234. TODO: fix
     return packages, sum_delta, max_delta
 
 
-@app.command()
-def main(
-    path_to_file: Path = typer.Argument(help='\n\n'.join([  # noqa: B008, WPS404. Typer API
-        'Path to file which specified project dependencies.',
-        'Examples:',
-        ' - requirements.txt',
-        ' - ./poetry.lock',
-        ' - /home/user/code/deltaver/poetry.lock',
-    ])),
-    file_format: Formats = typer.Option(  # noqa: B008, WPS404. Typer API
-        Formats.default.value,
-        '--format',
-        help='Dependencies file format (default: "pip-freeze")',
-    ),
-) -> None:
-    """Python project designed to calculate the lag or delay in dependencies in terms of days."""
+def cli(path_to_file: str, file_format: str):
     config = config_ctor(
         path_to_file,
         file_format,
@@ -172,3 +159,32 @@ def main(
     if config['fail_on_max'] > -1 and max_delta >= config['fail_on_max']:  # noqa: WPS333. TODO: fix
         rich_print('\n[red]Error: max delta greater than available[/red]')
         raise typer.Exit(code=1)
+
+
+@app.command()
+def main(
+    path_to_file: Path = typer.Argument(help='\n\n'.join([  # noqa: B008, WPS404. Typer API
+        'Path to file which specified project dependencies.',
+        'Examples:',
+        ' - requirements.txt',
+        ' - ./poetry.lock',
+        ' - /home/user/code/deltaver/poetry.lock',
+    ])),
+    file_format: Formats = typer.Option(  # noqa: B008, WPS404. Typer API
+        Formats.default.value,
+        '--format',
+        help='Dependencies file format (default: "pip-freeze")',
+    ),
+) -> None:
+    """Python project designed to calculate the lag or delay in dependencies in terms of days."""
+    try:
+        cli(path_to_file, file_format)
+    except Exception as err:
+        sys.stdout.write('\n'.join([
+            'Deltaver fail with: "{0}"'.format(err),
+            'Please submit it to https://github.com/blablatdinov/deltaver/issues',
+            'Copy and paste this stack trace to GitHub:',
+            '========================================',
+            traceback.format_exc(),
+        ]))
+        sys.exit(1)
