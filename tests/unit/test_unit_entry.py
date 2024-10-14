@@ -49,6 +49,7 @@ def _mock_pypi(respx_mock: respx.router.MockRouter, tmp_path: Path) -> None:
 
 
 @pytest.mark.usefixtures('_mock_pypi')
+@pytest.mark.slow  # TODO: optimize
 def test(time_machine: TimeMachineFixture) -> None:
     """Test logic function."""
     time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
@@ -71,6 +72,7 @@ def test(time_machine: TimeMachineFixture) -> None:
 
 @pytest.mark.usefixtures('_mock_pypi')
 @respx.mock(assert_all_mocked=False)
+@pytest.mark.slow  # TODO: optimize
 def test_excluded(time_machine: TimeMachineFixture) -> None:
     """Test excluded param."""
     time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
