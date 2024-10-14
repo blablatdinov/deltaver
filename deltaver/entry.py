@@ -25,13 +25,12 @@
 from __future__ import annotations
 
 import datetime
-from contextlib import suppress
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Literal, TypedDict
+from typing import TypedDict
 
-import toml
+import pytz
 import typer
 from rich import print as rich_print
 from rich.console import Console
@@ -39,7 +38,7 @@ from rich.progress import track
 from rich.table import Table
 
 from deltaver.delta import DaysDelta
-from deltaver.package import CachedPackageList, FilteredPackageList, PypiPackage, PypiPackageList, SortedPackageList
+from deltaver.package import CachedPackageList, FilteredPackageList, PypiPackageList, SortedPackageList
 from deltaver.parsed_requirements import ExcludedReqs, FileNotFoundSafeReqs, FreezedReqs
 
 app = typer.Typer()
@@ -56,6 +55,7 @@ class Formats(Enum):
 
 
 class Config(TypedDict):
+    """Config dict."""
 
     path_to_file: Path
     file_format: Formats
@@ -66,6 +66,7 @@ class Config(TypedDict):
 
 @dataclass
 class PackageOutLine:
+    """DTO for package info."""
 
     name: str
     version: str
@@ -78,6 +79,7 @@ def config_ctor(
     fail_on_avg: int | None,
     fail_on_max: int | None,
 ) -> Config:
+    """Ctor for config."""
     config = {
         'path_to_file': path_to_file,
         'file_format': Formats.pip_freeze,
@@ -93,7 +95,8 @@ def config_ctor(
 def logic(
     requirements_file_content: str,
     excluded_reqs: str,
-):
+) -> tuple[list[tuple[str, str, int]], int, int]:
+    """Logic."""
     dependencies = FileNotFoundSafeReqs(
         ExcludedReqs(
             FreezedReqs(requirements_file_content),
@@ -113,7 +116,7 @@ def logic(
                     ),
                 ),
             ),
-            datetime.datetime.now().date(),
+            datetime.datetime.now(tz=pytz.UTC).date(),
         ).days()
         sum_delta += delta
         max_delta = max(max_delta, delta)

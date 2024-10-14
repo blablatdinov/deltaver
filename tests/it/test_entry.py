@@ -23,7 +23,6 @@
 """Integration test with installing."""
 
 import os
-import re
 import subprocess
 from collections.abc import Generator
 from pathlib import Path

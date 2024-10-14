@@ -6,7 +6,7 @@ import pytest
 from deltaver.parsed_requirements import FreezedReqs, PackageLockReqs, PoetryLockReqs
 
 
-@pytest.fixture()
+@pytest.fixture
 def requirements_file(tmp_path: Path) -> Callable[[str], Path]:
     def _requirements_file(text: str) -> Path:
         path = tmp_path / 'requirements.txt'

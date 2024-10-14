@@ -39,6 +39,7 @@ typer = "^0"
 rich = "^13.0"
 typing-extensions = "^4.9"
 toml = "^0.10.2"
+pytz = "^2024.2"  # FIXME define needed
 
 [tool.poetry.group.dev.dependencies]
 pytest = "8.3.3"
@@ -74,7 +75,8 @@ output-format = "concise"
 [tool.ruff.lint]
 select = ["ALL"]
 fixable = [
-  "F401",   # Unused import
+  "F401",  # Unused import
+  "Q000",  # Double quotes
 ]
 ignore = [
   "ANN101",  # Missing type annotation for `self` in method
