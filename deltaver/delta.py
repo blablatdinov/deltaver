@@ -26,7 +26,7 @@ import datetime
 from typing import Protocol, final
 
 import attrs
-from packaging.version import parse
+from packaging.version import parse as version_parse
 
 from deltaver.package import VersionList
 
@@ -56,7 +56,7 @@ class DaysDelta(Delta):
             if flag:
                 next_version_release_date = package.release_date()
                 break
-            if package.version() == parse(self._version):
+            if package.version() == version_parse(self._version):
                 flag = True
         else:
             return 0

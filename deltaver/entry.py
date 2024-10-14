@@ -92,7 +92,7 @@ def config_ctor(
     return config
 
 
-def logic(
+def logic(  # noqa: WPS210, WPS234. TODO: fix
     requirements_file_content: str,
     excluded_reqs: list[str],
 ) -> tuple[list[tuple[str, str, int]], int, int]:
@@ -159,16 +159,16 @@ def main(
     for package, version, delta in packages:
         if delta != 0:
             table.add_row(package, version, str(delta))
-    if len(packages) > 0:
+    if packages:
         console.print(table)
         average_delta = '{0:.2f}'.format(sum_delta / len(packages))
     else:
         average_delta = '0'
     rich_print('Max delta: {0}'.format(max_delta))
     rich_print('Average delta: {0}'.format(average_delta))
-    if config['fail_on_avg'] > -1 and float(average_delta) >= config['fail_on_avg']:
+    if config['fail_on_avg'] > -1 and float(average_delta) >= config['fail_on_avg']:  # noqa: WPS221, WPS333. TODO: fix
         rich_print('\n[red]Error: average delta greater than available[/red]')
         raise typer.Exit(code=1)
-    if config['fail_on_max'] > -1 and max_delta >= config['fail_on_max']:
+    if config['fail_on_max'] > -1 and max_delta >= config['fail_on_max']:  # noqa: WPS333. TODO: fix
         rich_print('\n[red]Error: max delta greater than available[/red]')
         raise typer.Exit(code=1)

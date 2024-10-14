@@ -50,12 +50,16 @@ def _mock_pypi(respx_mock: respx.router.MockRouter, tmp_path: Path) -> None:
 
 @pytest.mark.usefixtures('_mock_pypi')
 @pytest.mark.slow  # TODO: optimize
-def test(time_machine: TimeMachineFixture) -> None:
+def test(time_machine: TimeMachineFixture) -> None:  # noqa: WPS210. TODO: fix
     """Test logic function."""
     time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
     packages, sum_delta, max_delta = logic(Path('tests/fixtures/requirements.txt').read_text(), [])
 
-    assert [(name, version, delta) for name, version, delta in packages if delta > 0] == [
+    assert [
+        (name, version, delta)
+        for name, version, delta in packages
+        if delta > 0
+    ] == [
         ('SQLAlchemy', '1.4.51', 366),
         ('smmap', '5.0.1', 132),
         ('jsonschema', '4.21.0', 8),
@@ -73,7 +77,7 @@ def test(time_machine: TimeMachineFixture) -> None:
 @pytest.mark.usefixtures('_mock_pypi')
 @respx.mock(assert_all_mocked=False)
 @pytest.mark.slow  # TODO: optimize
-def test_excluded(time_machine: TimeMachineFixture) -> None:
+def test_excluded(time_machine: TimeMachineFixture) -> None:  # noqa: WPS210. TODO: fix
     """Test excluded param."""
     time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
     packages, sum_delta, max_delta = logic(
@@ -81,7 +85,11 @@ def test_excluded(time_machine: TimeMachineFixture) -> None:
         ['sqlalchemy', 'bandit'],
     )
 
-    assert [(name, version, delta) for name, version, delta in packages if delta > 0] == [
+    assert [
+        (name, version, delta)
+        for name, version, delta in packages
+        if delta > 0
+    ] == [
         ('smmap', '5.0.1', 132),
         ('jsonschema', '4.21.0', 8),
         ('MarkupSafe', '2.1.3', 8),
