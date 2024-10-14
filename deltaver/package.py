@@ -93,7 +93,7 @@ class FkPackage(Package):
 class PackageInfo(Protocol):
     """Package info."""
 
-    def content(self) -> dict:  # FIXME
+    def content(self) -> dict:  # TODO: detalize
         """Content."""
 
 
