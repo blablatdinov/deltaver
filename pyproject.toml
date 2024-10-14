@@ -53,6 +53,7 @@ types-toml = "0.10.8.20240310"
 pytest-randomly = "3.16.0"
 ondivi = "0.6.0"
 wemake-python-styleguide = "0.19.2"
+types-pytz = "^2024.2.0.20241003"
 
 [tool.poetry.scripts]
 deltaver = "deltaver.__main__:app"

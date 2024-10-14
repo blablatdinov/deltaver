@@ -90,7 +90,7 @@ def controller(
     dependencies = FileNotFoundSafeReqs(
         ExcludedReqs(
             reqs_obj_ctor(config['path_to_requirements_file']),
-            config,
+            config['excluded'],
         ),
     ).reqs()
     for package, version in track(dependencies, description='Scanning...'):

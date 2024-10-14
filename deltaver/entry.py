@@ -60,8 +60,8 @@ class Config(TypedDict):
     path_to_file: Path
     file_format: Formats
     excluded: list[str]
-    fail_on_avg: int | None
-    fail_on_max: int | None
+    fail_on_avg: int
+    fail_on_max: int
 
 
 @dataclass
@@ -76,17 +76,17 @@ class PackageOutLine:
 def config_ctor(
     path_to_file: Path,
     file_format: Formats,
-    fail_on_avg: int | None,
-    fail_on_max: int | None,
+    fail_on_avg: int,
+    fail_on_max: int,
 ) -> Config:
     """Ctor for config."""
-    config = {
+    config = Config({
         'path_to_file': path_to_file,
         'file_format': Formats.pip_freeze,
         'excluded': [],  # FIXME
         'fail_on_avg': fail_on_avg,
         'fail_on_max': fail_on_max,
-    }
+    })
     if file_format == Formats.default:
         file_format = Formats.pip_freeze
     return config
@@ -94,7 +94,7 @@ def config_ctor(
 
 def logic(
     requirements_file_content: str,
-    excluded_reqs: str,
+    excluded_reqs: list[str],
 ) -> tuple[list[tuple[str, str, int]], int, int]:
     """Logic."""
     dependencies = FileNotFoundSafeReqs(
