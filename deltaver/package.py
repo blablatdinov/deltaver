@@ -26,14 +26,15 @@ from __future__ import annotations
 
 import datetime
 import string
+from collections.abc import Sequence
 from contextlib import suppress
 from typing import Protocol, final
-from collections.abc import Sequence
 
 import attrs
 import httpx
 import pytz
-from packaging.version import InvalidVersion, Version, parse
+from packaging.version import InvalidVersion, Version
+from packaging.version import parse as version_parse
 
 
 class Package(Protocol):
@@ -79,7 +80,7 @@ class FkPackage(Package):
 
     def version(self) -> Version:
         """Version."""
-        return parse(self._version)
+        return version_parse(self._version)
 
     def name(self) -> str:
         """Name."""
@@ -93,7 +94,7 @@ class FkPackage(Package):
 class PackageInfo(Protocol):
     """Package info."""
 
-    def content(self) -> dict:  # TODO: detalize
+    def pkg_content(self) -> dict:  # TODO: detalize
         """Content."""
 
 
@@ -113,7 +114,7 @@ class PypiPackageList(VersionList):
             if not release_info:
                 continue
             with suppress(InvalidVersion):
-                parse(version_num)
+                version_parse(version_num)
                 packages.append(PypiPackage(
                     self._name,
                     version_num,
@@ -142,6 +143,7 @@ class CachedPackageList(VersionList):
             return self._cache_value
         self._cache_value = self._origin.as_list()
         return self._cache_value
+
 
 @final
 @attrs.define(frozen=True)
@@ -186,7 +188,7 @@ class PypiPackage(Package):
 
     def version(self) -> Version:
         """Version."""
-        return parse(self._version)
+        return version_parse(self._version)
 
     def name(self) -> str:
         """Name."""
@@ -195,8 +197,9 @@ class PypiPackage(Package):
     def release_date(self) -> datetime.date:
         """Release date."""
         response = httpx.get('https://pypi.org/pypi/{0}/json'.format(self._name))
+        version_str = str(self.version())
         response.raise_for_status()
         return datetime.datetime.strptime(
-            response.json()['releases'][str(self.version())][0]['upload_time'],
+            response.json()['releases'][version_str][0]['upload_time'],
             '%Y-%m-%dT%H:%M:%S',
         ).astimezone(pytz.UTC).date()

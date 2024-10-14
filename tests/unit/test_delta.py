@@ -52,4 +52,8 @@ def test(packages: VersionList) -> None:
 
     https://www.timeanddate.com/date/durationresult.html?d1=20&m1=12&y1=2023&d2=28&m2=6&y2=2024
     """
-    assert DaysDelta('0.25.2', packages, datetime.date(2024, 6, 28)).days() == 191
+    assert DaysDelta(
+        '0.25.2',
+        packages,
+        datetime.date(2024, 6, 28),
+    ).days() == 191
