@@ -83,7 +83,7 @@ def config_ctor(
     config = Config({
         'path_to_file': path_to_file,
         'file_format': Formats.pip_freeze,
-        'excluded': [],  # FIXME
+        'excluded': [],  # TODO
         'fail_on_avg': fail_on_avg,
         'fail_on_max': fail_on_max,
     })
