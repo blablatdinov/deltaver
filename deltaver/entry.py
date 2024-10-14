@@ -29,12 +29,12 @@ from contextlib import suppress
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import TypedDict, Literal
+from typing import Literal, TypedDict
 
 import toml
 import typer
-from rich.console import Console
 from rich import print as rich_print
+from rich.console import Console
 from rich.progress import track
 from rich.table import Table
 
@@ -90,6 +90,38 @@ def config_ctor(
     return config
 
 
+def logic(
+    requirements_file_content: str,
+    excluded_reqs: str,
+):
+    dependencies = FileNotFoundSafeReqs(
+        ExcludedReqs(
+            FreezedReqs(requirements_file_content),
+            excluded_reqs,
+        ),
+    ).reqs()
+    packages = []
+    sum_delta = 0
+    max_delta = 0
+    for name, version in track(dependencies, description='Scanning...'):
+        delta = DaysDelta(
+            version,
+            CachedPackageList.ctor(
+                SortedPackageList(
+                    FilteredPackageList(
+                        PypiPackageList(name),
+                    ),
+                ),
+            ),
+            datetime.datetime.now().date(),
+        ).days()
+        sum_delta += delta
+        max_delta = max(max_delta, delta)
+        packages.append((name, version, delta))
+    packages = sorted(packages, key=lambda row: row[2], reverse=True)
+    return packages, sum_delta, max_delta
+
+
 @app.command()
 def main(
     path_to_file: Path = typer.Argument(help='\n\n'.join([  # noqa: B008, WPS404. Typer API
@@ -112,36 +144,15 @@ def main(
         -1,
         -1,
     )
-    dependencies = FileNotFoundSafeReqs(
-        ExcludedReqs(
-            FreezedReqs(config['path_to_file']),
-            config,
-        ),
-    ).reqs()
-    packages = []
-    sum_delta = 0
-    max_delta = 0
-    for name, version in track(dependencies, description='Scanning...'):
-        delta = DaysDelta(
-            version,
-            CachedPackageList.ctor(
-                SortedPackageList(
-                    FilteredPackageList(
-                        PypiPackageList(name),
-                    ),
-                ),
-            ),
-            datetime.datetime.now().date(),
-        ).days()
-        sum_delta += delta
-        max_delta = max(max_delta, delta)
-        packages.append((name, version, delta))
-    packages = sorted(packages, key=lambda row: row[2], reverse=True)
     console = Console()
     table = Table(show_header=True, header_style='bold magenta')
     table.add_column('Package')
     table.add_column('Version')
     table.add_column('Delta (days)')
+    packages, sum_delta, max_delta = logic(
+        config['path_to_file'].read_text(),
+        config['excluded'],
+    )
     for package, version, delta in packages:
         if delta != 0:
             table.add_row(package, version, str(delta))

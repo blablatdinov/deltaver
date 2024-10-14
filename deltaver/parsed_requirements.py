@@ -20,11 +20,11 @@ class ParsedReqs(Protocol):
 @attrs.define(frozen=True)
 class FreezedReqs(ParsedReqs):
 
-    _path: Path
+    _requirements_file_content: str
 
     def reqs(self) -> list[tuple[str, str]]:
         res = []
-        lines = self._path.read_text().strip().splitlines()
+        lines = self._requirements_file_content.splitlines()
         expected_splitted_line_len = 2
         for line in lines:
             splitted_line = line.split(';')[0].split('==')
@@ -41,10 +41,10 @@ class FreezedReqs(ParsedReqs):
 class ExcludedReqs(ParsedReqs):
 
     _origin: ParsedReqs
-    _config: ConfigDict
+    _excluded_reqs: list[str]
 
     def reqs(self) -> list[tuple[str, str]]:
-        excluded_packages_set = {package.lower() for package in self._config['excluded']}
+        excluded_packages_set = {package.lower() for package in self._excluded_reqs}
         return [
             item
             for item in self._origin.reqs()
