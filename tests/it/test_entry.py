@@ -105,6 +105,10 @@ def test(current_dir: Path) -> None:
     ('pytz==2024.2',),
     (_version_from_lock('pytz'),),
     ('pytz', '-U'),
+
+    ('typing-extensions==4.9.0',),
+    (_version_from_lock('typing-extensions'),),
+    ('typing-extensions', '-U'),
 ])
 def test_versions(current_dir: Path, version: tuple[str, ...]) -> None:
     """Test run command."""
