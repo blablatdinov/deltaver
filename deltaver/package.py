@@ -28,6 +28,7 @@ import datetime
 import string
 from contextlib import suppress
 from typing import Protocol, final
+from collections.abc import Sequence
 
 import attrs
 import httpx
@@ -44,14 +45,14 @@ class Package(Protocol):
     def name(self) -> str:
         """Name."""
 
-    def release_date(self) -> datetime.datetime:
+    def release_date(self) -> datetime.date:
         """Release date."""
 
 
 class VersionList(Protocol):
     """Version list."""
 
-    def as_list(self) -> list[Package]:
+    def as_list(self) -> Sequence[Package]:
         """List representation."""
 
 
@@ -60,9 +61,9 @@ class VersionList(Protocol):
 class FkVersionList(VersionList):
     """Fake version list."""
 
-    _packages: list[Package]
+    _packages: Sequence[Package]
 
-    def as_list(self) -> list[Package]:
+    def as_list(self) -> Sequence[Package]:
         """List representation."""
         return self._packages
 
@@ -84,7 +85,7 @@ class FkPackage(Package):
         """Name."""
         return self._name
 
-    def release_date(self) -> datetime.datetime:
+    def release_date(self) -> datetime.date:
         """Release date."""
         return self._release_date
 
@@ -103,7 +104,7 @@ class PypiPackageList(VersionList):
 
     _name: str
 
-    def as_list(self) -> list[Package]:
+    def as_list(self) -> Sequence[Package]:
         """List representation."""
         response = httpx.get('https://pypi.org/pypi/{0}/json'.format(self._name))
         response.raise_for_status()
@@ -127,7 +128,7 @@ class CachedPackageList(VersionList):
     """Cached packages list."""
 
     _origin: VersionList
-    _cache_value: list
+    _cache_value: Sequence[Package]
     _cached: bool
 
     @classmethod
@@ -135,7 +136,7 @@ class CachedPackageList(VersionList):
         """Ctor."""
         return cls(origin, [], cached=False)
 
-    def as_list(self) -> list[Package]:
+    def as_list(self) -> Sequence[Package]:
         """List representation."""
         if self._cached:
             return self._cache_value
@@ -149,7 +150,7 @@ class FilteredPackageList(VersionList):
 
     _origin: VersionList
 
-    def as_list(self) -> list[Package]:
+    def as_list(self) -> Sequence[Package]:
         """List representation."""
         packages = []
         for package in self._origin.as_list():
@@ -166,7 +167,7 @@ class SortedPackageList(VersionList):
 
     _origin: VersionList
 
-    def as_list(self) -> list[Package]:
+    def as_list(self) -> Sequence[Package]:
         """List representation."""
         return sorted(
             self._origin.as_list(),

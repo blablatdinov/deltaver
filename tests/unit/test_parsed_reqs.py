@@ -6,15 +6,6 @@ import pytest
 from deltaver.parsed_requirements import FreezedReqs, PackageLockReqs, PoetryLockReqs
 
 
-@pytest.fixture
-def requirements_file(tmp_path: Path) -> Callable[[str], Path]:
-    def _requirements_file(text: str) -> Path:
-        path = tmp_path / 'requirements.txt'
-        path.write_text(text)
-        return path
-    return _requirements_file
-
-
 @pytest.mark.parametrize(('text', 'expected'), [
     ('httpx==0.26.0', [('httpx', '0.26.0')]),
     ('txaio==22.2.1 ; python_version >= "3.9" and python_version < "3.10"', [('txaio', '22.2.1')]),
@@ -29,10 +20,8 @@ def requirements_file(tmp_path: Path) -> Callable[[str], Path]:
         [('zope-interface', '5.4.0')],
     ),
 ])
-def test_correct(requirements_file: Callable[[str], Path], text: str, expected: str) -> None:
-    got = FreezedReqs(
-        requirements_file(text),
-    ).reqs()
+def test_correct(text: str, expected: str) -> None:
+    got = FreezedReqs(text).reqs()
 
     assert got == expected
 
@@ -41,10 +30,8 @@ def test_correct(requirements_file: Callable[[str], Path], text: str, expected: 
     'deltaver @ file:///Users/almazilaletdinov/code/moment/deltaver',
     '-e git+https://github.com/blablatdinov/deltaver@77eb73d1ee66d4b2eed7fcb4ec889b8892b7ef2b#egg=deltaver',
 ])
-def test_not_semvar(requirements_file: Callable[[str], Path], text: str) -> None:
-    got = FreezedReqs(
-        requirements_file(text),
-    ).reqs()
+def test_not_semvar(text: str) -> None:
+    got = FreezedReqs(text).reqs()
 
     assert got == []
 
