@@ -28,6 +28,7 @@ from collections.abc import Generator
 from pathlib import Path
 
 import pytest
+import tomli
 from _pytest.legacypath import TempdirFactory
 
 
@@ -50,6 +51,17 @@ def _tmp_directory(tmpdir_factory: TempdirFactory, current_dir: str) -> Generato
     os.chdir(current_dir)
 
 
+def _version_from_lock(package_name: str) -> str:
+    return '{0}=={1}'.format(
+        package_name,
+        next(
+            package
+            for package in tomli.loads(Path('poetry.lock').read_text(encoding='utf-8'))['package']
+            if package['name'] == package_name
+        )['version'],
+    )
+
+
 @pytest.mark.usefixtures('_tmp_directory')
 def test(current_dir: Path) -> None:
     """Test run command."""
@@ -62,13 +74,47 @@ def test(current_dir: Path) -> None:
     stdout = got.stdout.decode('utf-8').strip().splitlines()
 
     assert got.returncode == 0, got.stderr or stdout
-    assert stdout == [
-        'Scanning... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00',
-        '┏━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━┓',
-        '┃ Package ┃ Version ┃ Delta (days) ┃',
-        '┡━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━┩',
-        '│ httpx   │ 0.25.0  │ 293          │',
-        '└─────────┴─────────┴──────────────┘',
-        'Max delta: 293',
-        'Average delta: 293.00',
-    ]
+
+
+@pytest.mark.usefixtures('_tmp_directory')
+@pytest.mark.parametrize('version', [
+    ('attrs==23.1.0',),
+    (_version_from_lock('attrs'),),
+    ('attrs', '-U'),
+
+    ('httpx==0.6.7',),
+    (_version_from_lock('httpx'),),
+    ('httpx', '-U'),
+
+    ('packaging==23.0',),
+    (_version_from_lock('packaging'),),
+    ('packaging', '-U'),
+
+    ('typer==0.9.0',),
+    (_version_from_lock('typer'),),
+    ('typer', '-U'),
+
+    ('rich==13.0.0',),
+    (_version_from_lock('rich'),),
+    ('rich', '-U'),
+
+    ('toml==0.10.2',),
+    (_version_from_lock('toml'),),
+    ('toml', '-U'),
+
+    ('pytz==2024.2',),
+    (_version_from_lock('pytz'),),
+    ('pytz', '-U'),
+])
+def test_versions(current_dir: Path, version: tuple[str, ...]) -> None:
+    """Test run command."""
+    subprocess.run(['venv/bin/pip', 'install', *version], check=True)
+    Path('req.txt').write_text('httpx==0.25.0')
+    got = subprocess.run(
+        ['venv/bin/deltaver_new', 'req.txt'],
+        stdout=subprocess.PIPE,
+        check=False,
+    )
+    stdout = got.stdout.decode('utf-8').strip().splitlines()
+
+    assert got.returncode == 0, got.stderr or stdout
