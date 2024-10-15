@@ -33,7 +33,7 @@ import pytest
 if sys.version_info < (3, 11):
     import tomli as toml
 else:
-    import tomlib as toml
+    import tomllib as toml
 
 from _pytest.legacypath import TempdirFactory
 
