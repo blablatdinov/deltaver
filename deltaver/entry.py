@@ -24,8 +24,8 @@
 
 from __future__ import annotations
 
-import sys
 import datetime
+import sys
 import traceback
 from dataclasses import dataclass
 from enum import Enum
@@ -127,7 +127,8 @@ def logic(  # noqa: WPS210, WPS234. TODO: fix
     return packages, sum_delta, max_delta
 
 
-def cli(path_to_file: str, file_format: str):
+def cli(path_to_file: Path, file_format: Formats) -> None:  # noqa: WPS210, WPS213. TODO: fix
+    """Cli."""
     config = config_ctor(
         path_to_file,
         file_format,
@@ -179,7 +180,7 @@ def main(
     """Python project designed to calculate the lag or delay in dependencies in terms of days."""
     try:
         cli(path_to_file, file_format)
-    except Exception as err:
+    except Exception as err:  # noqa: BLE001. Application entrypoint
         sys.stdout.write('\n'.join([
             'Deltaver fail with: "{0}"'.format(err),
             'Please submit it to https://github.com/blablatdinov/deltaver/issues',
