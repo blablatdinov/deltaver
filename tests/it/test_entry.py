@@ -24,11 +24,17 @@
 
 import os
 import subprocess
+import sys
 from collections.abc import Generator
 from pathlib import Path
 
 import pytest
-import tomli
+
+if sys.version_info < (3, 11):
+    import tomli as toml
+else:
+    import tomlib as toml
+
 from _pytest.legacypath import TempdirFactory
 
 
@@ -56,7 +62,7 @@ def _version_from_lock(package_name: str) -> str:
         package_name,
         next(
             package
-            for package in tomli.loads(Path('poetry.lock').read_text(encoding='utf-8'))['package']
+            for package in toml.loads(Path('poetry.lock').read_text(encoding='utf-8'))['package']
             if package['name'] == package_name
         )['version'],
     )
