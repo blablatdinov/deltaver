@@ -684,13 +684,13 @@ files = [
 
 [[package]]
 name = "ondivi"
-version = "0.5.0"
+version = "0.6.0"
 description = ""
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "ondivi-0.5.0-py3-none-any.whl", hash = "sha256:75d7b8da8aea8fb0284f41922571c635a120b569ba68b5d6c6a853027647bb01"},
-    {file = "ondivi-0.5.0.tar.gz", hash = "sha256:117cc419f3ea9b90ab3bd1afc0efa9309d4f18d03a284dea3e03baa2290d8368"},
+    {file = "ondivi-0.6.0-py3-none-any.whl", hash = "sha256:f0f6d7b0f04e503356bbe92ef3013918ef96a182b9c719105668a72cf446024d"},
+    {file = "ondivi-0.6.0.tar.gz", hash = "sha256:4ada3de926ff3263decd62e24d661cac9b835decbdad27eb8cc83078264b4170"},
 ]
 
 [package.dependencies]
@@ -1279,4 +1279,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "5710af6666f851bc83cfc787a32d7f0f12227db3d006f04082eeea1d65d4802e"
+content-hash = "c2512923dcceee6489a164f9f602b033fd9d27951a021efdb1c501ea6e39f888"
