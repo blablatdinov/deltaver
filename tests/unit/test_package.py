@@ -25,8 +25,9 @@
 import datetime
 from pathlib import Path
 
-import pytest
 import httpx
+import pytest
+import respx
 
 from deltaver.package import (
     FilteredPackageList,
@@ -39,7 +40,7 @@ from deltaver.package import (
 
 
 @pytest.fixture
-def _pypi_mock(respx_mock):
+def _pypi_mock(respx_mock: respx.router.MockRouter) -> None:
     respx_mock.get('https://pypi.org/pypi/smmap/json').mock(return_value=httpx.Response(
         status_code=200,
         text=Path('tests/fixtures/smmap_pypi_response.json').read_text(),
@@ -110,7 +111,9 @@ def test_sorted_package_list() -> None:
 
 
 @pytest.mark.usefixtures('_pypi_mock')
-def test_skip_removed():
+def test_skip_removed() -> None:
+    """Test skip yanked versions."""
     got = PypiPackageList('smmap').as_list()
 
-    assert '6.0.0' not in [elem.version() for elem in got]
+    assert len(got) == 15
+    assert '6.0.0' not in {elem.version() for elem in got}
