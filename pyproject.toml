@@ -33,12 +33,13 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.9"
 attrs = ">=23.0"
-httpx = "^0"
-packaging = ">=23,<25"
-typer = "^0"
+httpx = "^0.23"
+packaging = ">=23"
+typer = ">=0.9"
 rich = "^13.0"
-typing-extensions = "^4.9"
 toml = "^0.10.2"
+typing-extensions = "^4.9"
+pytz = "^2024.2"  # TODO define needed
 
 [tool.poetry.group.dev.dependencies]
 pytest = "8.3.3"
@@ -48,10 +49,13 @@ isort = "5.13.2"
 pytest-cov = "6.0.0"
 ruff = "0.7.3"
 mypy = "1.13.0"
+typing-extensions = "4.12.2"
 types-toml = "0.10.8.20240310"
 pytest-randomly = "3.16.0"
 ondivi = "0.6.0"
 wemake-python-styleguide = "0.19.2"
+types-pytz = "2024.2.0.20241003"
+vulture = "2.13"
 
 [tool.poetry.scripts]
 deltaver = "deltaver.__main__:app"
@@ -69,11 +73,13 @@ include_trailing_comma = true
 [tool.ruff]
 line-length = 120
 target-version = "py39"
+output-format = "concise"
 
 [tool.ruff.lint]
 select = ["ALL"]
 fixable = [
-  "F401",   # Unused import
+  "F401",  # Unused import
+  "Q000",  # Double quotes
 ]
 ignore = [
   "ANN101",  # Missing type annotation for `self` in method

@@ -1,18 +1,32 @@
+# The MIT License (MIT).
+#
+# Copyright (c) 2023-2024 Almaz Ilaletdinov <a.ilaletdinov@yandex.ru>
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+# OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+# OR OTHER DEALINGS IN THE SOFTWARE.
+
+"""Test parse pip requirements."""
+
 from pathlib import Path
-from typing import Callable
 
 import pytest
 
 from deltaver.parsed_requirements import FreezedReqs, PackageLockReqs, PoetryLockReqs
-
-
-@pytest.fixture()
-def requirements_file(tmp_path: Path) -> Callable[[str], Path]:
-    def _requirements_file(text: str) -> Path:
-        path = tmp_path / 'requirements.txt'
-        path.write_text(text)
-        return path
-    return _requirements_file
 
 
 @pytest.mark.parametrize(('text', 'expected'), [
@@ -29,10 +43,9 @@ def requirements_file(tmp_path: Path) -> Callable[[str], Path]:
         [('zope-interface', '5.4.0')],
     ),
 ])
-def test_correct(requirements_file: Callable[[str], Path], text: str, expected: str) -> None:
-    got = FreezedReqs(
-        requirements_file(text),
-    ).reqs()
+def test_correct(text: str, expected: str) -> None:
+    """Test parsing pip requirements file."""
+    got = FreezedReqs(text).reqs()
 
     assert got == expected
 
@@ -41,10 +54,9 @@ def test_correct(requirements_file: Callable[[str], Path], text: str, expected: 
     'deltaver @ file:///Users/almazilaletdinov/code/moment/deltaver',
     '-e git+https://github.com/blablatdinov/deltaver@77eb73d1ee66d4b2eed7fcb4ec889b8892b7ef2b#egg=deltaver',
 ])
-def test_not_semvar(requirements_file: Callable[[str], Path], text: str) -> None:
-    got = FreezedReqs(
-        requirements_file(text),
-    ).reqs()
+def test_not_semvar(text: str) -> None:
+    """Test not semver line."""
+    got = FreezedReqs(text).reqs()
 
     assert got == []
 
