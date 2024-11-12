@@ -111,7 +111,7 @@ class PypiPackageList(VersionList):
         response.raise_for_status()
         packages = []
         for version_num, release_info in response.json()['releases'].items():
-            if not release_info:
+            if not release_info and release_info['yanked']:
                 continue
             with suppress(InvalidVersion):
                 version_parse(version_num)
