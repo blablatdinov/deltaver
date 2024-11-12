@@ -61,7 +61,6 @@ def test(time_machine: TimeMachineFixture) -> None:  # noqa: WPS210. TODO: fix
         if delta > 0
     ] == [
         ('SQLAlchemy', '1.4.51', 366),
-        ('smmap', '5.0.1', 132),
         ('jsonschema', '4.21.0', 8),
         ('MarkupSafe', '2.1.3', 8),
         ('diff_cover', '8.0.2', 7),
@@ -70,7 +69,7 @@ def test(time_machine: TimeMachineFixture) -> None:  # noqa: WPS210. TODO: fix
         ('pluggy', '1.3.0', 3),
         ('refurb', '1.27.0', 3),
     ]
-    assert sum_delta == 535
+    assert sum_delta == 403
     assert max_delta == 366
 
 
@@ -90,7 +89,6 @@ def test_excluded(time_machine: TimeMachineFixture) -> None:  # noqa: WPS210. TO
         for name, version, delta in packages
         if delta > 0
     ] == [
-        ('smmap', '5.0.1', 132),
         ('jsonschema', '4.21.0', 8),
         ('MarkupSafe', '2.1.3', 8),
         ('diff_cover', '8.0.2', 7),
@@ -98,5 +96,5 @@ def test_excluded(time_machine: TimeMachineFixture) -> None:  # noqa: WPS210. TO
         ('pluggy', '1.3.0', 3),
         ('refurb', '1.27.0', 3),
     ]
-    assert sum_delta == 165
-    assert max_delta == 132
+    assert sum_delta == 33
+    assert max_delta == 8
