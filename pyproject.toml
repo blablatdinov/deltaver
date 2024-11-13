@@ -56,6 +56,7 @@ ondivi = "0.6.0"
 wemake-python-styleguide = "0.19.2"
 types-pytz = "2024.2.0.20241003"
 vulture = "2.13"
+flake8-one-class = "^0.0.1"
 
 [tool.poetry.scripts]
 deltaver = "deltaver.__main__:app"
@@ -105,6 +106,8 @@ ignore = [
   "UP004",   # Class `PrayerReaction` inherits from `object`
   "TD",      # "todo" formats
   "PLR630",  # We disrespect staticmethods
+  "TCH001",
+  "TCH002",
   "TCH003",  # Move standard library import `...` into a type-checking block
 ]
 

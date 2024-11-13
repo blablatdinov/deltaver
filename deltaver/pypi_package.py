@@ -20,44 +20,44 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Delta."""
+"""Pypi package list."""
 
 import datetime
-from typing import Protocol, final
+from typing import final
 
 import attrs
+import httpx
+import pytz
+from packaging.version import Version
 from packaging.version import parse as version_parse
 
+from deltaver.package import Package
 from deltaver.version_list import VersionList
-
-
-@attrs.define(frozen=True)
-class Delta(Protocol):
-    """Delta."""
-
-    def days(self) -> int:
-        """Days of delta."""
 
 
 @final
 @attrs.define(frozen=True)
-class DaysDelta(Delta):
-    """Delta."""
+class PypiPackage(Package):
+    """Pypi package list."""
 
+    _name: str
     _version: str
-    _packages: VersionList
-    _today: datetime.date
+    _version_list: VersionList
 
-    def days(self) -> int:
-        """Days of delta."""
-        flag = False
-        next_version_release_date = datetime.date(1, 1, 1)
-        for package in self._packages.as_list():
-            if flag:
-                next_version_release_date = package.release_date()
-                break
-            if package.version() == version_parse(self._version):
-                flag = True
-        else:
-            return 0
-        return (self._today - next_version_release_date).days
+    def version(self) -> Version:
+        """Version."""
+        return version_parse(self._version)
+
+    def name(self) -> str:
+        """Name."""
+        return self._name
+
+    def release_date(self) -> datetime.date:
+        """Release date."""
+        response = httpx.get('https://pypi.org/pypi/{0}/json'.format(self._name))
+        version_str = str(self.version())
+        response.raise_for_status()
+        return datetime.datetime.strptime(
+            response.json()['releases'][version_str][0]['upload_time'],
+            '%Y-%m-%dT%H:%M:%S',
+        ).astimezone(pytz.UTC).date()

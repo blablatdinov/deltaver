@@ -20,44 +20,19 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Delta."""
+"""Config dict."""
 
-import datetime
-from typing import Protocol, final
+from pathlib import Path
+from typing import TypedDict
 
-import attrs
-from packaging.version import parse as version_parse
-
-from deltaver.version_list import VersionList
+from deltaver.formats import Formats
 
 
-@attrs.define(frozen=True)
-class Delta(Protocol):
-    """Delta."""
+class Config(TypedDict):
+    """Config dict."""
 
-    def days(self) -> int:
-        """Days of delta."""
-
-
-@final
-@attrs.define(frozen=True)
-class DaysDelta(Delta):
-    """Delta."""
-
-    _version: str
-    _packages: VersionList
-    _today: datetime.date
-
-    def days(self) -> int:
-        """Days of delta."""
-        flag = False
-        next_version_release_date = datetime.date(1, 1, 1)
-        for package in self._packages.as_list():
-            if flag:
-                next_version_release_date = package.release_date()
-                break
-            if package.version() == version_parse(self._version):
-                flag = True
-        else:
-            return 0
-        return (self._today - next_version_release_date).days
+    path_to_file: Path
+    file_format: Formats
+    excluded: list[str]
+    fail_on_avg: int
+    fail_on_max: int

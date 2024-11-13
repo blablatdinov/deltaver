@@ -27,7 +27,9 @@ import datetime
 import pytest
 
 from deltaver.delta import DaysDelta
-from deltaver.package import FkPackage, FkVersionList, VersionList
+from deltaver.fk_package import FkPackage
+from deltaver.fk_version_list import FkVersionList
+from deltaver.version_list import VersionList
 
 
 @pytest.fixture
