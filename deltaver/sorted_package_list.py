@@ -20,44 +20,27 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Delta."""
+from __future__ import annotations
 
-import datetime
-from typing import Protocol, final
+from collections.abc import Sequence
+from typing import final
 
 import attrs
-from packaging.version import parse as version_parse
 
+from deltaver.package import Package
 from deltaver.version_list import VersionList
-
-
-@attrs.define(frozen=True)
-class Delta(Protocol):
-    """Delta."""
-
-    def days(self) -> int:
-        """Days of delta."""
 
 
 @final
 @attrs.define(frozen=True)
-class DaysDelta(Delta):
-    """Delta."""
+class SortedPackageList(VersionList):
+    """Sorted package list."""
 
-    _version: str
-    _packages: VersionList
-    _today: datetime.date
+    _origin: VersionList
 
-    def days(self) -> int:
-        """Days of delta."""
-        flag = False
-        next_version_release_date = datetime.date(1, 1, 1)
-        for package in self._packages.as_list():
-            if flag:
-                next_version_release_date = package.release_date()
-                break
-            if package.version() == version_parse(self._version):
-                flag = True
-        else:
-            return 0
-        return (self._today - next_version_release_date).days
+    def as_list(self) -> Sequence[Package]:
+        """List representation."""
+        return sorted(
+            self._origin.as_list(),
+            key=lambda pkg: pkg.version(),
+        )

@@ -20,44 +20,33 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Delta."""
-
 import datetime
-from typing import Protocol, final
+from typing import final
 
 import attrs
+from packaging.version import Version
 from packaging.version import parse as version_parse
 
-from deltaver.version_list import VersionList
-
-
-@attrs.define(frozen=True)
-class Delta(Protocol):
-    """Delta."""
-
-    def days(self) -> int:
-        """Days of delta."""
+from deltaver.package import Package
 
 
 @final
 @attrs.define(frozen=True)
-class DaysDelta(Delta):
-    """Delta."""
+class FkPackage(Package):
+    """Fake package."""
 
+    _name: str
     _version: str
-    _packages: VersionList
-    _today: datetime.date
+    _release_date: datetime.date
 
-    def days(self) -> int:
-        """Days of delta."""
-        flag = False
-        next_version_release_date = datetime.date(1, 1, 1)
-        for package in self._packages.as_list():
-            if flag:
-                next_version_release_date = package.release_date()
-                break
-            if package.version() == version_parse(self._version):
-                flag = True
-        else:
-            return 0
-        return (self._today - next_version_release_date).days
+    def version(self) -> Version:
+        """Version."""
+        return version_parse(self._version)
+
+    def name(self) -> str:
+        """Name."""
+        return self._name
+
+    def release_date(self) -> datetime.date:
+        """Release date."""
+        return self._release_date

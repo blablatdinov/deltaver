@@ -20,44 +20,14 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Delta."""
-
-import datetime
-from typing import Protocol, final
-
-import attrs
-from packaging.version import parse as version_parse
-
-from deltaver.version_list import VersionList
+from enum import Enum
 
 
-@attrs.define(frozen=True)
-class Delta(Protocol):
-    """Delta."""
+class Formats(Enum):
+    """Dependencies file format."""
 
-    def days(self) -> int:
-        """Days of delta."""
+    pip_freeze = 'pip-freeze'
+    poetry_lock = 'poetry-lock'
+    npm_lock = 'npm-lock'
 
-
-@final
-@attrs.define(frozen=True)
-class DaysDelta(Delta):
-    """Delta."""
-
-    _version: str
-    _packages: VersionList
-    _today: datetime.date
-
-    def days(self) -> int:
-        """Days of delta."""
-        flag = False
-        next_version_release_date = datetime.date(1, 1, 1)
-        for package in self._packages.as_list():
-            if flag:
-                next_version_release_date = package.release_date()
-                break
-            if package.version() == version_parse(self._version):
-                flag = True
-        else:
-            return 0
-        return (self._today - next_version_release_date).days
+    default = 'default'

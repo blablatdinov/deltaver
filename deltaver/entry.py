@@ -27,10 +27,7 @@ from __future__ import annotations
 import datetime
 import sys
 import traceback
-from dataclasses import dataclass
-from enum import Enum
 from pathlib import Path
-from typing import TypedDict
 
 import pytz
 import typer
@@ -39,40 +36,16 @@ from rich.console import Console
 from rich.progress import track
 from rich.table import Table
 
+from deltaver.cached_package_list import CachedPackageList
+from deltaver.config import Config
 from deltaver.delta import DaysDelta
-from deltaver.package import CachedPackageList, FilteredPackageList, PypiPackageList, SortedPackageList
+from deltaver.filtered_package_list import FilteredPackageList
+from deltaver.formats import Formats
 from deltaver.parsed_requirements import ExcludedReqs, FileNotFoundSafeReqs, FreezedReqs
+from deltaver.pypi_package_list import PypiPackageList
+from deltaver.sorted_package_list import SortedPackageList
 
 app = typer.Typer()
-
-
-class Formats(Enum):
-    """Dependencies file format."""
-
-    pip_freeze = 'pip-freeze'
-    poetry_lock = 'poetry-lock'
-    npm_lock = 'npm-lock'
-
-    default = 'default'
-
-
-class Config(TypedDict):
-    """Config dict."""
-
-    path_to_file: Path
-    file_format: Formats
-    excluded: list[str]
-    fail_on_avg: int
-    fail_on_max: int
-
-
-@dataclass
-class PackageOutLine:
-    """DTO for package info."""
-
-    name: str
-    version: str
-    delta: str
 
 
 def config_ctor(
@@ -132,8 +105,8 @@ def cli(path_to_file: Path, file_format: Formats) -> None:  # noqa: WPS210, WPS2
     config = config_ctor(
         path_to_file,
         file_format,
-        -1,
-        -1,
+        -1,  # TODO
+        -1,  # TODO
     )
     console = Console()
     table = Table(show_header=True, header_style='bold magenta')
