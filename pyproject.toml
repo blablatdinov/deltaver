@@ -106,6 +106,8 @@ ignore = [
   "UP004",   # Class `PrayerReaction` inherits from `object`
   "TD",      # "todo" formats
   "PLR630",  # We disrespect staticmethods
+  "TCH001",
+  "TCH002",
   "TCH003",  # Move standard library import `...` into a type-checking block
 ]
 

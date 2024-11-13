@@ -22,7 +22,7 @@
 
 """Python project designed to calculate the lag or delay in dependencies in terms of days."""
 
-from __future__ import annotations
+
 
 import datetime
 import sys

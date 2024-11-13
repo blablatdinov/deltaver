@@ -22,8 +22,6 @@
 
 """Package."""
 
-from __future__ import annotations
-
 import datetime
 from typing import Protocol
 
