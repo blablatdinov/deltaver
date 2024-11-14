@@ -39,5 +39,3 @@ class Package(Protocol):
 
     def release_date(self) -> datetime.date:
         """Release date."""
-
-

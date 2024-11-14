@@ -104,10 +104,10 @@ class FileNotFoundSafeReqs(ParsedReqs):
 @attrs.define(frozen=True)
 class PackageLockReqs(ParsedReqs):
 
-    _path: Path
+    _lock_file_content: str
 
     def reqs(self) -> list[tuple[str, str]]:
-        data = json.loads(self._path.read_text())
+        data = json.loads(self._lock_file_content)
         return [
             (name, version_info['version'])
             for name, version_info in data['dependencies'].items()

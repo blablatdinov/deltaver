@@ -32,6 +32,7 @@ import respx
 from time_machine import TimeMachineFixture
 
 from deltaver.entry import logic
+from deltaver.formats import Formats
 
 
 @pytest.fixture
@@ -46,6 +47,17 @@ def _mock_pypi(respx_mock: respx.router.MockRouter, tmp_path: Path) -> None:
                 text=Path(tmp_path / 'fixtures/{0}_pypi_response.json'.format(package_name)).read_text(),
             ),
         )
+
+
+@pytest.fixture()
+def _mock_npmjs(respx_mock: respx.router.MockRouter, tmp_path: Path) -> None:
+    with zipfile.ZipFile('tests/fixtures/npm_mock.zip', 'r') as zip_ref:
+        zip_ref.extractall(tmp_path)
+    # for package_name, _ in PackageLockReqs(Path('tests/fixtures/package-lock-example.json')).reqs():
+        # respx_mock.get('https://registry.npmjs.org/{0}'.format(package_name)).mock(return_value=httpx.Response(
+        #     200,
+        #     text=Path(tmp_path / 'npm/{0}.json'.format(package_name)).read_text(),
+        # ))
 
 
 @pytest.mark.usefixtures('_mock_pypi')
@@ -98,3 +110,16 @@ def test_excluded(time_machine: TimeMachineFixture) -> None:  # noqa: WPS210. TO
     ]
     assert sum_delta == 33
     assert max_delta == 8
+
+
+# @pytest.mark.usefixtures('_mock_pypi')
+# @respx.mock(assert_all_mocked=False)
+@pytest.mark.slow  # TODO: optimize
+def test_package_lock(time_machine: TimeMachineFixture) -> None:  # noqa: WPS210. TODO: fix
+    """Test excluded param."""
+    time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
+    packages, sum_delta, max_delta = logic(
+        Path('tests/fixtures/package-lock-example.json').read_text(),
+        [],
+        Formats.npm_lock,
+    )
