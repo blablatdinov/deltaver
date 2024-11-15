@@ -84,7 +84,7 @@ def test_poetry_lock() -> None:
 
 def test_package_lock() -> None:
     got = PackageLockReqs(
-        Path('tests/fixtures/package-lock-example.json'),
+        Path('tests/fixtures/package-lock-example.json').read_text(),
     ).reqs()
 
     assert len(got) == 171

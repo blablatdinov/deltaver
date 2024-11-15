@@ -22,8 +22,6 @@
 
 """Python project designed to calculate the lag or delay in dependencies in terms of days."""
 
-
-
 import datetime
 import sys
 import traceback
@@ -41,9 +39,11 @@ from deltaver.config import Config
 from deltaver.delta import DaysDelta
 from deltaver.filtered_package_list import FilteredPackageList
 from deltaver.formats import Formats
-from deltaver.parsed_requirements import ExcludedReqs, FileNotFoundSafeReqs, FreezedReqs
+from deltaver.npmjs_package_list import NpmjsPackageList
+from deltaver.parsed_requirements import ExcludedReqs, FileNotFoundSafeReqs, FreezedReqs, PackageLockReqs, ParsedReqs
 from deltaver.pypi_package_list import PypiPackageList
 from deltaver.sorted_package_list import SortedPackageList
+from deltaver.version_list import VersionList
 
 app = typer.Typer()
 
@@ -70,11 +70,17 @@ def config_ctor(
 def logic(  # noqa: WPS210, WPS234. TODO: fix
     requirements_file_content: str,
     excluded_reqs: list[str],
+    file_format: Formats,
 ) -> tuple[list[tuple[str, str, int]], int, int]:
     """Logic."""
+    file_format = Formats.pip_freeze if file_format == Formats.default else file_format
+    parsed_reqs: ParsedReqs = {
+        Formats.npm_lock: PackageLockReqs(requirements_file_content),
+        Formats.pip_freeze: FreezedReqs(requirements_file_content),
+    }[file_format]
     dependencies = FileNotFoundSafeReqs(
         ExcludedReqs(
-            FreezedReqs(requirements_file_content),
+            parsed_reqs,
             excluded_reqs,
         ),
     ).reqs()
@@ -82,12 +88,16 @@ def logic(  # noqa: WPS210, WPS234. TODO: fix
     sum_delta = 0
     max_delta = 0
     for name, version in track(dependencies, description='Scanning...'):
+        package_list: VersionList = {
+            Formats.npm_lock: NpmjsPackageList(name),
+            Formats.pip_freeze: PypiPackageList(name),
+        }[file_format]
         delta = DaysDelta(
             version,
             CachedPackageList.ctor(
                 SortedPackageList(
                     FilteredPackageList(
-                        PypiPackageList(name),
+                        package_list,
                     ),
                 ),
             ),
@@ -116,6 +126,7 @@ def cli(path_to_file: Path, file_format: Formats) -> None:  # noqa: WPS210, WPS2
     packages, sum_delta, max_delta = logic(
         config['path_to_file'].read_text(),
         config['excluded'],
+        file_format,
     )
     for package, version, delta in packages:
         if delta != 0:
