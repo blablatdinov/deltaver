@@ -73,6 +73,7 @@ def logic(  # noqa: WPS210, WPS234. TODO: fix
     file_format: Formats,
 ) -> tuple[list[tuple[str, str, int]], int, int]:
     """Logic."""
+    file_format = Formats.pip_freeze if Formats.default else file_format
     parsed_reqs: ParsedReqs = {
         Formats.npm_lock: PackageLockReqs(requirements_file_content),
         Formats.pip_freeze: FreezedReqs(requirements_file_content),
