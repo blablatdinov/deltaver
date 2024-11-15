@@ -39,12 +39,11 @@ from deltaver.config import Config
 from deltaver.delta import DaysDelta
 from deltaver.filtered_package_list import FilteredPackageList
 from deltaver.formats import Formats
-from deltaver.parsed_requirements import ExcludedReqs, FileNotFoundSafeReqs, FreezedReqs, PackageLockReqs
+from deltaver.npmjs_package_list import NpmjsPackageList
+from deltaver.parsed_requirements import ExcludedReqs, FileNotFoundSafeReqs, FreezedReqs, PackageLockReqs, ParsedReqs
 from deltaver.pypi_package_list import PypiPackageList
 from deltaver.sorted_package_list import SortedPackageList
-from deltaver.parsed_requirements import ParsedReqs
 from deltaver.version_list import VersionList
-from deltaver.npmjs_package_list import NpmjsPackageList
 
 app = typer.Typer()
 

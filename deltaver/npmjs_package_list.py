@@ -22,18 +22,18 @@
 
 """Npmjs package list."""
 
+import datetime
 from collections.abc import Sequence
 from contextlib import suppress
 from typing import final
-import datetime
 
 import attrs
 import httpx
 from packaging.version import InvalidVersion
 from packaging.version import parse as version_parse
 
-from deltaver.package import Package
 from deltaver.fk_package import FkPackage
+from deltaver.package import Package
 from deltaver.version_list import VersionList
 
 
@@ -44,7 +44,7 @@ class NpmjsPackageList(VersionList):
 
     _name: str
 
-    def as_list(self) -> Sequence[Package]:
+    def as_list(self) -> Sequence[Package]:  # noqa: WPS210. TODO: minimize variables
         """List representation."""
         response = httpx.get(httpx.URL('https://registry.npmjs.org').join(self._name))
         response.raise_for_status()
@@ -54,12 +54,19 @@ class NpmjsPackageList(VersionList):
             with suppress(InvalidVersion, IndexError, KeyError):
                 parsed_version = version_parse(version_number)
                 if not parsed_version.is_prerelease and not parsed_version.is_devrelease:
-                    parsed_release_time = datetime.datetime.strptime(
-                        release_time, '%Y-%m-%dT%H:%M:%S.%f%z',
-                    ).astimezone(datetime.timezone.utc).date()
-                    correct_versions.append(FkPackage(
-                        self._name,
-                        version_number,
-                        parsed_release_time,
-                    ))
+                    parsed_release_time = (
+                        datetime.datetime.strptime(
+                            release_time,
+                            '%Y-%m-%dT%H:%M:%S.%f%z',
+                        )
+                        .astimezone(datetime.timezone.utc)
+                        .date()
+                    )
+                    correct_versions.append(
+                        FkPackage(
+                            self._name,
+                            version_number,
+                            parsed_release_time,
+                        ),
+                    )
         return correct_versions

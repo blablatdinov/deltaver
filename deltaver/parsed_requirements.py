@@ -107,8 +107,8 @@ class PackageLockReqs(ParsedReqs):
     _lock_file_content: str
 
     def reqs(self) -> list[tuple[str, str]]:
-        data = json.loads(self._lock_file_content)
+        parsed_json = json.loads(self._lock_file_content)
         return [
             (name, version_info['version'])
-            for name, version_info in data['dependencies'].items()
+            for name, version_info in parsed_json['dependencies'].items()
         ]
