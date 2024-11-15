@@ -120,7 +120,7 @@ def test_excluded(time_machine: TimeMachineFixture) -> None:  # noqa: WPS210. TO
 
 @pytest.mark.usefixtures('_mock_npmjs')
 @pytest.mark.slow
-def test_package_lock(time_machine: TimeMachineFixture) -> None:
+def test_package_lock(time_machine: TimeMachineFixture) -> None:  # noqa: WPS210. TODO
     """Test npmjs."""
     time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
     packages, sum_delta, max_delta = logic(
