@@ -48,7 +48,6 @@ class NpmjsPackageList(VersionList):
         """List representation."""
         response = httpx.get(httpx.URL('https://registry.npmjs.org').join(self._name))
         response.raise_for_status()
-        packages = []
         versions = response.json()['time'].items()
         correct_versions = []
         for version_number, release_time in versions:

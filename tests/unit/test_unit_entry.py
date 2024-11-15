@@ -65,7 +65,11 @@ def _mock_npmjs(respx_mock: respx.router.MockRouter, tmp_path: Path) -> None:
 def test(time_machine: TimeMachineFixture) -> None:  # noqa: WPS210. TODO: fix
     """Test logic function."""
     time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
-    packages, sum_delta, max_delta = logic(Path('tests/fixtures/requirements.txt').read_text(), [])
+    packages, sum_delta, max_delta = logic(
+        Path('tests/fixtures/requirements.txt').read_text(),
+        [],
+        Formats.pip_freeze,
+    )
 
     assert [
         (name, version, delta)
@@ -94,6 +98,7 @@ def test_excluded(time_machine: TimeMachineFixture) -> None:  # noqa: WPS210. TO
     packages, sum_delta, max_delta = logic(
         Path('tests/fixtures/requirements.txt').read_text(),
         ['sqlalchemy', 'bandit'],
+        Formats.pip_freeze,
     )
 
     assert [
