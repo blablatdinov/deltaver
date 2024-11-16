@@ -111,7 +111,12 @@ def logic(  # noqa: WPS210, WPS234. TODO: fix
     return packages, sum_delta, max_delta
 
 
-def cli(path_to_file: Path, file_format: Formats, fail_on_average: int, fail_on_max: int) -> None:  # noqa: WPS210, WPS213. TODO: fix
+def cli(
+    path_to_file: Path,
+    file_format: Formats,
+    fail_on_average: int,
+    fail_on_max: int,
+) -> None:  # noqa: WPS210, WPS213. TODO: fix
     """Cli."""
     config = config_ctor(
         path_to_file,
