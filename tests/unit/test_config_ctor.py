@@ -20,28 +20,46 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Config dict."""
-
+import os
 from pathlib import Path
-from typing import TypedDict
 
+import pytest
+
+from deltaver.entry import config_ctor, config_from_cli, pyproject_config
 from deltaver.formats import Formats
 
 
-class UnfillableConfig(TypedDict):
+@pytest.fixture
+def _tmp_directory(tmpdir_factory):
+    current = Path().absolute()
+    tmp_path = tmpdir_factory.mktemp('test')
+    os.chdir(tmp_path)
+    yield
+    os.chdir(current)
 
-    path_to_file: Path | None
-    file_format: Formats | None
-    excluded: list[str]
-    fail_on_avg: int | None
-    fail_on_max: int | None
+
+# @pytest.mark.usefixtures('_tmp_directory')
+def test_cli_only():
+    got = config_ctor(
+        config_from_cli(
+            '', Formats.default, -1, -1,
+        ),
+        {},
+    )
+
+    assert got == {
+        'excluded': [],
+        'fail_on_avg': -1,
+        'fail_on_max': -1,
+        'file_format': Formats.pip_freeze,
+        'path_to_file': '',
+    }
 
 
-class Config(TypedDict):
-    """Config dict."""
-
-    path_to_file: Path
-    file_format: Formats
-    excluded: list[str]
-    fail_on_avg: int
-    fail_on_max: int
+def test_with_pyproject():
+    got = config_ctor(
+        config_from_cli(
+            '', Formats.default, -1, -1,
+        ),
+        {},
+    )
