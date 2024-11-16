@@ -26,6 +26,7 @@ import datetime
 import sys
 import traceback
 from pathlib import Path
+from typing import Annotated
 
 import pytz
 import typer
@@ -110,13 +111,18 @@ def logic(  # noqa: WPS210, WPS234. TODO: fix
     return packages, sum_delta, max_delta
 
 
-def cli(path_to_file: Path, file_format: Formats) -> None:  # noqa: WPS210, WPS213. TODO: fix
+def cli(  # noqa: WPS210, WPS213. TODO: fix
+    path_to_file: Path,
+    file_format: Formats,
+    fail_on_average: int,
+    fail_on_max: int,
+) -> None:
     """Cli."""
     config = config_ctor(
         path_to_file,
         file_format,
-        -1,  # TODO
-        -1,  # TODO
+        fail_on_average,
+        fail_on_max,
     )
     console = Console()
     table = Table(show_header=True, header_style='bold magenta')
@@ -160,10 +166,12 @@ def main(
         '--format',
         help='Dependencies file format (default: "pip-freeze")',
     ),
+    fail_on_average: Annotated[int, typer.Option('--fail-on-avg')] = -1,
+    fail_on_max: Annotated[int, typer.Option('--fail-on-max')] = -1,
 ) -> None:
     """Python project designed to calculate the lag or delay in dependencies in terms of days."""
     try:
-        cli(path_to_file, file_format)
+        cli(path_to_file, file_format, fail_on_average, fail_on_max)
     except Exception as err:  # noqa: BLE001. Application entrypoint
         sys.stdout.write('\n'.join([
             'Deltaver fail with: "{0}"'.format(err),

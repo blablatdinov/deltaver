@@ -128,3 +128,31 @@ def test_versions(current_dir: Path, version: tuple[str, ...]) -> None:
     stdout = got.stdout.decode('utf-8').strip().splitlines()
 
     assert got.returncode == 0, got.stderr or stdout
+
+
+@pytest.mark.usefixtures('_tmp_directory')
+def test_fail_on_avg(current_dir: Path) -> None:
+    """Test deltaver fail on average."""
+    Path('req.txt').write_text('httpx==0.25.0')
+    got = subprocess.run(
+        ['venv/bin/deltaver_new', 'req.txt', '--fail-on-avg', '1'],
+        stdout=subprocess.PIPE,
+        check=False,
+    )
+    stdout = got.stdout.decode('utf-8').strip().splitlines()
+
+    assert got.returncode == 1, got.stderr or stdout
+
+
+@pytest.mark.usefixtures('_tmp_directory')
+def test_fail_on_max(current_dir: Path) -> None:
+    """Test deltaver fail on max."""
+    Path('req.txt').write_text('httpx==0.25.0')
+    got = subprocess.run(
+        ['venv/bin/deltaver_new', 'req.txt', '--fail-on-max', '1'],
+        stdout=subprocess.PIPE,
+        check=False,
+    )
+    stdout = got.stdout.decode('utf-8').strip().splitlines()
+
+    assert got.returncode == 1, got.stderr or stdout
