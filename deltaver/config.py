@@ -23,18 +23,18 @@
 """Config dict."""
 
 from pathlib import Path
-from typing import TypedDict
+from typing import TypedDict, Optional
 
 from deltaver.formats import Formats
 
 
 class UnfillableConfig(TypedDict):
 
-    path_to_file: Path | None
-    file_format: Formats | None
+    path_to_file: Optional[Path]
+    file_format: Optional[Formats]
     excluded: list[str]
-    fail_on_avg: int | None
-    fail_on_max: int | None
+    fail_on_avg: Optional[int]
+    fail_on_max: Optional[int]
 
 
 class Config(TypedDict):
