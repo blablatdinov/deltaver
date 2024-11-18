@@ -22,35 +22,26 @@
 
 """Test constructing deltaver config."""
 
-import os
-from collections.abc import Generator
 from pathlib import Path
 
-import pytest
-from _pytest.legacypath import TempdirFactory  # noqa: WPS436. For typing
-
-from deltaver.config import UnfillableConfig
+from deltaver.config import PyprojectConfig
 from deltaver.entry import config_ctor, config_from_cli
 from deltaver.formats import Formats
 
 
-@pytest.fixture
-def _tmp_directory(tmpdir_factory: TempdirFactory) -> Generator[None]:
-    current = Path().absolute()
-    tmp_path = tmpdir_factory.mktemp('test')
-    os.chdir(tmp_path)
-    yield
-    os.chdir(current)
-
-
-# @pytest.mark.usefixtures('_tmp_directory')
 def test_cli_only() -> None:
     """Test cli only."""
     got = config_ctor(
         config_from_cli(
-            '', Formats.default, -1, -1,
+            Path(''), Formats.default, -1, -1,
         ),
-        {},
+        PyprojectConfig({
+            'excluded': [],
+            'fail_on_avg': None,
+            'fail_on_max': None,
+            'file_format': None,
+            'path_to_file': None,
+        }),
     )
 
     assert got == {
@@ -64,14 +55,16 @@ def test_cli_only() -> None:
 
 def test_with_pyproject() -> None:
     """Test merge with pyproject."""
-    # TODO
     got = config_ctor(
         config_from_cli(
-            '', Formats.default, -1, -1,
+            Path(''), Formats.default, -1, -1,
         ),
-        UnfillableConfig({
+        PyprojectConfig({
             'fail_on_avg': 40,
             'fail_on_max': 20,
+            'excluded': [],
+            'file_format': None,
+            'path_to_file': None,
         }),
     )
 
@@ -79,6 +72,30 @@ def test_with_pyproject() -> None:
         'excluded': [],
         'fail_on_avg': 40,
         'fail_on_max': 20,
+        'file_format': Formats.pip_freeze,
+        'path_to_file': '',
+    }
+
+
+def test_fail_not_filled() -> None:
+    """Test fail not filled."""
+    got = config_ctor(
+        config_from_cli(
+            Path(''), Formats.default, -1, -1,
+        ),
+        PyprojectConfig({
+            'fail_on_avg': None,
+            'fail_on_max': None,
+            'excluded': [],
+            'file_format': None,
+            'path_to_file': None,
+        }),
+    )
+
+    assert got == {
+        'excluded': [],
+        'fail_on_avg': -1,
+        'fail_on_max': -1,
         'file_format': Formats.pip_freeze,
         'path_to_file': '',
     }

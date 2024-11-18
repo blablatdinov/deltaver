@@ -30,11 +30,16 @@ from typing import TypedDict
 from deltaver.formats import Formats
 
 
-class UnfillableConfig(TypedDict):
-    """Unfillable config.
+class CliInputConfig(TypedDict):
 
-    We don't take all config params from cli and config files
-    """
+    path_to_file: Path
+    file_format: Formats
+    excluded: list[str]
+    fail_on_avg: int | None
+    fail_on_max: int | None
+
+
+class PyprojectConfig(TypedDict):
 
     path_to_file: Path | None
     file_format: Formats | None

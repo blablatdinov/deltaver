@@ -38,7 +38,7 @@ from rich.progress import track
 from rich.table import Table
 
 from deltaver.cached_package_list import CachedPackageList
-from deltaver.config import Config, UnfillableConfig
+from deltaver.config import Config, PyprojectConfig, CliInputConfig
 from deltaver.delta import DaysDelta
 from deltaver.filtered_package_list import FilteredPackageList
 from deltaver.formats import Formats
@@ -56,9 +56,9 @@ def config_from_cli(
     file_format: Formats,
     fail_on_avg: int,
     fail_on_max: int,
-) -> UnfillableConfig:
+) -> CliInputConfig:
     """Config from cli."""
-    return UnfillableConfig({
+    return CliInputConfig({
         'path_to_file': path_to_file,
         'file_format': file_format,
         'excluded': [],  # TODO
@@ -67,7 +67,7 @@ def config_from_cli(
     })
 
 
-def pyproject_config() -> UnfillableConfig:
+def pyproject_config() -> PyprojectConfig:
     """Config from pyproject.toml ."""
     pyproject_cfg = {}
     with suppress(FileNotFoundError):
@@ -78,7 +78,7 @@ def pyproject_config() -> UnfillableConfig:
             .get('tool', {})
             .get('deltaver', {})
         )
-    return Config({
+    return PyprojectConfig({
         'path_to_file': pyproject_cfg.get('path_to_file'),
         'file_format': pyproject_cfg.get('path_to_file'),
         'excluded': pyproject_cfg.get('path_to_file', []),  # TODO
@@ -88,16 +88,24 @@ def pyproject_config() -> UnfillableConfig:
 
 
 def config_ctor(
-    cli_config: UnfillableConfig,
-    pyproject_cfg: UnfillableConfig,
+    cli_config: CliInputConfig,
+    pyproject_cfg: PyprojectConfig,
 ) -> Config:
     """Ctor for config."""
     config = Config({
-        'path_to_file': pyproject_cfg.get('path_to_file', cli_config['path_to_file']),
-        'file_format': pyproject_cfg.get('file_format', cli_config['file_format']),
+        # CliInputConfig.path_to_file filled
+        'path_to_file': pyproject_cfg.get(  # type: ignore[typeddict-item]
+            'path_to_file',
+            cli_config['path_to_file'],
+        ),
+        # CliInputConfig.file_format filled
+        'file_format': pyproject_cfg.get(  # type: ignore[typeddict-item]
+            'file_format',
+            cli_config['file_format'],
+        ),
         'excluded': pyproject_cfg.get('excluded', []),  # TODO
-        'fail_on_avg': pyproject_cfg.get('fail_on_avg', cli_config['fail_on_avg']),
-        'fail_on_max': pyproject_cfg.get('fail_on_max', cli_config['fail_on_max']),
+        'fail_on_avg': pyproject_cfg.get('fail_on_avg', cli_config['fail_on_avg']) or -1,
+        'fail_on_max': pyproject_cfg.get('fail_on_max', cli_config['fail_on_max']) or -1,
     })
     if config['file_format'] == Formats.default:
         config['file_format'] = Formats.pip_freeze
