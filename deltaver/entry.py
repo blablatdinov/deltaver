@@ -22,14 +22,15 @@
 
 """Python project designed to calculate the lag or delay in dependencies in terms of days."""
 
-import toml
 import datetime
 import sys
 import traceback
+from contextlib import suppress
 from pathlib import Path
 from typing import Annotated
 
 import pytz
+import toml
 import typer
 from rich import print as rich_print
 from rich.console import Console
@@ -56,6 +57,7 @@ def config_from_cli(
     fail_on_avg: int,
     fail_on_max: int,
 ) -> UnfillableConfig:
+    """Config from cli."""
     return UnfillableConfig({
         'path_to_file': path_to_file,
         'file_format': file_format,
@@ -66,31 +68,36 @@ def config_from_cli(
 
 
 def pyproject_config() -> UnfillableConfig:
-    try:
-        pyproject_config_path = Path('pyproject.toml')
-        pyproject_config = toml.loads(pyproject_config_path.read_text()).get('tool', {}).get('deltaver', {})
-    except FileNotFoundError:
-        pyproject_config = {}
+    """Config from pyproject.toml ."""
+    pyproject_cfg = {}
+    with suppress(FileNotFoundError):
+        pyproject_cfg = (
+            toml.loads(
+                Path('pyproject.toml').read_text(),
+            )
+            .get('tool', {})
+            .get('deltaver', {})
+        )
     return Config({
-        'path_to_file': pyproject_config.get('path_to_file'),
-        'file_format': pyproject_config.get('path_to_file'),
-        'excluded': pyproject_config.get('path_to_file', []),  # TODO
-        'fail_on_avg': pyproject_config.get('path_to_file'),
-        'fail_on_max': pyproject_config.get('path_to_file'),
+        'path_to_file': pyproject_cfg.get('path_to_file'),
+        'file_format': pyproject_cfg.get('path_to_file'),
+        'excluded': pyproject_cfg.get('path_to_file', []),  # TODO
+        'fail_on_avg': pyproject_cfg.get('path_to_file'),
+        'fail_on_max': pyproject_cfg.get('path_to_file'),
     })
 
 
 def config_ctor(
-    cli_config: Config,
-    pyproject_config: Config,
+    cli_config: UnfillableConfig,
+    pyproject_cfg: UnfillableConfig,
 ) -> Config:
     """Ctor for config."""
     config = Config({
-        'path_to_file': pyproject_config.get('path_to_file', cli_config['path_to_file']),
-        'file_format': pyproject_config.get('file_format', cli_config['file_format']),
-        'excluded': pyproject_config.get('excluded', []),  # TODO
-        'fail_on_avg': pyproject_config.get('fail_on_avg', cli_config['fail_on_avg']),
-        'fail_on_max': pyproject_config.get('fail_on_max', cli_config['fail_on_max']),
+        'path_to_file': pyproject_cfg.get('path_to_file', cli_config['path_to_file']),
+        'file_format': pyproject_cfg.get('file_format', cli_config['file_format']),
+        'excluded': pyproject_cfg.get('excluded', []),  # TODO
+        'fail_on_avg': pyproject_cfg.get('fail_on_avg', cli_config['fail_on_avg']),
+        'fail_on_max': pyproject_cfg.get('fail_on_max', cli_config['fail_on_max']),
     })
     if config['file_format'] == Formats.default:
         config['file_format'] = Formats.pip_freeze

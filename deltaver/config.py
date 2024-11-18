@@ -22,19 +22,25 @@
 
 """Config dict."""
 
+from __future__ import annotations
+
 from pathlib import Path
-from typing import TypedDict, Optional
+from typing import TypedDict
 
 from deltaver.formats import Formats
 
 
 class UnfillableConfig(TypedDict):
+    """Unfillable config.
 
-    path_to_file: Optional[Path]
-    file_format: Optional[Formats]
+    We don't take all config params from cli and config files
+    """
+
+    path_to_file: Path | None
+    file_format: Formats | None
     excluded: list[str]
-    fail_on_avg: Optional[int]
-    fail_on_max: Optional[int]
+    fail_on_avg: int | None
+    fail_on_max: int | None
 
 
 class Config(TypedDict):

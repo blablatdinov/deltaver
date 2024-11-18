@@ -20,17 +20,22 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
+"""Test constructing deltaver config."""
+
 import os
+from collections.abc import Generator
 from pathlib import Path
 
 import pytest
+from _pytest.legacypath import TempdirFactory  # noqa: WPS436. For typing
 
-from deltaver.entry import config_ctor, config_from_cli, pyproject_config
+from deltaver.config import UnfillableConfig
+from deltaver.entry import config_ctor, config_from_cli
 from deltaver.formats import Formats
 
 
 @pytest.fixture
-def _tmp_directory(tmpdir_factory):
+def _tmp_directory(tmpdir_factory: TempdirFactory) -> Generator[None]:
     current = Path().absolute()
     tmp_path = tmpdir_factory.mktemp('test')
     os.chdir(tmp_path)
@@ -39,7 +44,8 @@ def _tmp_directory(tmpdir_factory):
 
 
 # @pytest.mark.usefixtures('_tmp_directory')
-def test_cli_only():
+def test_cli_only() -> None:
+    """Test cli only."""
     got = config_ctor(
         config_from_cli(
             '', Formats.default, -1, -1,
@@ -56,10 +62,23 @@ def test_cli_only():
     }
 
 
-def test_with_pyproject():
+def test_with_pyproject() -> None:
+    """Test merge with pyproject."""
+    # TODO
     got = config_ctor(
         config_from_cli(
             '', Formats.default, -1, -1,
         ),
-        {},
+        UnfillableConfig({
+            'fail_on_avg': 40,
+            'fail_on_max': 20,
+        }),
     )
+
+    assert got == {
+        'excluded': [],
+        'fail_on_avg': 40,
+        'fail_on_max': 20,
+        'file_format': Formats.pip_freeze,
+        'path_to_file': '',
+    }
