@@ -49,7 +49,7 @@ def test_cli_only() -> None:
         'fail_on_avg': -1,
         'fail_on_max': -1,
         'file_format': Formats.pip_freeze,
-        'path_to_file': '',
+        'path_to_file': Path(),
     }
 
 
@@ -73,7 +73,7 @@ def test_with_pyproject() -> None:
         'fail_on_avg': 40,
         'fail_on_max': 20,
         'file_format': Formats.pip_freeze,
-        'path_to_file': '',
+        'path_to_file': Path(),
     }
 
 
@@ -97,5 +97,5 @@ def test_fail_not_filled() -> None:
         'fail_on_avg': -1,
         'fail_on_max': -1,
         'file_format': Formats.pip_freeze,
-        'path_to_file': '',
+        'path_to_file': Path(),
     }
