@@ -93,8 +93,8 @@ def config_ctor(
 ) -> Config:
     """Ctor for config."""
     config = Config({
-        'path_to_file': cli_config['path_to_file'] or pyproject_cfg['path_to_file'],
-        'file_format': cli_config['file_format'] or pyproject_cfg['file_format'],
+        'path_to_file': cli_config['path_to_file'] or pyproject_cfg['path_to_file'] or Path(),
+        'file_format': cli_config['file_format'] or pyproject_cfg['file_format'] or Formats.default,
         'excluded': pyproject_cfg.get('excluded', []),  # TODO
         'fail_on_avg': pyproject_cfg.get('fail_on_avg', cli_config['fail_on_avg']) or -1,
         'fail_on_max': pyproject_cfg.get('fail_on_max', cli_config['fail_on_max']) or -1,
