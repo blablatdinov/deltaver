@@ -31,6 +31,7 @@ from deltaver.formats import Formats
 
 
 class CliInputConfig(TypedDict):
+    """Structure description for CLI input."""
 
     path_to_file: Path
     file_format: Formats
@@ -40,6 +41,7 @@ class CliInputConfig(TypedDict):
 
 
 class PyprojectConfig(TypedDict):
+    """Structure description for pyproject input."""
 
     path_to_file: Path | None
     file_format: Formats | None

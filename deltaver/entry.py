@@ -38,7 +38,7 @@ from rich.progress import track
 from rich.table import Table
 
 from deltaver.cached_package_list import CachedPackageList
-from deltaver.config import Config, PyprojectConfig, CliInputConfig
+from deltaver.config import CliInputConfig, Config, PyprojectConfig
 from deltaver.delta import DaysDelta
 from deltaver.filtered_package_list import FilteredPackageList
 from deltaver.formats import Formats

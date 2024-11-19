@@ -33,7 +33,7 @@ def test_cli_only() -> None:
     """Test cli only."""
     got = config_ctor(
         config_from_cli(
-            Path(''), Formats.default, -1, -1,
+            Path(), Formats.default, -1, -1,
         ),
         PyprojectConfig({
             'excluded': [],
@@ -57,7 +57,7 @@ def test_with_pyproject() -> None:
     """Test merge with pyproject."""
     got = config_ctor(
         config_from_cli(
-            Path(''), Formats.default, -1, -1,
+            Path(), Formats.default, -1, -1,
         ),
         PyprojectConfig({
             'fail_on_avg': 40,
@@ -81,7 +81,7 @@ def test_fail_not_filled() -> None:
     """Test fail not filled."""
     got = config_ctor(
         config_from_cli(
-            Path(''), Formats.default, -1, -1,
+            Path(), Formats.default, -1, -1,
         ),
         PyprojectConfig({
             'fail_on_avg': None,
