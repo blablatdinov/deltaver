@@ -96,8 +96,8 @@ def config_ctor(
         'path_to_file': cli_config['path_to_file'] or pyproject_cfg['path_to_file'] or Path(),
         'file_format': cli_config['file_format'] or pyproject_cfg['file_format'] or Formats.default,
         'excluded': pyproject_cfg.get('excluded', []),  # TODO
-        'fail_on_avg': pyproject_cfg.get('fail_on_avg', cli_config['fail_on_avg']) or -1,
-        'fail_on_max': pyproject_cfg.get('fail_on_max', cli_config['fail_on_max']) or -1,
+        'fail_on_avg': pyproject_cfg['fail_on_avg'] or cli_config['fail_on_avg'] or -1,
+        'fail_on_max': pyproject_cfg['fail_on_max'] or cli_config['fail_on_max'] or -1,
     })
     if config['file_format'] == Formats.default:
         config['file_format'] = Formats.pip_freeze
