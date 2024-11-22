@@ -139,9 +139,8 @@ def test_fail_on_avg(current_dir: Path) -> None:
         stdout=subprocess.PIPE,
         check=False,
     )
-    stdout = got.stdout.decode('utf-8').strip().splitlines()
 
-    assert got.returncode == 1, got.stderr or stdout
+    assert got.returncode == 1, (got.stderr or got.stdout).decode()
 
 
 @pytest.mark.usefixtures('_tmp_directory')
@@ -153,6 +152,5 @@ def test_fail_on_max(current_dir: Path) -> None:
         stdout=subprocess.PIPE,
         check=False,
     )
-    stdout = got.stdout.decode('utf-8').strip().splitlines()
 
-    assert got.returncode == 1, got.stderr or stdout
+    assert got.returncode == 1, (got.stderr or got.stdout).decode()

@@ -22,10 +22,32 @@
 
 """Config dict."""
 
+from __future__ import annotations
+
 from pathlib import Path
 from typing import TypedDict
 
 from deltaver.formats import Formats
+
+
+class CliInputConfig(TypedDict):
+    """Structure description for CLI input."""
+
+    path_to_file: Path
+    file_format: Formats
+    excluded: list[str]
+    fail_on_avg: int | None
+    fail_on_max: int | None
+
+
+class PyprojectConfig(TypedDict):
+    """Structure description for pyproject input."""
+
+    path_to_file: Path | None
+    file_format: Formats | None
+    excluded: list[str]
+    fail_on_avg: int | None
+    fail_on_max: int | None
 
 
 class Config(TypedDict):

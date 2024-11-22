@@ -25,10 +25,12 @@
 import datetime
 import sys
 import traceback
+from contextlib import suppress
 from pathlib import Path
 from typing import Annotated
 
 import pytz
+import toml
 import typer
 from rich import print as rich_print
 from rich.console import Console
@@ -36,7 +38,7 @@ from rich.progress import track
 from rich.table import Table
 
 from deltaver.cached_package_list import CachedPackageList
-from deltaver.config import Config
+from deltaver.config import CliInputConfig, Config, PyprojectConfig
 from deltaver.delta import DaysDelta
 from deltaver.filtered_package_list import FilteredPackageList
 from deltaver.formats import Formats
@@ -49,22 +51,56 @@ from deltaver.version_list import VersionList
 app = typer.Typer()
 
 
-def config_ctor(
+def config_from_cli(
     path_to_file: Path,
     file_format: Formats,
     fail_on_avg: int,
     fail_on_max: int,
+) -> CliInputConfig:
+    """Config from cli."""
+    return CliInputConfig({
+        'path_to_file': path_to_file,
+        'file_format': file_format,
+        'excluded': [],  # TODO
+        'fail_on_avg': None if fail_on_avg == -1 else fail_on_avg,
+        'fail_on_max': None if fail_on_max == -1 else fail_on_max,
+    })
+
+
+def pyproject_config() -> PyprojectConfig:
+    """Config from pyproject.toml ."""
+    pyproject_cfg = {}
+    with suppress(FileNotFoundError):
+        pyproject_cfg = (
+            toml.loads(
+                Path('pyproject.toml').read_text(),
+            )
+            .get('tool', {})
+            .get('deltaver', {})
+        )
+    return PyprojectConfig({
+        'path_to_file': pyproject_cfg.get('path_to_file'),
+        'file_format': pyproject_cfg.get('path_to_file'),
+        'excluded': pyproject_cfg.get('path_to_file', []),  # TODO
+        'fail_on_avg': pyproject_cfg.get('path_to_file'),
+        'fail_on_max': pyproject_cfg.get('path_to_file'),
+    })
+
+
+def config_ctor(
+    cli_config: CliInputConfig,
+    pyproject_cfg: PyprojectConfig,
 ) -> Config:
     """Ctor for config."""
     config = Config({
-        'path_to_file': path_to_file,
-        'file_format': Formats.pip_freeze,
-        'excluded': [],  # TODO
-        'fail_on_avg': fail_on_avg,
-        'fail_on_max': fail_on_max,
+        'path_to_file': cli_config['path_to_file'] or pyproject_cfg['path_to_file'] or Path(),
+        'file_format': cli_config['file_format'] or pyproject_cfg['file_format'] or Formats.default,
+        'excluded': pyproject_cfg.get('excluded', []),  # TODO
+        'fail_on_avg': pyproject_cfg['fail_on_avg'] or cli_config['fail_on_avg'] or -1,
+        'fail_on_max': pyproject_cfg['fail_on_max'] or cli_config['fail_on_max'] or -1,
     })
-    if file_format == Formats.default:
-        file_format = Formats.pip_freeze
+    if config['file_format'] == Formats.default:
+        config['file_format'] = Formats.pip_freeze
     return config
 
 
@@ -119,10 +155,13 @@ def cli(  # noqa: WPS210, WPS213. TODO: fix
 ) -> None:
     """Cli."""
     config = config_ctor(
-        path_to_file,
-        file_format,
-        fail_on_average,
-        fail_on_max,
+        config_from_cli(
+            path_to_file,
+            file_format,
+            fail_on_average,
+            fail_on_max,
+        ),
+        pyproject_config(),
     )
     console = Console()
     table = Table(show_header=True, header_style='bold magenta')
