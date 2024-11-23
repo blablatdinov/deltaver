@@ -210,7 +210,7 @@ def main(
     ),
     fail_on_average: Annotated[int, typer.Option('--fail-on-avg')] = -1,
     fail_on_max: Annotated[int, typer.Option('--fail-on-max')] = -1,
-    exclude_deps: Annotated[list[str], typer.Option('--exclude')] = [],  # noqa: B006
+    exclude_deps: Annotated[list[str], typer.Option('--exclude')] = [],  # noqa: B006, WPS404. Typer API
 ) -> None:
     """Python project designed to calculate the lag or delay in dependencies in terms of days."""
     try:
