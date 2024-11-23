@@ -56,7 +56,7 @@ def config_from_cli(
     file_format: Formats,
     fail_on_avg: int,
     fail_on_max: int,
-    excluded: list[int],
+    excluded: list[str],
 ) -> CliInputConfig:
     """Config from cli."""
     return CliInputConfig({
