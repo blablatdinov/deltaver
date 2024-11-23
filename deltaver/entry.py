@@ -56,12 +56,13 @@ def config_from_cli(
     file_format: Formats,
     fail_on_avg: int,
     fail_on_max: int,
+    excluded: list[int],
 ) -> CliInputConfig:
     """Config from cli."""
     return CliInputConfig({
         'path_to_file': path_to_file,
         'file_format': file_format,
-        'excluded': [],  # TODO
+        'excluded': excluded,
         'fail_on_avg': None if fail_on_avg == -1 else fail_on_avg,
         'fail_on_max': None if fail_on_max == -1 else fail_on_max,
     })
@@ -80,10 +81,10 @@ def pyproject_config() -> PyprojectConfig:
         )
     return PyprojectConfig({
         'path_to_file': pyproject_cfg.get('path_to_file'),
-        'file_format': pyproject_cfg.get('path_to_file'),
-        'excluded': pyproject_cfg.get('path_to_file', []),  # TODO
-        'fail_on_avg': pyproject_cfg.get('path_to_file'),
-        'fail_on_max': pyproject_cfg.get('path_to_file'),
+        'file_format': pyproject_cfg.get('file_format'),
+        'excluded': pyproject_cfg.get('excluded', []),  # TODO
+        'fail_on_avg': pyproject_cfg.get('fail_on_avg'),
+        'fail_on_max': pyproject_cfg.get('fail_on_max'),
     })
 
 
@@ -95,7 +96,7 @@ def config_ctor(
     config = Config({
         'path_to_file': cli_config['path_to_file'] or pyproject_cfg['path_to_file'] or Path(),
         'file_format': cli_config['file_format'] or pyproject_cfg['file_format'] or Formats.default,
-        'excluded': pyproject_cfg.get('excluded', []),  # TODO
+        'excluded': pyproject_cfg.get('excluded', []),
         'fail_on_avg': pyproject_cfg['fail_on_avg'] or cli_config['fail_on_avg'] or -1,
         'fail_on_max': pyproject_cfg['fail_on_max'] or cli_config['fail_on_max'] or -1,
     })
@@ -152,6 +153,7 @@ def cli(  # noqa: WPS210, WPS213. TODO: fix
     file_format: Formats,
     fail_on_average: int,
     fail_on_max: int,
+    excluded: list[str],
 ) -> None:
     """Cli."""
     config = config_ctor(
@@ -160,6 +162,7 @@ def cli(  # noqa: WPS210, WPS213. TODO: fix
             file_format,
             fail_on_average,
             fail_on_max,
+            excluded,
         ),
         pyproject_config(),
     )
@@ -207,10 +210,11 @@ def main(
     ),
     fail_on_average: Annotated[int, typer.Option('--fail-on-avg')] = -1,
     fail_on_max: Annotated[int, typer.Option('--fail-on-max')] = -1,
+    exclude_deps: Annotated[list[str], typer.Option('--exclude')] = [],  # noqa: B006
 ) -> None:
     """Python project designed to calculate the lag or delay in dependencies in terms of days."""
     try:
-        cli(path_to_file, file_format, fail_on_average, fail_on_max)
+        cli(path_to_file, file_format, fail_on_average, fail_on_max, exclude_deps)
     except Exception as err:  # noqa: BLE001. Application entrypoint
         sys.stdout.write('\n'.join([
             'Deltaver fail with: "{0}"'.format(err),
