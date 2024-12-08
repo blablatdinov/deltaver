@@ -55,7 +55,7 @@ pytest-randomly = "3.16.0"
 ondivi = "0.6.0"
 wemake-python-styleguide = "0.19.2"
 types-pytz = "2024.2.0.20241003"
-vulture = "2.13"
+vulture = "2.14"
 flake8-one-class = "^0.0.1"
 
 [tool.poetry.scripts]
