@@ -37,8 +37,7 @@ jobs:
       matrix:
         python_version: [
           "3.9",
-          "3.12",
-          # "3.13",  TODO: uncomment
+          "3.13",
         ]
     runs-on: ubuntu-latest
     steps:
