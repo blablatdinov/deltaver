@@ -43,7 +43,7 @@ pytz = "^2024.2"  # TODO define needed
 
 [tool.poetry.group.dev.dependencies]
 pytest = "8.3.4"
-respx = "0.21.1"
+respx = "0.22.0"
 time-machine = "2.16.0"
 isort = "5.13.2"
 pytest-cov = "6.0.0"
