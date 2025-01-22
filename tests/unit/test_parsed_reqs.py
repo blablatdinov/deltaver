@@ -63,7 +63,7 @@ def test_not_semvar(text: str) -> None:
 
 def test_poetry_lock() -> None:
     got = PoetryLockReqs(
-        Path('tests/fixtures/poetry_lock_example.lock'),
+        Path('tests/fixtures/poetry_lock_example.lock').read_text(),
     ).reqs()
 
     assert got == [

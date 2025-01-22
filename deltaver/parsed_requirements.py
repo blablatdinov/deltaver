@@ -78,10 +78,10 @@ class PoetryLockReqs(ParsedReqs):
     _requirements_file_content: str
 
     def reqs(self) -> list[tuple[str, str]]:
-        data = toml.loads(self._requirements_file_content)
+        parsed_toml = toml.loads(self._requirements_file_content)
         return [
             (dependency['name'], dependency['version'])
-            for dependency in data['package']
+            for dependency in parsed_toml['package']
         ]
 
 
