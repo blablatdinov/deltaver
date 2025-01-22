@@ -1,6 +1,6 @@
 # The MIT License (MIT).
 #
-# Copyright (c) 2023-2025 Almaz Ilaletdinov <a.ilaletdinov@yandex.ru>
+# Copyright (c) 2018-2025 Almaz Ilaletdinov <a.ilaletdinov@yandex.ru>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -19,16 +19,28 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
+---
+version: 3
+tasks:
 
-lint:
-	poetry run isort deltaver tests
-	poetry run ruff check deltaver tests --fix | poetry run ondivi
-	poetry run flake8 deltaver tests | poetry run ondivi
-	poetry run mypy deltaver tests
+  fmt:
+    cmds:
+      - poetry run isort deltaver tests
+      - poetry run ruff check deltaver tests --fix
 
-test:
-	TZ=UTC poetry run pytest --cov=deltaver --cov-report=term-missing:skip-covered
+  lint:
+    cmds:
+      - poetry run isort deltaver tests
+      - poetry run ruff check deltaver tests --fix | poetry run ondivi
+      - poetry run flake8 deltaver tests | poetry run ondivi
+      - poetry run mypy deltaver tests
 
-clean:
-	rm -rf .deltaver_cache .mypy_cache .pytest_cache .ruff_cache .coverage dist
-	find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
+  test:
+    env:
+      TZ: UTC
+    cmds:
+      - poetry run pytest --cov=deltaver --cov-report=term-missing:skip-covered
+
+  clean:
+    cmds:
+      - git clean -f -d -x
