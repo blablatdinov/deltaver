@@ -76,10 +76,10 @@ class ExcludedReqs(ParsedReqs):
 @attrs.define(frozen=True)
 class PoetryLockReqs(ParsedReqs):
 
-    _path: Path
+    _requirements_file_content: str
 
     def reqs(self) -> list[tuple[str, str]]:
-        data = toml.loads(self._path.read_text())
+        data = toml.loads(self._requirements_file_content)
         return [
             (dependency['name'], dependency['version'])
             for dependency in data['package']
