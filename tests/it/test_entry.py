@@ -27,6 +27,7 @@ import subprocess
 import sys
 from collections.abc import Generator
 from pathlib import Path
+from shutil import copyfile
 
 import pytest
 
@@ -154,3 +155,17 @@ def test_fail_on_max(current_dir: Path) -> None:
     )
 
     assert got.returncode == 1, (got.stderr or got.stdout).decode()
+
+
+@pytest.mark.usefixtures('_tmp_directory')
+def test_poetry_lock(current_dir: Path) -> None:
+    """Test poetry lock file."""
+    copyfile((current_dir / 'tests/fixtures/poetry_lock_example.lock'), Path('poetry.lock'))
+    got = subprocess.run(
+        ['venv/bin/deltaver_new', 'poetry.lock', '--format', 'poetry-lock'],
+        stdout=subprocess.PIPE,
+        check=False,
+    )
+    stdout = got.stdout.decode('utf-8').strip().splitlines()
+
+    assert got.returncode == 0, got.stderr or stdout

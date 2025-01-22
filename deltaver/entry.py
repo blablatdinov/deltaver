@@ -43,7 +43,14 @@ from deltaver.delta import DaysDelta
 from deltaver.filtered_package_list import FilteredPackageList
 from deltaver.formats import Formats
 from deltaver.npmjs_package_list import NpmjsPackageList
-from deltaver.parsed_requirements import ExcludedReqs, FileNotFoundSafeReqs, FreezedReqs, PackageLockReqs, ParsedReqs
+from deltaver.parsed_requirements import (
+    ExcludedReqs,
+    FileNotFoundSafeReqs,
+    FreezedReqs,
+    PackageLockReqs,
+    ParsedReqs,
+    PoetryLockReqs,
+)
 from deltaver.pypi_package_list import PypiPackageList
 from deltaver.sorted_package_list import SortedPackageList
 from deltaver.version_list import VersionList
@@ -115,6 +122,7 @@ def logic(  # noqa: WPS210, WPS234. TODO: fix
     parsed_reqs: ParsedReqs = {
         Formats.npm_lock: PackageLockReqs(requirements_file_content),
         Formats.pip_freeze: FreezedReqs(requirements_file_content),
+        Formats.poetry_lock: PoetryLockReqs(requirements_file_content),
     }[file_format]
     dependencies = FileNotFoundSafeReqs(
         ExcludedReqs(
@@ -129,6 +137,7 @@ def logic(  # noqa: WPS210, WPS234. TODO: fix
         package_list: VersionList = {
             Formats.npm_lock: NpmjsPackageList(name),
             Formats.pip_freeze: PypiPackageList(name),
+            Formats.poetry_lock: PypiPackageList(name),
         }[file_format]
         delta = DaysDelta(
             version,
