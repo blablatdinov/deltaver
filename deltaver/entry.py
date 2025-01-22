@@ -43,7 +43,14 @@ from deltaver.delta import DaysDelta
 from deltaver.filtered_package_list import FilteredPackageList
 from deltaver.formats import Formats
 from deltaver.npmjs_package_list import NpmjsPackageList
-from deltaver.parsed_requirements import ExcludedReqs, FileNotFoundSafeReqs, FreezedReqs, PackageLockReqs, ParsedReqs, PoetryLockReqs
+from deltaver.parsed_requirements import (
+    ExcludedReqs,
+    FileNotFoundSafeReqs,
+    FreezedReqs,
+    PackageLockReqs,
+    ParsedReqs,
+    PoetryLockReqs,
+)
 from deltaver.pypi_package_list import PypiPackageList
 from deltaver.sorted_package_list import SortedPackageList
 from deltaver.version_list import VersionList

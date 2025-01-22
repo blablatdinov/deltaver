@@ -22,7 +22,6 @@
 
 import json
 import re
-from pathlib import Path
 from typing import Protocol, final
 
 import attrs
