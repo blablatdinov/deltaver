@@ -20,12 +20,55 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
+import json
 import datetime
+
+import pytest
+from respx.router import MockRouter
+from httpx import Response
 
 from deltaver.golang_package_list import GolangPackageList
 from deltaver.fk_package import FkPackage
 
 
+@pytest.fixture
+def _mock_golang_proxy(respx_mock: MockRouter) -> None:
+    versions = [
+        'v2.0.0',
+        'v2.0.1',
+        'v2.0.2',
+        'v2.0.3',
+        'v2.0.4',
+        'v2.0.5',
+        'v2.0.6',
+    ]
+    dates = [
+        datetime.datetime(2019, 3, 14, 23, 30, 15),
+        datetime.datetime(2021, 7, 16, 23, 20, 56),
+        datetime.datetime(2022, 4, 22, 22, 25, 44),
+        datetime.datetime(2023, 10, 10, 18, 5, 46),
+        datetime.datetime(2024, 3, 18, 16, 6, 27),
+        datetime.datetime(2024, 9, 16, 17, 36, 36),
+        datetime.datetime(2024, 12, 16, 17, 50, 50),
+    ]
+    respx_mock.get('https://proxy.golang.org/github.com/cpuguy83/go-md2man/v2/@v/list').mock(return_value=Response(
+        200, text='\n'.join(versions),
+    ))
+    for ver, date in zip(versions, dates):
+        (
+            respx_mock
+            .get('https://proxy.golang.org/github.com/cpuguy83/go-md2man/v2/@v/{0}.info'.format(ver))
+            .mock(return_value=Response(
+                200,
+                text=json.dumps({
+                    'Version': ver,
+                    'Time': date.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                }),
+            ))
+        )
+
+
+@pytest.mark.usefixtures('_mock_golang_proxy')
 def test():
     got = GolangPackageList(
         'github.com/cpuguy83/go-md2man/v2',
