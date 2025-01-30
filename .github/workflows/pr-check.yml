@@ -62,8 +62,10 @@ jobs:
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --no-interaction
-      - name: Run tests via pytest
+      - name: Check types
         run: poetry run pytest
+      - name: Run tests via pytest
+        run: poetry run mypy deltaver tests
 
   lint:
     runs-on: ubuntu-latest
@@ -90,15 +92,17 @@ jobs:
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --no-interaction
+      - name: Install lint dependencies
+        run: |
+          python3 -m venv lint-venv
+          lint-venv/bin/pip install -r lint-requirements.txt
       - name: lint via ruff
         run: .venv/bin/ruff check deltaver tests | .venv/bin/ondivi
       - name: flake8
-        run: .venv/bin/flake8 deltaver tests | .venv/bin/ondivi
-      - name: mypy
-        run: .venv/bin/mypy deltaver tests
+        run: lint-venv/bin/flake8 deltaver tests | .venv/bin/ondivi
       - name: Checking files for compliance with editorconfig
         run: |
-          VERSION="v3.0.3"
+          VERSION="v3.2.0"
           curl -O -L -C - https://github.com/editorconfig-checker/editorconfig-checker/releases/download/$VERSION/ec-linux-amd64.tar.gz
           tar xzf ec-linux-amd64.tar.gz
-          bin/ec-linux-amd64 -v
+          git ls-files | xargs bin/ec-linux-amd64 -v
