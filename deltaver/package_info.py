@@ -22,6 +22,8 @@
 
 """Package info."""
 
+# fIXME: not used
+
 from typing import Protocol
 
 

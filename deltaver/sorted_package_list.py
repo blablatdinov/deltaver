@@ -26,6 +26,7 @@ from collections.abc import Sequence
 from typing import final
 
 import attrs
+from typing_extensions import override
 
 from deltaver.package import Package
 from deltaver.version_list import VersionList
@@ -38,6 +39,7 @@ class SortedPackageList(VersionList):
 
     _origin: VersionList
 
+    @override
     def as_list(self) -> Sequence[Package]:
         """List representation."""
         return sorted(

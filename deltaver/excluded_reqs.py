@@ -20,44 +20,30 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Config dict."""
+"""Filter decorator for requirements."""
 
-from __future__ import annotations
+from typing import final
 
-from pathlib import Path
-from typing import TypedDict, final
+import attrs
+from typing_extensions import override
 
-from deltaver.formats import Formats
-
-
-@final
-class CliInputConfig(TypedDict):
-    """Structure description for CLI input."""
-
-    path_to_file: Path
-    file_format: Formats
-    excluded: list[str]
-    fail_on_avg: int | None
-    fail_on_max: int | None
+from deltaver.parsed_reqs import ParsedReqs
 
 
 @final
-class PyprojectConfig(TypedDict):
-    """Structure description for pyproject input."""
+@attrs.define(frozen=True)
+class ExcludedReqs(ParsedReqs):
+    """Filter decorator for requirements."""
 
-    path_to_file: Path | None
-    file_format: Formats | None
-    excluded: list[str]
-    fail_on_avg: int | None
-    fail_on_max: int | None
+    _origin: ParsedReqs
+    _excluded_reqs: list[str]
 
-
-@final
-class Config(TypedDict):
-    """Config dict."""
-
-    path_to_file: Path
-    file_format: Formats
-    excluded: list[str]
-    fail_on_avg: int
-    fail_on_max: int
+    @override
+    def reqs(self) -> list[tuple[str, str]]:
+        """Filtered requirements."""
+        excluded_packages_set = {package.lower() for package in self._excluded_reqs}
+        return [
+            item
+            for item in self._origin.reqs()
+            if item[0].lower() not in excluded_packages_set
+        ]

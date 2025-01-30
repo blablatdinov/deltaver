@@ -20,44 +20,39 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Config dict."""
+"""Days delta."""
 
-from __future__ import annotations
+import datetime
+from typing import final
 
-from pathlib import Path
-from typing import TypedDict, final
+import attrs
+from packaging.version import parse as version_parse
+from typing_extensions import override
 
-from deltaver.formats import Formats
-
-
-@final
-class CliInputConfig(TypedDict):
-    """Structure description for CLI input."""
-
-    path_to_file: Path
-    file_format: Formats
-    excluded: list[str]
-    fail_on_avg: int | None
-    fail_on_max: int | None
+from deltaver.delta import Delta
+from deltaver.version_list import VersionList
 
 
 @final
-class PyprojectConfig(TypedDict):
-    """Structure description for pyproject input."""
+@attrs.define(frozen=True)
+class DaysDelta(Delta):
+    """Days delta."""
 
-    path_to_file: Path | None
-    file_format: Formats | None
-    excluded: list[str]
-    fail_on_avg: int | None
-    fail_on_max: int | None
+    _version: str
+    _packages: VersionList
+    _today: datetime.date
 
-
-@final
-class Config(TypedDict):
-    """Config dict."""
-
-    path_to_file: Path
-    file_format: Formats
-    excluded: list[str]
-    fail_on_avg: int
-    fail_on_max: int
+    @override
+    def days(self) -> int:
+        """Days of delta."""
+        flag = False
+        next_version_release_date = datetime.date(1, 1, 1)
+        for package in self._packages.as_list():
+            if flag:
+                next_version_release_date = package.release_date()
+                break
+            if package.version() == version_parse(self._version):
+                flag = True
+        else:
+            return 0
+        return (self._today - next_version_release_date).days

@@ -33,3 +33,8 @@ class NextVersionNotFoundError(Exception):
 @final
 class VersionNotFoundError(Exception):
     """Version not found error."""
+
+
+@final
+class TargetGreaterLastError(Exception):
+    """Target greater last error."""

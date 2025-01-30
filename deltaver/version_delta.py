@@ -29,21 +29,13 @@ from typing import Protocol, final
 import attrs
 import httpx
 from packaging import version
-from typing_extensions import TypeAlias
+from typing_extensions import TypeAlias, override
+
+from deltaver.exceptions import TargetGreaterLastError, VersionNotFoundError
 
 VersionNumber: TypeAlias = str
 UploadTime: TypeAlias = datetime.date
 SortedVersionsList: TypeAlias = list[dict[VersionNumber, UploadTime]]
-
-
-@final
-class VersionNotFoundError(Exception):
-    pass
-
-
-@final
-class TargetGreaterLastError(Exception):
-    pass
 
 
 class VersionDelta(Protocol):
@@ -62,6 +54,7 @@ class FkSortedVersions(SortedVersions):
 
     _value: SortedVersionsList
 
+    @override
     def fetch(self) -> SortedVersionsList:
         return self._value
 
@@ -72,6 +65,7 @@ class FkVersionDelta(VersionDelta):
 
     _value: int
 
+    @override
     def days(self) -> int:
         return self._value
 
@@ -82,6 +76,7 @@ class VersionsSortedByDate(SortedVersions):
 
     _package_name: str
 
+    @override
     def fetch(self) -> SortedVersionsList:
         response = httpx.get('https://pypi.org/pypi/{0}/json'.format(self._package_name))
         response.raise_for_status()
@@ -113,6 +108,7 @@ class CachedSortedVersions(SortedVersions):
     _origin: SortedVersions
     _package_name: str
 
+    @override
     def fetch(self) -> SortedVersionsList:
         cache_dir = Path('.deltaver_cache')
         (cache_dir / self._package_name).mkdir(exist_ok=True, parents=True)
@@ -148,6 +144,7 @@ class PypiVersionsSortedBySemver(SortedVersions):
     _artifactory_domain: str
     _package_name: str
 
+    @override
     def fetch(self) -> SortedVersionsList:
         response = httpx.get(
             httpx.URL(self._artifactory_domain).join('pypi/{0}/json'.format(self._package_name)),
@@ -177,6 +174,7 @@ class NpmjsVersionsSortedBySemver(SortedVersions):
     _artifactory_domain: str
     _package_name: str
 
+    @override
     def fetch(self) -> SortedVersionsList:
         response = httpx.get(
             httpx.URL(self._artifactory_domain).join(self._package_name),
@@ -207,6 +205,7 @@ class OvertakingSafeVersionDelta(VersionDelta):
     _origin: VersionDelta
     _enable: bool
 
+    @override
     def days(self) -> int:
         try:
             return self._origin.days()
@@ -221,6 +220,7 @@ class PypiVersionDelta(VersionDelta):
     _sorted_versions: SortedVersions
     _version: str
 
+    @override
     def days(self) -> int:  # noqa: C901. TODO
         v = version.parse(self._version)
         if v.pre or v.dev:
@@ -259,7 +259,9 @@ class DecrDelta(VersionDelta):
     _origin: VersionDelta
     _for_date: datetime.date
 
+    @override
     def days(self) -> int:
         today = datetime.datetime.now(tz=datetime.timezone.utc).date()
         recalculated_days = self._origin.days() - (today - self._for_date).days
         return 0 if recalculated_days < 0 else recalculated_days
+

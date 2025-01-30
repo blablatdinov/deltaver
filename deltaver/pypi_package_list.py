@@ -30,6 +30,7 @@ import attrs
 import httpx
 from packaging.version import InvalidVersion
 from packaging.version import parse as version_parse
+from typing_extensions import override
 
 from deltaver.package import Package
 from deltaver.pypi_package import PypiPackage
@@ -43,6 +44,7 @@ class PypiPackageList(VersionList):
 
     _name: str
 
+    @override
     def as_list(self) -> Sequence[Package]:
         """List representation."""
         response = httpx.get('https://pypi.org/pypi/{0}/json'.format(self._name))

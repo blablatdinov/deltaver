@@ -31,6 +31,7 @@ import attrs
 import httpx
 from packaging.version import InvalidVersion
 from packaging.version import parse as version_parse
+from typing_extensions import override
 
 from deltaver.fk_package import FkPackage
 from deltaver.package import Package
@@ -44,6 +45,7 @@ class NpmjsPackageList(VersionList):
 
     _name: str
 
+    @override
     def as_list(self) -> Sequence[Package]:  # noqa: WPS210. TODO: minimize variables
         """List representation."""
         response = httpx.get(httpx.URL('https://registry.npmjs.org').join(self._name))

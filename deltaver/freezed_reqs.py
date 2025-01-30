@@ -20,44 +20,33 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Config dict."""
+import re
+from typing import final
 
-from __future__ import annotations
+import attrs
+from typing_extensions import override
 
-from pathlib import Path
-from typing import TypedDict, final
-
-from deltaver.formats import Formats
-
-
-@final
-class CliInputConfig(TypedDict):
-    """Structure description for CLI input."""
-
-    path_to_file: Path
-    file_format: Formats
-    excluded: list[str]
-    fail_on_avg: int | None
-    fail_on_max: int | None
+from deltaver.parsed_reqs import ParsedReqs
 
 
 @final
-class PyprojectConfig(TypedDict):
-    """Structure description for pyproject input."""
+@attrs.define(frozen=True)
+class FreezedReqs(ParsedReqs):
+    """Requirements from `pip freeze` format."""
 
-    path_to_file: Path | None
-    file_format: Formats | None
-    excluded: list[str]
-    fail_on_avg: int | None
-    fail_on_max: int | None
+    _requirements_file_content: str
 
-
-@final
-class Config(TypedDict):
-    """Config dict."""
-
-    path_to_file: Path
-    file_format: Formats
-    excluded: list[str]
-    fail_on_avg: int
-    fail_on_max: int
+    @override
+    def reqs(self) -> list[tuple[str, str]]:
+        """Parsed requirements list."""
+        res = []
+        lines = self._requirements_file_content.splitlines()
+        expected_splitted_line_len = 2
+        for line in lines:
+            splitted_line = line.split(';')[0].split('==')
+            if len(splitted_line) != expected_splitted_line_len:
+                continue
+            package, version = splitted_line
+            package = re.sub(r'\[.*?\]', '', package)
+            res.append((package, version.strip()))
+        return res

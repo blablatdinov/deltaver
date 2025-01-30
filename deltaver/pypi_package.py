@@ -30,6 +30,7 @@ import httpx
 import pytz
 from packaging.version import Version
 from packaging.version import parse as version_parse
+from typing_extensions import override
 
 from deltaver.package import Package
 from deltaver.version_list import VersionList
@@ -44,14 +45,17 @@ class PypiPackage(Package):
     _version: str
     _version_list: VersionList
 
+    @override
     def version(self) -> Version:
         """Version."""
         return version_parse(self._version)
 
+    @override
     def name(self) -> str:
         """Name."""
         return self._name
 
+    @override
     def release_date(self) -> datetime.date:
         """Release date."""
         response = httpx.get('https://pypi.org/pypi/{0}/json'.format(self._name))

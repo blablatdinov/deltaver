@@ -33,7 +33,7 @@ from time_machine import TimeMachineFixture
 
 from deltaver.entry import logic
 from deltaver.formats import Formats
-from deltaver.parsed_requirements import PackageLockReqs
+from deltaver.package_lock_reqs import PackageLockReqs
 
 
 @pytest.fixture

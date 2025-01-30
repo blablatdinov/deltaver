@@ -26,7 +26,10 @@ from pathlib import Path
 
 import pytest
 
-from deltaver.parsed_requirements import FreezedReqs, GolangReqs, PackageLockReqs, PoetryLockReqs
+from deltaver.freezed_reqs import FreezedReqs
+from deltaver.golang_reqs import GolangReqs
+from deltaver.package_lock_reqs import PackageLockReqs
+from deltaver.poetry_lock_reqs import PoetryLockReqs
 
 
 @pytest.mark.parametrize(('text', 'expected'), [

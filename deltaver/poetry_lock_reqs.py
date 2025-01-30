@@ -20,44 +20,27 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Config dict."""
+from typing import final
 
-from __future__ import annotations
+import attrs
+import toml
+from typing_extensions import override
 
-from pathlib import Path
-from typing import TypedDict, final
-
-from deltaver.formats import Formats
-
-
-@final
-class CliInputConfig(TypedDict):
-    """Structure description for CLI input."""
-
-    path_to_file: Path
-    file_format: Formats
-    excluded: list[str]
-    fail_on_avg: int | None
-    fail_on_max: int | None
+from deltaver.parsed_reqs import ParsedReqs
 
 
 @final
-class PyprojectConfig(TypedDict):
-    """Structure description for pyproject input."""
+@attrs.define(frozen=True)
+class PoetryLockReqs(ParsedReqs):
+    """Parsed poetry.lock requirements file."""
 
-    path_to_file: Path | None
-    file_format: Formats | None
-    excluded: list[str]
-    fail_on_avg: int | None
-    fail_on_max: int | None
+    _requirements_file_content: str
 
-
-@final
-class Config(TypedDict):
-    """Config dict."""
-
-    path_to_file: Path
-    file_format: Formats
-    excluded: list[str]
-    fail_on_avg: int
-    fail_on_max: int
+    @override
+    def reqs(self) -> list[tuple[str, str]]:
+        """Parsed poetry.lock requirements file."""
+        parsed_toml = toml.loads(self._requirements_file_content)
+        return [
+            (dependency['name'], dependency['version'])
+            for dependency in parsed_toml['package']
+        ]

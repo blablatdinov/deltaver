@@ -40,19 +40,17 @@ from rich.table import Table
 from deltaver.cached_package_list import CachedPackageList
 from deltaver.config import CliInputConfig, Config, PyprojectConfig
 from deltaver.delta import DaysDelta
+from deltaver.excluded_reqs import ExcludedReqs
+from deltaver.file_not_foudn_safe_reqs import FileNotFoundSafeReqs
 from deltaver.filtered_package_list import FilteredPackageList
 from deltaver.formats import Formats
+from deltaver.freezed_reqs import FreezedReqs
 from deltaver.golang_package_list import GolangPackageList
+from deltaver.golang_reqs import GolangReqs
 from deltaver.npmjs_package_list import NpmjsPackageList
-from deltaver.parsed_requirements import (
-    ExcludedReqs,
-    FileNotFoundSafeReqs,
-    FreezedReqs,
-    GolangReqs,
-    PackageLockReqs,
-    ParsedReqs,
-    PoetryLockReqs,
-)
+from deltaver.package_lock_reqs import PackageLockReqs
+from deltaver.parsed_reqs import ParsedReqs
+from deltaver.poetry_lock_reqs import PoetryLockReqs
 from deltaver.pypi_package_list import PypiPackageList
 from deltaver.sorted_package_list import SortedPackageList
 from deltaver.version_list import VersionList
