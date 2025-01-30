@@ -83,8 +83,6 @@ fixable = [
   "Q000",  # Double quotes
 ]
 ignore = [
-  "ANN101",  # Missing type annotation for `self` in method
-  "ANN102",  # Missing type annotation for `cls` in classmethod
   "ARG001",  # Unused function argument
   "ARG002",  # Unused method argument
   "D203",    # no-blank-line-before-class
@@ -106,9 +104,9 @@ ignore = [
   "UP004",   # Class `PrayerReaction` inherits from `object`
   "TD",      # "todo" formats
   "PLR630",  # We disrespect staticmethods
-  "TCH001",
-  "TCH002",
-  "TCH003",  # Move standard library import `...` into a type-checking block
+  "TC001",
+  "TC002",
+  "TC003",  # Move standard library import `...` into a type-checking block
 ]
 
 [tool.ruff.lint.flake8-quotes]
