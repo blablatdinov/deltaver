@@ -130,5 +130,4 @@ class GolangReqs(ParsedReqs):
                 splitted_line[0],
                 splitted_line[1],
             ))
-        print(res)
         return res

@@ -110,4 +110,29 @@ def test_golang_reqs() -> None:
         'gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=',
     ])).reqs()
 
-    assert got == []
+    assert got == [
+        (
+            'github.com/cpuguy83/go-md2man/v2',
+            'v2.0.5',
+        ),
+        (
+            'github.com/russross/blackfriday/v2',
+            'v2.1.0',
+        ),
+        (
+            'github.com/urfave/cli/v2',
+            'v2.27.5',
+        ),
+        (
+            'github.com/xrash/smetrics',
+            'v0.0.0-20240521201337-686a1a2994c1',
+        ),
+        (
+            'gopkg.in/check.v1',
+            'v0.0.0-20161208181325-20d25e280405',
+        ),
+        (
+            'gopkg.in/yaml.v3',
+            'v3.0.1',
+        ),
+    ]

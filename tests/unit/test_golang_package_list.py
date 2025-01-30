@@ -70,16 +70,15 @@ def _mock_golang_proxy(respx_mock: MockRouter) -> None:
 
 @pytest.mark.usefixtures('_mock_golang_proxy')
 def test():
-    got = GolangPackageList(
-        'github.com/cpuguy83/go-md2man/v2',
-    ).as_list()
+    package = 'github.com/cpuguy83/go-md2man/v2'
+    got = GolangPackageList(package).as_list()
 
     assert got == [
-        FkPackage('github.com/cpuguy83/go-md2man/v2', 'v2.0.0', datetime.datetime(2019, 3, 14, 23, 30, 15)),
-        FkPackage('github.com/cpuguy83/go-md2man/v2', 'v2.0.1', datetime.datetime(2021, 7, 16, 23, 20, 56)),
-        FkPackage('github.com/cpuguy83/go-md2man/v2', 'v2.0.2', datetime.datetime(2022, 4, 22, 22, 25, 44)),
-        FkPackage('github.com/cpuguy83/go-md2man/v2', 'v2.0.3', datetime.datetime(2023, 10, 10, 18, 5, 46)),
-        FkPackage('github.com/cpuguy83/go-md2man/v2', 'v2.0.4', datetime.datetime(2024, 3, 18, 16, 6, 27)),
-        FkPackage('github.com/cpuguy83/go-md2man/v2', 'v2.0.5', datetime.datetime(2024, 9, 16, 17, 36, 36)),
-        FkPackage('github.com/cpuguy83/go-md2man/v2', 'v2.0.6', datetime.datetime(2024, 12, 16, 17, 50, 50)),
+        FkPackage(package, 'v2.0.0', datetime.date(2019, 3, 14)),
+        FkPackage(package, 'v2.0.1', datetime.date(2021, 7, 16)),
+        FkPackage(package, 'v2.0.2', datetime.date(2022, 4, 22)),
+        FkPackage(package, 'v2.0.3', datetime.date(2023, 10, 10)),
+        FkPackage(package, 'v2.0.4', datetime.date(2024, 3, 18)),
+        FkPackage(package, 'v2.0.5', datetime.date(2024, 9, 16)),
+        FkPackage(package, 'v2.0.6', datetime.date(2024, 12, 16)),
     ]
