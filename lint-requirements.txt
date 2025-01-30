@@ -1,6 +1,6 @@
 # The MIT License (MIT).
 #
-# Copyright (c) 2018-2025 Almaz Ilaletdinov <a.ilaletdinov@yandex.ru>
+# Copyright (c) 2023-2025 Almaz Ilaletdinov <a.ilaletdinov@yandex.ru>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -19,28 +19,18 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
----
-version: 3
-tasks:
 
-  fmt:
-    cmds:
-      - poetry run isort deltaver tests
-      - poetry run ruff check deltaver tests --fix --fix-only
-
-  lint:
-    cmds:
-      - poetry run ruff check deltaver tests --select="F"
-      - poetry run ruff check deltaver tests | poetry run ondivi
-      - ./lint-venv/bin/flake8 deltaver tests
-      - poetry run mypy deltaver tests
-
-  test:
-    env:
-      TZ: UTC
-    cmds:
-      - poetry run pytest --cov=deltaver --cov-report=term-missing:skip-covered
-
-  clean:
-    cmds:
-      - git clean -f -d -x
+attrs==25.1.0
+    # via wemake-python-styleguide
+flake8==7.1.1
+    # via wemake-python-styleguide
+mccabe==0.7.0
+    # via flake8
+pycodestyle==2.12.1
+    # via flake8
+pyflakes==3.2.0
+    # via flake8
+pygments==2.19.1
+    # via wemake-python-styleguide
+wemake-python-styleguide==1.0.0
+    # via -r lint-requirements.txt
