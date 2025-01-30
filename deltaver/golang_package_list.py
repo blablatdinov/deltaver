@@ -28,8 +28,8 @@ from typing import final
 
 import attrs
 import httpx
-
 from packaging.version import parse as version_parse
+
 from deltaver.fk_package import FkPackage
 from deltaver.package import Package
 from deltaver.version_list import VersionList
@@ -44,6 +44,7 @@ class GolangPackageList(VersionList):
 
     def as_list(self) -> Sequence[Package]:
         """List representation."""
+        print('https://proxy.golang.org/{0}/@v/list'.format(self._name))
         response = httpx.get('https://proxy.golang.org/{0}/@v/list'.format(self._name))
         response.raise_for_status()
         versions = response.text.splitlines()
@@ -53,7 +54,21 @@ class GolangPackageList(VersionList):
         )
         packages = []
         for version in versions:
+            print('  https://proxy.golang.org/{0}/@v/{1}.info'.format(self._name, version))
             response = httpx.get('https://proxy.golang.org/{0}/@v/{1}.info'.format(self._name, version))
+            if response.status_code == 404:
+                # Request to get the list of versions for the module:
+                # https://proxy.golang.org/github.com/russross/blackfriday/v2/@v/list
+                # Response:
+                # v2.0.0
+                # v2.1.0-pre.1
+                # v2.1.0
+                # v2.0.1
+                #
+                # However, attempting to request information for a specific version, such as:
+                # https://proxy.golang.org/github.com/russross/blackfriday/v2/@v/v2.0.0.info
+                # will result in a 404 error (page not found).
+                continue
             response.raise_for_status()
             packages.append(FkPackage(
                 self._name,
@@ -61,6 +76,6 @@ class GolangPackageList(VersionList):
                 datetime.datetime.strptime(
                     response.json()['Time'],
                     '%Y-%m-%dT%H:%M:%SZ',
-                ),
+                ).date(),
             ))
         return packages

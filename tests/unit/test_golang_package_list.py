@@ -20,15 +20,15 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-import json
 import datetime
+import json
 
 import pytest
-from respx.router import MockRouter
 from httpx import Response
+from respx.router import MockRouter
 
-from deltaver.golang_package_list import GolangPackageList
 from deltaver.fk_package import FkPackage
+from deltaver.golang_package_list import GolangPackageList
 
 
 @pytest.fixture

@@ -27,7 +27,7 @@ from typing import Protocol, final
 import attrs
 import toml
 import typer
-from rich import print
+from rich import print as rich_print
 
 
 class ParsedReqs(Protocol):
@@ -95,7 +95,7 @@ class FileNotFoundSafeReqs(ParsedReqs):
         try:
             return self._origin.reqs()
         except FileNotFoundError as err:
-            print('Requirements file not found')
+            rich_print('Requirements file not found')
             raise typer.Exit(1) from err
 
 
@@ -111,3 +111,24 @@ class PackageLockReqs(ParsedReqs):
             (name, version_info['version'])
             for name, version_info in parsed_json['dependencies'].items()
         ]
+
+
+@final
+@attrs.define(frozen=True)
+class GolangReqs(ParsedReqs):
+
+    _go_sum_content: str
+
+    def reqs(self) -> list[tuple[str, str]]:
+        lines = self._go_sum_content.strip().splitlines()
+        res = []
+        for idx, line in enumerate(lines):
+            if idx % 2 == 1:
+                continue
+            splitted_line = line.split(' ')
+            res.append((
+                splitted_line[0],
+                splitted_line[1],
+            ))
+        print(res)
+        return res
