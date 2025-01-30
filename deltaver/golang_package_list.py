@@ -24,18 +24,14 @@
 
 import datetime
 from collections.abc import Sequence
-from contextlib import suppress
 from typing import final
 
 import attrs
 import httpx
-from packaging.version import InvalidVersion
-from packaging.version import parse as version_parse
 
-from deltaver.package import Package
-from deltaver.pypi_package import PypiPackage
-from deltaver.version_list import VersionList
 from deltaver.fk_package import FkPackage
+from deltaver.package import Package
+from deltaver.version_list import VersionList
 
 
 @final
