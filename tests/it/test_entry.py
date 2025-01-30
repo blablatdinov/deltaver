@@ -169,3 +169,17 @@ def test_poetry_lock(current_dir: Path) -> None:
     stdout = got.stdout.decode('utf-8').strip().splitlines()
 
     assert got.returncode == 0, got.stderr or stdout
+
+
+@pytest.mark.usefixtures('_tmp_directory')
+def test_golang(current_dir: Path) -> None:
+    """Test go.sum file."""
+    copyfile((current_dir / 'tests/fixtures/go.sum'), Path('go.sum'))
+    got = subprocess.run(
+        ['venv/bin/deltaver_new', 'go.sum', '--format', 'golang'],
+        stdout=subprocess.PIPE,
+        check=False,
+    )
+    stdout = got.stdout.decode('utf-8').strip().splitlines()
+
+    assert got.returncode == 0, got.stderr or stdout

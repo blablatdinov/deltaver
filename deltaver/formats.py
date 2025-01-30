@@ -31,5 +31,6 @@ class Formats(Enum):
     pip_freeze = 'pip-freeze'
     poetry_lock = 'poetry-lock'
     npm_lock = 'npm-lock'
+    golang = 'golang'
 
     default = 'default'

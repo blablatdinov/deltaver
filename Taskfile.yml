@@ -30,6 +30,7 @@ tasks:
 
   lint:
     cmds:
+      - poetry run ruff check deltaver tests --select="F"
       - poetry run ruff check deltaver tests | poetry run ondivi
       - poetry run flake8 deltaver tests | poetry run ondivi
       - poetry run mypy deltaver tests

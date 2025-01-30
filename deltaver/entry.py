@@ -42,11 +42,13 @@ from deltaver.config import CliInputConfig, Config, PyprojectConfig
 from deltaver.delta import DaysDelta
 from deltaver.filtered_package_list import FilteredPackageList
 from deltaver.formats import Formats
+from deltaver.golang_package_list import GolangPackageList
 from deltaver.npmjs_package_list import NpmjsPackageList
 from deltaver.parsed_requirements import (
     ExcludedReqs,
     FileNotFoundSafeReqs,
     FreezedReqs,
+    GolangReqs,
     PackageLockReqs,
     ParsedReqs,
     PoetryLockReqs,
@@ -123,6 +125,7 @@ def logic(  # noqa: WPS210, WPS234. TODO: fix
         Formats.npm_lock: PackageLockReqs(requirements_file_content),
         Formats.pip_freeze: FreezedReqs(requirements_file_content),
         Formats.poetry_lock: PoetryLockReqs(requirements_file_content),
+        Formats.golang: GolangReqs(requirements_file_content),
     }[file_format]
     dependencies = FileNotFoundSafeReqs(
         ExcludedReqs(
@@ -138,6 +141,7 @@ def logic(  # noqa: WPS210, WPS234. TODO: fix
             Formats.npm_lock: NpmjsPackageList(name),
             Formats.pip_freeze: PypiPackageList(name),
             Formats.poetry_lock: PypiPackageList(name),
+            Formats.golang: GolangPackageList(name),
         }[file_format]
         delta = DaysDelta(
             version,
