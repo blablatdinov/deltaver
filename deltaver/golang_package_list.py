@@ -29,6 +29,7 @@ from typing import final
 import attrs
 import httpx
 
+from packaging.version import parse as version_parse
 from deltaver.fk_package import FkPackage
 from deltaver.package import Package
 from deltaver.version_list import VersionList
@@ -46,9 +47,13 @@ class GolangPackageList(VersionList):
         response = httpx.get('https://proxy.golang.org/{0}/@v/list'.format(self._name))
         response.raise_for_status()
         versions = response.text.splitlines()
+        versions = sorted(
+            versions,
+            key=lambda v: version_parse(v[1:]),
+        )
         packages = []
         for version in versions:
-            response = httpx.get('https://proxy.golang.org/{0}/@v/{1}.info'.format(self._name, versions[0]))
+            response = httpx.get('https://proxy.golang.org/{0}/@v/{1}.info'.format(self._name, version))
             response.raise_for_status()
             packages.append(FkPackage(
                 self._name,
