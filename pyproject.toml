@@ -45,7 +45,6 @@ pytz = "^2024.2"  # TODO define needed
 pytest = "8.3.4"
 respx = "0.21.1"
 time-machine = "2.16.0"
-isort = "5.13.2"
 pytest-cov = "6.0.0"
 ruff = "0.9.3"
 mypy = "1.14.1"
@@ -53,7 +52,6 @@ typing-extensions = "4.12.2"
 types-toml = "0.10.8.20240310"
 pytest-randomly = "3.16.0"
 ondivi = "0.6.0"
-wemake-python-styleguide = "0.19.2"
 types-pytz = "2024.2.0.20241221"
 vulture = "2.14"
 flake8-one-class = "^0.0.1"
@@ -81,6 +79,7 @@ select = ["ALL"]
 fixable = [
   "F401",  # Unused import
   "Q000",  # Double quotes
+  "I001",  # sort imports
 ]
 ignore = [
   "ARG001",  # Unused function argument
@@ -93,7 +92,6 @@ ignore = [
   "FBT002",  # Boolean-typed positional argument in function definition
   "FIX002",  # Line contains TODO, consider resolving the issue
   "FLY002",  # We not use f-strings
-  "I001",    # Conflict with isort
   "RUF100",  # WPS primary linter
   "RUF001",  # Project contain cyrillic symbols
   "RUF002",  # Project contain cyrillic symbols
