@@ -116,10 +116,12 @@ class PackageLockReqs(ParsedReqs):
 @final
 @attrs.define(frozen=True)
 class GolangReqs(ParsedReqs):
+    """Parsed golang go.sum requirements file."""
 
     _go_sum_content: str
 
     def reqs(self) -> list[tuple[str, str]]:
+        """Parsed golang go.sum requirements file."""
         lines = self._go_sum_content.strip().splitlines()
         res = []
         for idx, line in enumerate(lines):

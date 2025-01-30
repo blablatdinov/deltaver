@@ -20,6 +20,8 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
+"""Test golang package list."""
+
 import datetime
 import json
 
@@ -43,13 +45,13 @@ def _mock_golang_proxy(respx_mock: MockRouter) -> None:
         'v2.0.6',
     ]
     dates = [
-        datetime.datetime(2019, 3, 14, 23, 30, 15),
-        datetime.datetime(2021, 7, 16, 23, 20, 56),
-        datetime.datetime(2022, 4, 22, 22, 25, 44),
-        datetime.datetime(2023, 10, 10, 18, 5, 46),
-        datetime.datetime(2024, 3, 18, 16, 6, 27),
-        datetime.datetime(2024, 9, 16, 17, 36, 36),
-        datetime.datetime(2024, 12, 16, 17, 50, 50),
+        '2019-03-14T23:30:15Z',
+        '2021-07-16T23:20:56Z',
+        '2022-04-22T22:25:44Z',
+        '2023-10-10T18:05:46Z',
+        '2024-03-18T16:06:27Z',
+        '2024-09-16T17:36:36Z',
+        '2024-12-16T17:50:50Z',
     ]
     respx_mock.get('https://proxy.golang.org/github.com/cpuguy83/go-md2man/v2/@v/list').mock(return_value=Response(
         200, text='\n'.join(versions),
@@ -62,14 +64,15 @@ def _mock_golang_proxy(respx_mock: MockRouter) -> None:
                 200,
                 text=json.dumps({
                     'Version': ver,
-                    'Time': date.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                    'Time': date,
                 }),
             ))
         )
 
 
 @pytest.mark.usefixtures('_mock_golang_proxy')
-def test():
+def test() -> None:
+    """Test golang package list."""
     package = 'github.com/cpuguy83/go-md2man/v2'
     got = GolangPackageList(package).as_list()
 

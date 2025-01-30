@@ -44,19 +44,17 @@ class GolangPackageList(VersionList):
 
     def as_list(self) -> Sequence[Package]:
         """List representation."""
-        print('https://proxy.golang.org/{0}/@v/list'.format(self._name))
         response = httpx.get('https://proxy.golang.org/{0}/@v/list'.format(self._name))
         response.raise_for_status()
         versions = response.text.splitlines()
         versions = sorted(
             versions,
-            key=lambda v: version_parse(v[1:]),
+            key=lambda ver: version_parse(ver[1:]),
         )
         packages = []
         for version in versions:
-            print('  https://proxy.golang.org/{0}/@v/{1}.info'.format(self._name, version))
             response = httpx.get('https://proxy.golang.org/{0}/@v/{1}.info'.format(self._name, version))
-            if response.status_code == 404:
+            if response.status_code == httpx.codes.NOT_FOUND:
                 # Request to get the list of versions for the module:
                 # https://proxy.golang.org/github.com/russross/blackfriday/v2/@v/list
                 # Response:
@@ -73,9 +71,13 @@ class GolangPackageList(VersionList):
             packages.append(FkPackage(
                 self._name,
                 version,
-                datetime.datetime.strptime(
-                    response.json()['Time'],
-                    '%Y-%m-%dT%H:%M:%SZ',
-                ).date(),
+                (
+                    datetime.datetime
+                    .strptime(
+                        response.json()['Time'],
+                        '%Y-%m-%dT%H:%M:%S%z',
+                    )
+                    .date()
+                ),
             ))
         return packages
