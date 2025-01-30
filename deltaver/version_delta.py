@@ -39,45 +39,55 @@ SortedVersionsList: TypeAlias = list[dict[VersionNumber, UploadTime]]
 
 
 class VersionDelta(Protocol):
+    """Version delta protocol."""
 
-    def days(self) -> int: ...
+    def days(self) -> int:
+        """Delta in days."""
 
 
 class SortedVersions(Protocol):
+    """Sorted versions protocol."""
 
-    def fetch(self) -> SortedVersionsList: ...
+    def fetch(self) -> SortedVersionsList:
+        """Sorted versions list."""
 
 
 @final
 @attrs.define(frozen=True)
 class FkSortedVersions(SortedVersions):
+    """Fake sorted versions."""
 
     _value: SortedVersionsList
 
     @override
     def fetch(self) -> SortedVersionsList:
+        """Sorted versions list."""
         return self._value
 
 
 @final
 @attrs.define(frozen=True)
 class FkVersionDelta(VersionDelta):
+    """Fake version delta."""
 
     _value: int
 
     @override
     def days(self) -> int:
+        """Delta in days."""
         return self._value
 
 
 @final
 @attrs.define(frozen=True)
 class VersionsSortedByDate(SortedVersions):
+    """Versions sorted by date."""
 
     _package_name: str
 
     @override
     def fetch(self) -> SortedVersionsList:
+        """Sorted versions list."""
         response = httpx.get('https://pypi.org/pypi/{0}/json'.format(self._package_name))
         response.raise_for_status()
         versions = list(response.json()['releases'].items())
@@ -104,12 +114,14 @@ class VersionsSortedByDate(SortedVersions):
 @final
 @attrs.define(frozen=True)
 class CachedSortedVersions(SortedVersions):
+    """Cached sorted versions."""
 
     _origin: SortedVersions
     _package_name: str
 
     @override
     def fetch(self) -> SortedVersionsList:
+        """Sorted versions list."""
         cache_dir = Path('.deltaver_cache')
         (cache_dir / self._package_name).mkdir(exist_ok=True, parents=True)
         if cache_dir.exists():
@@ -140,12 +152,14 @@ class CachedSortedVersions(SortedVersions):
 @final
 @attrs.define(frozen=True)
 class PypiVersionsSortedBySemver(SortedVersions):
+    """Pypi versions sorted by semver."""
 
     _artifactory_domain: str
     _package_name: str
 
     @override
     def fetch(self) -> SortedVersionsList:
+        """Sorted versions list."""
         response = httpx.get(
             httpx.URL(self._artifactory_domain).join('pypi/{0}/json'.format(self._package_name)),
         )
@@ -170,12 +184,14 @@ class PypiVersionsSortedBySemver(SortedVersions):
 @final
 @attrs.define(frozen=True)
 class NpmjsVersionsSortedBySemver(SortedVersions):
+    """Npmjs versions sorted by semver."""
 
     _artifactory_domain: str
     _package_name: str
 
     @override
     def fetch(self) -> SortedVersionsList:
+        """Sorted versions list."""
         response = httpx.get(
             httpx.URL(self._artifactory_domain).join(self._package_name),
         )
@@ -201,12 +217,14 @@ class NpmjsVersionsSortedBySemver(SortedVersions):
 @final
 @attrs.define(frozen=True)
 class OvertakingSafeVersionDelta(VersionDelta):
+    """Overtaking safe version delta."""
 
     _origin: VersionDelta
     _enable: bool
 
     @override
     def days(self) -> int:
+        """Delta in days."""
         try:
             return self._origin.days()
         except TargetGreaterLastError:
@@ -216,12 +234,14 @@ class OvertakingSafeVersionDelta(VersionDelta):
 @final
 @attrs.define(frozen=True)
 class PypiVersionDelta(VersionDelta):
+    """Pypi version delta."""
 
     _sorted_versions: SortedVersions
     _version: str
 
     @override
     def days(self) -> int:  # noqa: C901. TODO
+        """Delta in days."""
         v = version.parse(self._version)
         if v.pre or v.dev:
             return 0
@@ -255,12 +275,14 @@ class PypiVersionDelta(VersionDelta):
 @final
 @attrs.define(frozen=True)
 class DecrDelta(VersionDelta):
+    """Decrement delta."""
 
     _origin: VersionDelta
     _for_date: datetime.date
 
     @override
     def days(self) -> int:
+        """Delta in days."""
         today = datetime.datetime.now(tz=datetime.timezone.utc).date()
         recalculated_days = self._origin.days() - (today - self._for_date).days
         return 0 if recalculated_days < 0 else recalculated_days
