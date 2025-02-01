@@ -62,7 +62,7 @@ class VersionsSortedByDate(SortedVersions):
             key=self._sort_key,
         )
 
-    def _sort_key(self, release_dict: dict[VersionNumber, UploadTime]):
+    def _sort_key(self, release_dict: dict[VersionNumber, UploadTime]) -> UploadTime:
         if not release_dict or not next(iter(list(release_dict.values()))):
             return datetime.date(1, 1, 1)
         times: list[UploadTime] = list(release_dict.values())
