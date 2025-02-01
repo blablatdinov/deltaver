@@ -72,7 +72,7 @@ class CachedSortedVersions(SortedVersions):
             {
                 next(iter(dict_.keys())): next(
                     iter(dict_.values()),
-                ).strftime('%Y-%m-%dT%H:%M:%S')
+                ).strftime('%Y-%m-%dT%H:%M:%S'),
             }
             for dict_ in origin_val
         ]))
