@@ -39,7 +39,7 @@ from rich.table import Table
 
 from deltaver.cached_package_list import CachedPackageList
 from deltaver.config import CliInputConfig, Config, PyprojectConfig
-from deltaver.delta import DaysDelta
+from deltaver.days_delta import DaysDelta
 from deltaver.excluded_reqs import ExcludedReqs
 from deltaver.file_not_foudn_safe_reqs import FileNotFoundSafeReqs
 from deltaver.filtered_package_list import FilteredPackageList
