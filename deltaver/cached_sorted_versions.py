@@ -60,15 +60,16 @@ class CachedSortedVersions(SortedVersions):
         if cache_path.exists():
             res = []
             for package_info in json.loads(cache_path.read_text()):
+                version_num = next(iter(package_info.keys()))
                 release_date = datetime.datetime.strptime(
                     next(iter(package_info.values())),
                     '%Y-%m-%dT%H:%M:%S',
                 ).astimezone(datetime.timezone.utc).date()
-                res.append({self._package_name: release_date})
+                res.append({version_num: release_date})
             return res
         origin_val = self._origin.fetch()
         cache_path.write_text(json.dumps([
-            {self._package_name: next(iter(dict_.values())).strftime('%Y-%m-%dT%H:%M:%S')}
+            {next(iter(dict_.keys())): next(iter(dict_.values())).strftime('%Y-%m-%dT%H:%M:%S')}
             for dict_ in origin_val
         ]))
         return origin_val
