@@ -20,6 +20,8 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
+"""Sorted versions protocol."""
+
 from typing import Protocol
 
 from deltaver.version_delta import SortedVersionsList

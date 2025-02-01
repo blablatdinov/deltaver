@@ -65,6 +65,7 @@ def test_not_semvar(text: str) -> None:
 
 
 def test_poetry_lock() -> None:
+    """Test PoetryLockReqs."""
     got = PoetryLockReqs(
         Path('tests/fixtures/poetry_lock_example.lock').read_text(),
     ).reqs()
@@ -86,6 +87,7 @@ def test_poetry_lock() -> None:
 
 
 def test_package_lock() -> None:
+    """Test PackageLockReqs."""
     got = PackageLockReqs(
         Path('tests/fixtures/package-lock-example.json').read_text(),
     ).reqs()

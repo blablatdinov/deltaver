@@ -20,6 +20,8 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
+"""Decrement delta."""
+
 import datetime
 from typing import final
 
@@ -42,4 +44,4 @@ class DecrDelta(VersionDelta):
         """Delta in days."""
         today = datetime.datetime.now(tz=datetime.timezone.utc).date()
         recalculated_days = self._origin.days() - (today - self._for_date).days
-        return 0 if recalculated_days < 0 else recalculated_days
+        return max(recalculated_days, 0)
