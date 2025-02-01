@@ -20,6 +20,8 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
+# flake8: noqa: WPS226. Found string literal over-use
+
 """Python project designed to calculate the lag or delay in dependencies in terms of days."""
 
 import datetime

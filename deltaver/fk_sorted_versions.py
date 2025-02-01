@@ -36,9 +36,9 @@ from deltaver.version_delta import SortedVersionsList
 class FkSortedVersions(SortedVersions):
     """Fake sorted versions."""
 
-    _value: SortedVersionsList
+    _origin: SortedVersionsList
 
     @override
     def fetch(self) -> SortedVersionsList:
         """Sorted versions list."""
-        return self._value
+        return self._origin

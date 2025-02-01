@@ -37,5 +37,3 @@ class VersionDelta(Protocol):
 
     def days(self) -> int:
         """Delta in days."""
-
-

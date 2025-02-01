@@ -44,7 +44,7 @@ class PypiVersionsSortedBySemver(SortedVersions):
     _package_name: str
 
     @override
-    def fetch(self) -> SortedVersionsList:
+    def fetch(self) -> SortedVersionsList:  # noqa: WPS210. TODO
         """Sorted versions list."""
         response = httpx.get(
             httpx.URL(self._artifactory_domain).join('pypi/{0}/json'.format(self._package_name)),
@@ -54,8 +54,8 @@ class PypiVersionsSortedBySemver(SortedVersions):
         correct_versions = []
         for version_number, release_info in versions:
             with suppress(version.InvalidVersion, IndexError):
-                v = version.parse(version_number)
-                if not v.pre and not v.dev:
+                parsed_version = version.parse(version_number)
+                if not parsed_version.pre and not parsed_version.dev:
                     correct_versions.append({
                         version_number: datetime.datetime.strptime(
                             release_info[0]['upload_time'], '%Y-%m-%dT%H:%M:%S',

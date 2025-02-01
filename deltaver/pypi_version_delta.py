@@ -43,15 +43,17 @@ class PypiVersionDelta(VersionDelta):
     _version: str
 
     @override
-    def days(self) -> int:  # noqa: C901. TODO
+    def days(self) -> int:  # noqa: C901, WPS210, WPS231. TODO
         """Delta in days."""
-        v = version.parse(self._version)
-        if v.pre or v.dev:
+        parsed_version = version.parse(self._version)
+        if parsed_version.pre or parsed_version.dev:
             return 0
         sorted_versions = self._sorted_versions.fetch()
         if not sorted_versions:
             return 0
-        last_version_number = version.parse(next(iter(list(sorted_versions[-1].keys()))))
+        last_version_number = version.parse(
+            next(iter(list(sorted_versions[-1].keys()))),
+        )
         if version.parse(self._version) > last_version_number:
             raise TargetGreaterLastError
         if next(iter(sorted_versions[-1].keys())) == self._version:
@@ -66,7 +68,7 @@ class PypiVersionDelta(VersionDelta):
                 break
             if release_number == self._version:
                 flag = True
-        for item in sorted_versions:
+        for item in sorted_versions:  # noqa: WPS110, rename
             release, upload_time = next(iter(item.items()))
             if release == next_available_release:
                 start = upload_time

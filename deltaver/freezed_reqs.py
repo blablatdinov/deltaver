@@ -39,7 +39,7 @@ class FreezedReqs(ParsedReqs):
     _requirements_file_content: str
 
     @override
-    def reqs(self) -> list[tuple[str, str]]:
+    def reqs(self) -> list[tuple[str, str]]:  # noqa: WPS210. Simplify later
         """Parsed requirements list."""
         res = []
         lines = self._requirements_file_content.splitlines()

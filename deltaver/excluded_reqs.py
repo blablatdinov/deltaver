@@ -43,7 +43,7 @@ class ExcludedReqs(ParsedReqs):
         """Filtered requirements."""
         excluded_packages_set = {package.lower() for package in self._excluded_reqs}
         return [
-            item
-            for item in self._origin.reqs()
-            if item[0].lower() not in excluded_packages_set
+            package
+            for package in self._origin.reqs()
+            if package[0].lower() not in excluded_packages_set
         ]

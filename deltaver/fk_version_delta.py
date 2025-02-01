@@ -35,9 +35,9 @@ from deltaver.version_delta import VersionDelta
 class FkVersionDelta(VersionDelta):
     """Fake version delta."""
 
-    _value: int
+    _origin: int
 
     @override
     def days(self) -> int:
         """Delta in days."""
-        return self._value
+        return self._origin
