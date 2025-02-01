@@ -145,6 +145,22 @@ tomli = {version = "*", optional = true, markers = "python_full_version <= \"3.1
 toml = ["tomli"]
 
 [[package]]
+name = "eo-styleguide"
+version = "0.0.1a16"
+description = "Pyeo is an advanced static analysis tool tailored specifically to enforce the principles advocated by Elegant Objects (elegantobjects.org) in Python projects. It serves as a quality control instrument to ensure that your Python code adheres to the core tenets of elegance, simplicity, and maintainability."
+optional = false
+python-versions = "<4.0,>=3.9"
+files = [
+    {file = "eo_styleguide-0.0.1a16-py3-none-any.whl", hash = "sha256:4ad0ea8748cfbc7ba1eb3e08263c14362682c283176f0765ec28b416ec70aa74"},
+    {file = "eo_styleguide-0.0.1a16.tar.gz", hash = "sha256:8a9d8de00677f7b614c6a063325cc56fe15aa0d608ede34c9f3450459e592249"},
+]
+
+[package.dependencies]
+flake8 = ">=7.1,<8.0"
+flake8-final = "*"
+flake8-override = "*"
+
+[[package]]
 name = "exceptiongroup"
 version = "1.2.1"
 description = "Backport of PEP 654 (exception groups)"
@@ -175,6 +191,20 @@ pycodestyle = ">=2.12.0,<2.13.0"
 pyflakes = ">=3.2.0,<3.3.0"
 
 [[package]]
+name = "flake8-final"
+version = "0.0.3"
+description = "flake8 plugin for check and inheritance of implementations"
+optional = false
+python-versions = "<4.0,>=3.9"
+files = [
+    {file = "flake8_final-0.0.3-py3-none-any.whl", hash = "sha256:48d375a071c5d0193b5d698100d5751896337e9596ec541886c2895be7f19027"},
+    {file = "flake8_final-0.0.3.tar.gz", hash = "sha256:652c95616199aa4f1bf4ccb60c2cd944797e12dc21b0343f12534e24465b3c43"},
+]
+
+[package.dependencies]
+flake8 = ">=7.1,<8.0"
+
+[[package]]
 name = "flake8-one-class"
 version = "0.0.1"
 description = "flake8 plugin for check and inheritance of implementations"
@@ -187,6 +217,20 @@ files = [
 
 [package.dependencies]
 flake8 = ">=7.1,<8.0"
+
+[[package]]
+name = "flake8-override"
+version = "0.0.4"
+description = "This is how python package should look like!"
+optional = false
+python-versions = "<4.0,>=3.9"
+files = [
+    {file = "flake8_override-0.0.4-py3-none-any.whl", hash = "sha256:8d7585440161bf2868f455450d16c6d7178a0fbc71ac6d582b3c4fbf0bfcd84c"},
+    {file = "flake8_override-0.0.4.tar.gz", hash = "sha256:891571dc19786e59cabde6d1cf2a6f55df540fdd92e95d79265b027c60d21798"},
+]
+
+[package.dependencies]
+flake8 = ">=5.0.0"
 
 [[package]]
 name = "gitdb"
@@ -894,4 +938,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "bc7f585122ac5c99f5a7d7498c5a51aea35facf19aeeb5cecfac9c0dbec5e93c"
+content-hash = "15c7178d53c29f49d36e60d6abad3bbf22dc9955af61afa285158ac15a4f3b48"

@@ -20,29 +20,29 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Sorted package list."""
+"""Parsed package-lock.json requirements file."""
 
-from collections.abc import Sequence
+import json
 from typing import final
 
 import attrs
 from typing_extensions import override
 
-from deltaver.package import Package
-from deltaver.version_list import VersionList
+from deltaver.parsed_reqs import ParsedReqs
 
 
 @final
 @attrs.define(frozen=True)
-class SortedPackageList(VersionList):
-    """Sorted package list."""
+class PackageLockReqs(ParsedReqs):
+    """Parsed package-lock.json requirements file."""
 
-    _origin: VersionList
+    _lock_file_content: str
 
     @override
-    def as_list(self) -> Sequence[Package]:
-        """List representation."""
-        return sorted(
-            self._origin.as_list(),
-            key=lambda pkg: pkg.version(),
-        )
+    def reqs(self) -> list[tuple[str, str]]:
+        """Parsed package-lock.json requirements file."""
+        parsed_json = json.loads(self._lock_file_content)
+        return [
+            (name, version_info['version'])
+            for name, version_info in parsed_json['dependencies'].items()
+        ]

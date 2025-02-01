@@ -26,6 +26,7 @@ from collections.abc import Sequence
 from typing import final
 
 import attrs
+from typing_extensions import override
 
 from deltaver.package import Package
 from deltaver.version_list import VersionList
@@ -33,7 +34,7 @@ from deltaver.version_list import VersionList
 
 @final
 @attrs.define
-class CachedPackageList(VersionList):
+class CachedPackageList(VersionList):  # noqa: PEO200. Class for caching
     """Cached packages list."""
 
     _origin: VersionList
@@ -45,6 +46,7 @@ class CachedPackageList(VersionList):
         """Ctor."""
         return cls(origin, [], cached=False)
 
+    @override
     def as_list(self) -> Sequence[Package]:
         """List representation."""
         if self._cached:

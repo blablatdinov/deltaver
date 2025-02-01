@@ -20,55 +20,49 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Npmjs package list."""
+"""Npmjs versions sorted by semver."""
 
 import datetime
-from collections.abc import Sequence
 from contextlib import suppress
 from typing import final
 
 import attrs
 import httpx
-from packaging.version import InvalidVersion
-from packaging.version import parse as version_parse
+from packaging import version
 from typing_extensions import override
 
-from deltaver.fk_package import FkPackage
-from deltaver.package import Package
-from deltaver.version_list import VersionList
+from deltaver.sorted_versions import SortedVersions
+from deltaver.version_delta import SortedVersionsList
 
 
 @final
 @attrs.define(frozen=True)
-class NpmjsPackageList(VersionList):
-    """Npmjs package list."""
+class NpmjsVersionsSortedBySemver(SortedVersions):
+    """Npmjs versions sorted by semver."""
 
-    _name: str
+    _artifactory_domain: str
+    _package_name: str
 
     @override
-    def as_list(self) -> Sequence[Package]:  # noqa: WPS210. TODO: minimize variables
-        """List representation."""
-        response = httpx.get(httpx.URL('https://registry.npmjs.org').join(self._name))
+    def fetch(self) -> SortedVersionsList:  # noqa: WPS210, WPS210. TODO
+        """Sorted versions list."""
+        response = httpx.get(
+            httpx.URL(self._artifactory_domain).join(self._package_name),
+        )
         response.raise_for_status()
         versions = response.json()['time'].items()
         correct_versions = []
         for version_number, release_time in versions:
-            with suppress(InvalidVersion, IndexError, KeyError):
-                parsed_version = version_parse(version_number)
+            with suppress(version.InvalidVersion, IndexError, KeyError):
+                parsed_version = version.parse(version_number)
                 if not parsed_version.is_prerelease and not parsed_version.is_devrelease:
-                    parsed_release_time = (
-                        datetime.datetime.strptime(
-                            release_time,
-                            '%Y-%m-%dT%H:%M:%S.%f%z',
-                        )
-                        .astimezone(datetime.timezone.utc)
-                        .date()
-                    )
-                    correct_versions.append(
-                        FkPackage(
-                            self._name,
-                            version_number,
-                            parsed_release_time,
-                        ),
-                    )
-        return correct_versions
+                    parsed_release_time = datetime.datetime.strptime(
+                        release_time, '%Y-%m-%dT%H:%M:%S.%f%z',
+                    ).astimezone(datetime.timezone.utc).date()
+                    correct_versions.append({
+                        version_number: parsed_release_time,
+                    })
+        return sorted(
+            correct_versions,
+            key=lambda release_dict: version.parse(next(iter(release_dict.keys()))),
+        )

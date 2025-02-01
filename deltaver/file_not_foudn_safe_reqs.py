@@ -20,29 +20,30 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Sorted package list."""
+"""File not found safe requirements."""
 
-from collections.abc import Sequence
 from typing import final
 
 import attrs
+import typer
+from rich import print as rich_print
 from typing_extensions import override
 
-from deltaver.package import Package
-from deltaver.version_list import VersionList
+from deltaver.parsed_reqs import ParsedReqs
 
 
 @final
 @attrs.define(frozen=True)
-class SortedPackageList(VersionList):
-    """Sorted package list."""
+class FileNotFoundSafeReqs(ParsedReqs):
+    """File not found safe requirements."""
 
-    _origin: VersionList
+    _origin: ParsedReqs
 
     @override
-    def as_list(self) -> Sequence[Package]:
-        """List representation."""
-        return sorted(
-            self._origin.as_list(),
-            key=lambda pkg: pkg.version(),
-        )
+    def reqs(self) -> list[tuple[str, str]]:
+        """File not found safe requirements."""
+        try:
+            return self._origin.reqs()
+        except FileNotFoundError as err:
+            rich_print('Requirements file not found')
+            raise typer.Exit(1) from err

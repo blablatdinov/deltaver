@@ -20,29 +20,34 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Sorted package list."""
+"""Parsed golang go.sum requirements file."""
 
-from collections.abc import Sequence
 from typing import final
 
 import attrs
 from typing_extensions import override
 
-from deltaver.package import Package
-from deltaver.version_list import VersionList
+from deltaver.parsed_reqs import ParsedReqs
 
 
 @final
 @attrs.define(frozen=True)
-class SortedPackageList(VersionList):
-    """Sorted package list."""
+class GolangReqs(ParsedReqs):
+    """Parsed golang go.sum requirements file."""
 
-    _origin: VersionList
+    _go_sum_content: str
 
     @override
-    def as_list(self) -> Sequence[Package]:
-        """List representation."""
-        return sorted(
-            self._origin.as_list(),
-            key=lambda pkg: pkg.version(),
-        )
+    def reqs(self) -> list[tuple[str, str]]:
+        """Parsed golang go.sum requirements file."""
+        lines = self._go_sum_content.strip().splitlines()
+        res = []
+        for idx, line in enumerate(lines):
+            if idx % 2 == 1:
+                continue
+            splitted_line = line.split(' ')
+            res.append((
+                splitted_line[0],
+                splitted_line[1],
+            ))
+        return res

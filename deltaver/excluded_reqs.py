@@ -20,29 +20,30 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Sorted package list."""
+"""Filter decorator for requirements."""
 
-from collections.abc import Sequence
 from typing import final
 
 import attrs
 from typing_extensions import override
 
-from deltaver.package import Package
-from deltaver.version_list import VersionList
+from deltaver.parsed_reqs import ParsedReqs
 
 
 @final
 @attrs.define(frozen=True)
-class SortedPackageList(VersionList):
-    """Sorted package list."""
+class ExcludedReqs(ParsedReqs):
+    """Filter decorator for requirements."""
 
-    _origin: VersionList
+    _origin: ParsedReqs
+    _excluded_reqs: list[str]
 
     @override
-    def as_list(self) -> Sequence[Package]:
-        """List representation."""
-        return sorted(
-            self._origin.as_list(),
-            key=lambda pkg: pkg.version(),
-        )
+    def reqs(self) -> list[tuple[str, str]]:
+        """Filtered requirements."""
+        excluded_packages_set = {package.lower() for package in self._excluded_reqs}
+        return [
+            package
+            for package in self._origin.reqs()
+            if package[0].lower() not in excluded_packages_set
+        ]

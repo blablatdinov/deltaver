@@ -26,7 +26,10 @@ from pathlib import Path
 
 import pytest
 
-from deltaver.parsed_requirements import FreezedReqs, GolangReqs, PackageLockReqs, PoetryLockReqs
+from deltaver.freezed_reqs import FreezedReqs
+from deltaver.golang_reqs import GolangReqs
+from deltaver.package_lock_reqs import PackageLockReqs
+from deltaver.poetry_lock_reqs import PoetryLockReqs
 
 
 @pytest.mark.parametrize(('text', 'expected'), [
@@ -62,6 +65,7 @@ def test_not_semvar(text: str) -> None:
 
 
 def test_poetry_lock() -> None:
+    """Test PoetryLockReqs."""
     got = PoetryLockReqs(
         Path('tests/fixtures/poetry_lock_example.lock').read_text(),
     ).reqs()
@@ -83,6 +87,7 @@ def test_poetry_lock() -> None:
 
 
 def test_package_lock() -> None:
+    """Test PackageLockReqs."""
     got = PackageLockReqs(
         Path('tests/fixtures/package-lock-example.json').read_text(),
     ).reqs()

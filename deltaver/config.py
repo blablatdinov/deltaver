@@ -22,14 +22,17 @@
 
 """Config dict."""
 
+# noqa: FOC100. Data structures
+
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TypedDict
+from typing import TypedDict, final
 
 from deltaver.formats import Formats
 
 
+@final
 class CliInputConfig(TypedDict):
     """Structure description for CLI input."""
 
@@ -40,6 +43,7 @@ class CliInputConfig(TypedDict):
     fail_on_max: int | None
 
 
+@final
 class PyprojectConfig(TypedDict):
     """Structure description for pyproject input."""
 
@@ -50,6 +54,7 @@ class PyprojectConfig(TypedDict):
     fail_on_max: int | None
 
 
+@final
 class Config(TypedDict):
     """Config dict."""
 

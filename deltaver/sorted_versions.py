@@ -20,13 +20,15 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Package info."""
+"""Sorted versions protocol."""
 
 from typing import Protocol
 
+from deltaver.version_delta import SortedVersionsList
 
-class PackageInfo(Protocol):
-    """Package info."""
 
-    def pkg_content(self) -> dict:  # TODO: detalize
-        """Content."""
+class SortedVersions(Protocol):
+    """Sorted versions protocol."""
+
+    def fetch(self) -> SortedVersionsList:
+        """Sorted versions list."""

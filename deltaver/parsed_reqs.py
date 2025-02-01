@@ -20,29 +20,13 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Sorted package list."""
+"""Parsed requirements protocol."""
 
-from collections.abc import Sequence
-from typing import final
-
-import attrs
-from typing_extensions import override
-
-from deltaver.package import Package
-from deltaver.version_list import VersionList
+from typing import Protocol
 
 
-@final
-@attrs.define(frozen=True)
-class SortedPackageList(VersionList):
-    """Sorted package list."""
+class ParsedReqs(Protocol):
+    """Parsed requirements protocol."""
 
-    _origin: VersionList
-
-    @override
-    def as_list(self) -> Sequence[Package]:
-        """List representation."""
-        return sorted(
-            self._origin.as_list(),
-            key=lambda pkg: pkg.version(),
-        )
+    def reqs(self) -> list[tuple[str, str]]:
+        """Parsed requirements list."""

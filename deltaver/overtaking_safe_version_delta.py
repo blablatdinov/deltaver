@@ -20,29 +20,29 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Sorted package list."""
+"""Overtaking safe version delta."""
 
-from collections.abc import Sequence
 from typing import final
 
 import attrs
 from typing_extensions import override
 
-from deltaver.package import Package
-from deltaver.version_list import VersionList
+from deltaver.exceptions import TargetGreaterLastError
+from deltaver.version_delta import VersionDelta
 
 
 @final
 @attrs.define(frozen=True)
-class SortedPackageList(VersionList):
-    """Sorted package list."""
+class OvertakingSafeVersionDelta(VersionDelta):
+    """Overtaking safe version delta."""
 
-    _origin: VersionList
+    _origin: VersionDelta
+    _enable: bool
 
     @override
-    def as_list(self) -> Sequence[Package]:
-        """List representation."""
-        return sorted(
-            self._origin.as_list(),
-            key=lambda pkg: pkg.version(),
-        )
+    def days(self) -> int:
+        """Delta in days."""
+        try:
+            return self._origin.days()
+        except TargetGreaterLastError:
+            return 0

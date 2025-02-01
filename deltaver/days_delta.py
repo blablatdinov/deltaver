@@ -20,29 +20,39 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Sorted package list."""
+"""Days delta."""
 
-from collections.abc import Sequence
+import datetime
 from typing import final
 
 import attrs
+from packaging.version import parse as version_parse
 from typing_extensions import override
 
-from deltaver.package import Package
+from deltaver.delta import Delta
 from deltaver.version_list import VersionList
 
 
 @final
 @attrs.define(frozen=True)
-class SortedPackageList(VersionList):
-    """Sorted package list."""
+class DaysDelta(Delta):
+    """Days delta."""
 
-    _origin: VersionList
+    _version: str
+    _packages: VersionList
+    _today: datetime.date
 
     @override
-    def as_list(self) -> Sequence[Package]:
-        """List representation."""
-        return sorted(
-            self._origin.as_list(),
-            key=lambda pkg: pkg.version(),
-        )
+    def days(self) -> int:
+        """Days of delta."""
+        flag = False
+        next_version_release_date = datetime.date(1, 1, 1)
+        for package in self._packages.as_list():
+            if flag:
+                next_version_release_date = package.release_date()
+                break
+            if package.version() == version_parse(self._version):
+                flag = True
+        else:
+            return 0
+        return (self._today - next_version_release_date).days

@@ -20,44 +20,48 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Pypi package list."""
+"""Pypi versions sorted by semver."""
 
-from collections.abc import Sequence
+import datetime
 from contextlib import suppress
 from typing import final
 
 import attrs
 import httpx
-from packaging.version import InvalidVersion
-from packaging.version import parse as version_parse
+from packaging import version
 from typing_extensions import override
 
-from deltaver.package import Package
-from deltaver.pypi_package import PypiPackage
-from deltaver.version_list import VersionList
+from deltaver.sorted_versions import SortedVersions
+from deltaver.version_delta import SortedVersionsList
 
 
 @final
 @attrs.define(frozen=True)
-class PypiPackageList(VersionList):
-    """Pypi package list."""
+class PypiVersionsSortedBySemver(SortedVersions):
+    """Pypi versions sorted by semver."""
 
-    _name: str
+    _artifactory_domain: str
+    _package_name: str
 
     @override
-    def as_list(self) -> Sequence[Package]:
-        """List representation."""
-        response = httpx.get('https://pypi.org/pypi/{0}/json'.format(self._name))
+    def fetch(self) -> SortedVersionsList:  # noqa: WPS210. TODO
+        """Sorted versions list."""
+        response = httpx.get(
+            httpx.URL(self._artifactory_domain).join('pypi/{0}/json'.format(self._package_name)),
+        )
         response.raise_for_status()
-        packages = []
-        for version_num, release_info in response.json()['releases'].items():
-            if not release_info or release_info[0]['yanked']:
-                continue
-            with suppress(InvalidVersion):
-                version_parse(version_num)
-                packages.append(PypiPackage(
-                    self._name,
-                    version_num,
-                    self,
-                ))
-        return packages
+        versions = list(response.json()['releases'].items())
+        correct_versions = []
+        for version_number, release_info in versions:
+            with suppress(version.InvalidVersion, IndexError):
+                parsed_version = version.parse(version_number)
+                if not parsed_version.pre and not parsed_version.dev:
+                    correct_versions.append({
+                        version_number: datetime.datetime.strptime(
+                            release_info[0]['upload_time'], '%Y-%m-%dT%H:%M:%S',
+                        ).astimezone(datetime.timezone.utc).date(),
+                    })
+        return sorted(
+            correct_versions,
+            key=lambda release_dict: version.parse(next(iter(release_dict.keys()))),
+        )

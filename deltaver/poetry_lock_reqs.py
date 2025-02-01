@@ -20,29 +20,29 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Sorted package list."""
+"""Parsed poetry.lock requirements file."""
 
-from collections.abc import Sequence
 from typing import final
 
 import attrs
+import toml
 from typing_extensions import override
 
-from deltaver.package import Package
-from deltaver.version_list import VersionList
+from deltaver.parsed_reqs import ParsedReqs
 
 
 @final
 @attrs.define(frozen=True)
-class SortedPackageList(VersionList):
-    """Sorted package list."""
+class PoetryLockReqs(ParsedReqs):
+    """Parsed poetry.lock requirements file."""
 
-    _origin: VersionList
+    _requirements_file_content: str
 
     @override
-    def as_list(self) -> Sequence[Package]:
-        """List representation."""
-        return sorted(
-            self._origin.as_list(),
-            key=lambda pkg: pkg.version(),
-        )
+    def reqs(self) -> list[tuple[str, str]]:
+        """Parsed poetry.lock requirements file."""
+        parsed_toml = toml.loads(self._requirements_file_content)
+        return [
+            (dependency['name'], dependency['version'])
+            for dependency in parsed_toml['package']
+        ]

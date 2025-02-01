@@ -20,29 +20,25 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Sorted package list."""
+"""Fake sorted versions."""
 
-from collections.abc import Sequence
 from typing import final
 
 import attrs
 from typing_extensions import override
 
-from deltaver.package import Package
-from deltaver.version_list import VersionList
+from deltaver.sorted_versions import SortedVersions
+from deltaver.version_delta import SortedVersionsList
 
 
 @final
 @attrs.define(frozen=True)
-class SortedPackageList(VersionList):
-    """Sorted package list."""
+class FkSortedVersions(SortedVersions):
+    """Fake sorted versions."""
 
-    _origin: VersionList
+    _origin: SortedVersionsList
 
     @override
-    def as_list(self) -> Sequence[Package]:
-        """List representation."""
-        return sorted(
-            self._origin.as_list(),
-            key=lambda pkg: pkg.version(),
-        )
+    def fetch(self) -> SortedVersionsList:
+        """Sorted versions list."""
+        return self._origin

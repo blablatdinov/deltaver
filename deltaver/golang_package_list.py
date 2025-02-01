@@ -29,6 +29,7 @@ from typing import final
 import attrs
 import httpx
 from packaging.version import parse as version_parse
+from typing_extensions import override
 
 from deltaver.fk_package import FkPackage
 from deltaver.package import Package
@@ -42,6 +43,7 @@ class GolangPackageList(VersionList):
 
     _name: str
 
+    @override
     def as_list(self) -> Sequence[Package]:
         """List representation."""
         response = httpx.get('https://proxy.golang.org/{0}/@v/list'.format(self._name))
