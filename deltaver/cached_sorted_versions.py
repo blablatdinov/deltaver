@@ -43,30 +43,32 @@ class CachedSortedVersions(SortedVersions):
     _package_name: str
 
     @override
-    def fetch(self) -> SortedVersionsList:
+    def fetch(self) -> SortedVersionsList:  # noqa: WPS210. Simplify later
         """Sorted versions list."""
         cache_dir = Path('.deltaver_cache')
         (cache_dir / self._package_name).mkdir(exist_ok=True, parents=True)
         if cache_dir.exists():
-            for x in cache_dir.glob('**/*.json'):
-                if x.name != '{0}.json'.format(datetime.datetime.now(tz=datetime.timezone.utc).strftime('%Y-%m-%d')):
-                    x.unlink()
+            for cache_file in cache_dir.glob('**/*.json'):
+                expected_filename = '{0}.json'.format(
+                    datetime.datetime.now(tz=datetime.timezone.utc).strftime('%Y-%m-%d'),
+                )
+                if cache_file.name != expected_filename:
+                    cache_file.unlink()
         cache_path = cache_dir / self._package_name / '{0}.json'.format(
             datetime.datetime.now(tz=datetime.timezone.utc).date(),
         )
         if cache_path.exists():
-            return [
-                {
-                    next(iter(elem.keys())): datetime.datetime.strptime(
-                        next(iter(elem.values())),
-                        '%Y-%m-%dT%H:%M:%S',
-                    ).astimezone(datetime.timezone.utc).date(),
-                }
-                for elem  in json.loads(cache_path.read_text())
-            ]
+            res = []
+            for package_info in json.loads(cache_path.read_text()):
+                release_date = datetime.datetime.strptime(
+                    next(iter(package_info.values())),
+                    '%Y-%m-%dT%H:%M:%S',
+                ).astimezone(datetime.timezone.utc).date()
+                res.append({self._package_name: release_date})
+            return res
         origin_val = self._origin.fetch()
         cache_path.write_text(json.dumps([
-            {next(iter(dict_.keys())): next(iter(dict_.values())).strftime('%Y-%m-%dT%H:%M:%S')}
+            {self._package_name: next(iter(dict_.values())).strftime('%Y-%m-%dT%H:%M:%S')}
             for dict_ in origin_val
         ]))
         return origin_val
