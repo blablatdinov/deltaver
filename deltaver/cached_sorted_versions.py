@@ -69,7 +69,11 @@ class CachedSortedVersions(SortedVersions):
             return res
         origin_val = self._origin.fetch()
         cache_path.write_text(json.dumps([
-            {next(iter(dict_.keys())): next(iter(dict_.values())).strftime('%Y-%m-%dT%H:%M:%S')}
+            {
+                next(iter(dict_.keys())): next(
+                    iter(dict_.values()),
+                ).strftime('%Y-%m-%dT%H:%M:%S')
+            }
             for dict_ in origin_val
         ]))
         return origin_val
