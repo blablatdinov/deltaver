@@ -28,7 +28,7 @@ import pytest
 
 from deltaver.days_delta import DaysDelta
 from deltaver.fk_package import FkPackage
-from deltaver.fk_version_list import FkVersionList
+from deltaver.version_list.fk_version_list import FkVersionList
 from deltaver.version_list import VersionList
 
 

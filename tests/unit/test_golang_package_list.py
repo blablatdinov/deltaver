@@ -30,7 +30,7 @@ from httpx import Response
 from respx.router import MockRouter
 
 from deltaver.fk_package import FkPackage
-from deltaver.golang_package_list import GolangPackageList
+from deltaver.version_list.golang_package_list import GolangPackageList
 
 
 @pytest.fixture
