@@ -30,7 +30,7 @@ pycodestyle==2.12.1
     # via flake8
 pyflakes==3.2.0
     # via flake8
-pygments==2.19.1
+pygments==2.19.2
     # via wemake-python-styleguide
 wemake-python-styleguide==1.1.0
     # via -r lint-requirements.txt
