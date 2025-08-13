@@ -1,3 +1,5 @@
+"""Module for parsing version strings into semantic version objects."""
+
 # The MIT License (MIT).  #
 # Copyright (c) 2018-2025 Almaz Ilaletdinov <a.ilaletdinov@yandex.ru>
 #
@@ -26,6 +28,10 @@ from semver import VersionInfo
 
 from deltaver.exceptions import InvalidVersionError
 
+# Constants for version parsing
+MIN_VERSION_PARTS = 2
+MIN_INDEX_FOR_PRE_RELEASE = 1
+
 
 @final
 @attrs.define(frozen=True)
@@ -38,44 +44,59 @@ class ParsedVersion:
         """Original version."""
         return self._version
 
+    def _handle_dev_versions(self, origin: str) -> str:
+        """Handle dev versions: 0.13.dev0 -> 0.13.0-dev0, 0.13.0.dev1 -> 0.13.0-dev1."""
+        if '.dev' not in origin:
+            return origin
+
+        parts = origin.split('.dev')
+        if len(parts) != MIN_VERSION_PARTS:
+            return origin
+
+        version_part = parts[0]
+        dev_number = parts[1]
+        version_parts = version_part.split('.')
+        if len(version_parts) == MIN_VERSION_PARTS:
+            return f'{version_part}.0-dev{dev_number}'
+        return f'{version_part}-dev{dev_number}'
+
+    def _handle_beta_versions(self, origin: str) -> str:
+        """Handle PyPI beta versions: 0.15.0b1 -> 0.15.0-b1."""
+        if 'b' not in origin or origin.endswith('b') or any(x in origin for x in ['-b', '-beta']):
+            return origin
+
+        for i, char in enumerate(origin):
+            if (char == 'b' and i > 0 and origin[i-1].isdigit() and
+                i+1 < len(origin) and origin[i+1].isdigit()):
+                return origin[:i] + '-b' + origin[i+1:]
+        return origin
+
+    def _handle_alpha_versions(self, origin: str) -> str:
+        """Handle PyPI alpha versions: 0.15.0a1 -> 0.15.0-a1."""
+        if 'a' not in origin or origin.endswith('a') or any(x in origin for x in ['-a', '-alpha']):
+            return origin
+
+        for i, char in enumerate(origin):
+            if (char == 'a' and i > 0 and origin[i-1].isdigit() and
+                i+1 < len(origin) and origin[i+1].isdigit()):
+                return origin[:i] + '-a' + origin[i+1:]
+        return origin
+
+    def _handle_rc_versions(self, origin: str) -> str:
+        """Handle PyPI rc versions: 0.15.0rc1 -> 0.15.0-rc1."""
+        if 'rc' not in origin or any(x in origin for x in ['-rc']):
+            return origin
+        return origin.replace('rc', '-rc')
+
     def parse(self) -> VersionInfo:
         """Parse version."""
-        origin = self._version
-        if origin.startswith('v'):
-            origin = origin[1:]
-        
-        # Handle dev versions: 0.13.dev0 -> 0.13.0-dev0, 0.13.0.dev1 -> 0.13.0-dev1
-        if '.dev' in origin:
-            parts = origin.split('.dev')
-            if len(parts) == 2:
-                version_part = parts[0]
-                dev_number = parts[1]
-                version_parts = version_part.split('.')
-                if len(version_parts) == 2:
-                    origin = f"{version_part}.0-dev{dev_number}"
-                else:
-                    origin = f"{version_part}-dev{dev_number}"
-        
-        # Handle PyPI beta versions: 0.15.0b1 -> 0.15.0-b1
-        if 'b' in origin and not origin.endswith('b') and not any(x in origin for x in ['-b', '-beta']):
-            # Find the position of 'b' that's not part of a larger word
-            for i, char in enumerate(origin):
-                if char == 'b' and i > 0 and origin[i-1].isdigit() and i+1 < len(origin) and origin[i+1].isdigit():
-                    origin = origin[:i] + '-b' + origin[i+1:]
-                    break
-        
-        # Handle PyPI alpha versions: 0.15.0a1 -> 0.15.0-a1
-        if 'a' in origin and not origin.endswith('a') and not any(x in origin for x in ['-a', '-alpha']):
-            for i, char in enumerate(origin):
-                if char == 'a' and i > 0 and origin[i-1].isdigit() and i+1 < len(origin) and origin[i+1].isdigit():
-                    origin = origin[:i] + '-a' + origin[i+1:]
-                    break
-        
-        # Handle PyPI rc versions: 0.15.0rc1 -> 0.15.0-rc1
-        if 'rc' in origin and not any(x in origin for x in ['-rc']):
-            origin = origin.replace('rc', '-rc')
-        
+        origin = self._version.removeprefix('v')
+        origin = self._handle_dev_versions(origin)
+        origin = self._handle_beta_versions(origin)
+        origin = self._handle_alpha_versions(origin)
+        origin = self._handle_rc_versions(origin)
+
         try:
             return VersionInfo.parse(origin)
-        except ValueError:
-            raise InvalidVersionError(self._version)
+        except ValueError as err:
+            raise InvalidVersionError(self._version) from err

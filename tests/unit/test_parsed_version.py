@@ -1,3 +1,5 @@
+"""Unit tests for parsed version module."""
+
 # The MIT License (MIT).
 #
 # Copyright (c) 2018-2025 Almaz Ilaletdinov <a.ilaletdinov@yandex.ru>
@@ -30,23 +32,28 @@ from deltaver.parsed_version import ParsedVersion
     '3.0.0-alpha9.5',
 ])
 def test_correct(version: str) -> None:
+    """Test correct version parsing."""
     parsed_version = ParsedVersion(version)
     assert str(parsed_version.parse()) == version
 
 
 def test_v_prefix() -> None:
+    """Test version with v prefix."""
     assert str(ParsedVersion('v2.0.0').parse()) == '2.0.0'
 
 
 def test_dev() -> None:
+    """Test dev version parsing."""
     assert str(ParsedVersion('0.13.0.dev1').parse()) == '0.13.0-dev1'
     assert str(ParsedVersion('0.13.dev0').parse()) == '0.13.0-dev0'
 
 
 def test_beta() -> None:
+    """Test beta version parsing."""
     assert str(ParsedVersion('0.15.0b1').parse()) == '0.15.0-b1'
     assert str(ParsedVersion('0.15.0-b1').parse()) == '0.15.0-b1'
 
 
 def test_compare() -> None:
+    """Test version comparison."""
     assert ParsedVersion('3.0.0-alpha9.5').parse() < ParsedVersion('3.0.0-alpha9.6').parse()
