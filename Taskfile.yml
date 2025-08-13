@@ -31,7 +31,7 @@ tasks:
     cmds:
       - poetry run ruff check deltaver tests --select="F"
       - poetry run ruff check deltaver tests | poetry run ondivi
-      - ./lint-venv/bin/flake8 deltaver tests
+      - ./lint-venv/bin/flake8 deltaver tests | poetry run ondivi
 
   syntax-check:
     cmds:
