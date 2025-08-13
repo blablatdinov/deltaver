@@ -59,6 +59,11 @@ def test_beta() -> None:
     assert str(ParsedVersion('0.15.0-b1').parse()) == '0.15.0-b1'
 
 
+def test_rc() -> None:
+    """Test rc version parsing."""
+    assert str(ParsedVersion('0.15.0rc1').parse()) == '0.15.0-rc1'
+
+
 def test_post_release() -> None:
     """Test post release version parsing."""
     assert str(ParsedVersion('4.6.2.post1').parse()) == '4.6.2+post1'

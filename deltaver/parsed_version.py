@@ -112,6 +112,21 @@ class AlphaCorrectVersion(SupportsStr):
 
 @final
 @attrs.define(frozen=True)
+class RcCorrectVersion(SupportsStr):
+    """Rc correct version."""
+
+    _origin: SupportsStr
+
+    def __str__(self) -> str:
+        """Convert rc version to semver format."""
+        origin = str(self._origin)
+        if '-rc' in origin or 'rc' not in origin:
+            return origin
+        return origin.replace('rc', '-rc')
+
+
+@final
+@attrs.define(frozen=True)
 class PostCorrectVersion(SupportsStr):
     """Post correct version."""
 
@@ -167,10 +182,12 @@ class ParsedVersion:
                 str(
                     ZeroBeforeIntCorrectVersion(
                         PostCorrectVersion(
-                            AlphaCorrectVersion(
-                                BetaCorrectVersion(
-                                    DevCorrectVersion(
-                                        FkSupportsStr(origin),
+                            RcCorrectVersion(
+                                AlphaCorrectVersion(
+                                    BetaCorrectVersion(
+                                        DevCorrectVersion(
+                                            FkSupportsStr(origin),
+                                        ),
                                     ),
                                 ),
                             ),
