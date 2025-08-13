@@ -44,15 +44,23 @@ class ParsedVersion:
         """Original version."""
         return self._version
 
+    def parse(self) -> VersionInfo:
+        """Parse version."""
+        origin = self._version.removeprefix('v')
+        origin = self._handle_dev_versions(origin)
+        origin = self._handle_all_pre_release_versions(origin)
+        try:
+            return VersionInfo.parse(origin)
+        except ValueError as err:
+            raise InvalidVersionError(self._version) from err
+
     def _handle_dev_versions(self, origin: str) -> str:
         """Handle dev versions: 0.13.dev0 -> 0.13.0-dev0, 0.13.0.dev1 -> 0.13.0-dev1."""
         if '.dev' not in origin:
             return origin
-
         parts = origin.split('.dev')
         if len(parts) != MIN_VERSION_PARTS:
             return origin
-
         version_part = parts[0]
         dev_number = parts[1]
         version_parts = version_part.split('.')
@@ -60,43 +68,48 @@ class ParsedVersion:
             return f'{version_part}.0-dev{dev_number}'
         return f'{version_part}-dev{dev_number}'
 
-    def _handle_beta_versions(self, origin: str) -> str:
-        """Handle PyPI beta versions: 0.15.0b1 -> 0.15.0-b1."""
-        if 'b' not in origin or origin.endswith('b') or any(x in origin for x in ['-b', '-beta']):
-            return origin
-
-        for i, char in enumerate(origin):
-            if (char == 'b' and i > 0 and origin[i-1].isdigit() and
-                i+1 < len(origin) and origin[i+1].isdigit()):
-                return origin[:i] + '-b' + origin[i+1:]
+    def _handle_all_pre_release_versions(self, origin: str) -> str:
+        """Handle all PyPI pre-release versions: beta, alpha, and rc."""
+        # Handle beta versions: 0.15.0b1 -> 0.15.0-b1
+        origin = self._process_single_char_pre_release(origin, 'b', ['-b', '-beta'])
+        # Handle alpha versions: 0.15.0a1 -> 0.15.0-a1
+        origin = self._process_single_char_pre_release(origin, 'a', ['-a', '-alpha'])
+        # Handle rc versions: 0.15.0rc1 -> 0.15.0-rc1
+        origin = self._process_rc_version(origin)
         return origin
 
-    def _handle_alpha_versions(self, origin: str) -> str:
-        """Handle PyPI alpha versions: 0.15.0a1 -> 0.15.0-a1."""
-        if 'a' not in origin or origin.endswith('a') or any(x in origin for x in ['-a', '-alpha']):
+    def _process_single_char_pre_release(
+        self, origin: str, character: str, suffixes: list[str]
+    ) -> str:
+        """Process single character pre-release version."""
+        # Check if processing should be skipped
+        if character not in origin or origin.endswith(character):
             return origin
-
-        for i, char in enumerate(origin):
-            if (char == 'a' and i > 0 and origin[i-1].isdigit() and
-                i+1 < len(origin) and origin[i+1].isdigit()):
-                return origin[:i] + '-a' + origin[i+1:]
+        if any(suffix in origin for suffix in suffixes):
+            return origin
+        # Process the version
+        for index, current_char in enumerate(origin):
+            if self._is_valid_pre_release_position(origin, index, current_char, character):
+                prefix = origin[:index]
+                suffix = origin[index + 1:]
+                return f'{prefix}-{character}{suffix}'
         return origin
 
-    def _handle_rc_versions(self, origin: str) -> str:
-        """Handle PyPI rc versions: 0.15.0rc1 -> 0.15.0-rc1."""
-        if 'rc' not in origin or any(x in origin for x in ['-rc']):
+    def _is_valid_pre_release_position(
+        self, origin: str, index: int, current_char: str, character: str
+    ) -> bool:
+        """Check if the current position is valid for pre-release processing."""
+        if current_char != character or index <= 0:
+            return False
+        if index + 1 >= len(origin):
+            return False
+        prev_char_is_digit = origin[index - 1].isdigit()
+        next_char_is_digit = origin[index + 1].isdigit()
+        return prev_char_is_digit and next_char_is_digit
+
+    def _process_rc_version(self, origin: str) -> str:
+        """Process rc version by replacing 'rc' with '-rc'."""
+        rc_suffixes = ['-rc']
+        if 'rc' not in origin or any(suffix in origin for suffix in rc_suffixes):
             return origin
         return origin.replace('rc', '-rc')
-
-    def parse(self) -> VersionInfo:
-        """Parse version."""
-        origin = self._version.removeprefix('v')
-        origin = self._handle_dev_versions(origin)
-        origin = self._handle_beta_versions(origin)
-        origin = self._handle_alpha_versions(origin)
-        origin = self._handle_rc_versions(origin)
-
-        try:
-            return VersionInfo.parse(origin)
-        except ValueError as err:
-            raise InvalidVersionError(self._version) from err
