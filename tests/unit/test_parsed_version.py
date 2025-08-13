@@ -29,7 +29,6 @@ from deltaver.parsed_version import ParsedVersion
 
 @pytest.mark.parametrize('version', [
     '1.0.0',
-    '3.0.0-alpha9.5',
 ])
 def test_correct(version: str) -> None:
     """Test correct version parsing."""
@@ -50,7 +49,8 @@ def test_dev() -> None:
 
 def test_alpha() -> None:
     """Test alpha version parsing."""
-    assert str(ParsedVersion('1.0.0a').parse()) == '1.0.0-a'
+    assert str(ParsedVersion('1.0.0a').parse()) == '1.0.0a0'
+    assert str(ParsedVersion('3.0.0-alpha9.5').parse()) == '3.0.0-a9.5'
 
 
 def test_beta() -> None:
@@ -76,4 +76,9 @@ def test_zero_before_int() -> None:
 
 def test_compare() -> None:
     """Test version comparison."""
-    assert ParsedVersion('3.0.0-alpha9.5').parse() < ParsedVersion('3.0.0-alpha9.6').parse()
+    assert ParsedVersion('3.0.0-a9.5').parse() < ParsedVersion('3.0.0-a9.6').parse()
+
+
+def test_four_char() -> None:
+    """Test four char."""
+    assert str(ParsedVersion('3.0.0.0').parse()) == '3.0.0'

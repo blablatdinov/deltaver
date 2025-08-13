@@ -53,9 +53,12 @@ class NpmjsPackageList(VersionList):
         versions = response.json()['time'].items()
         correct_versions = []
         for version_number, release_time in versions:
+            # Skip non-version keys like 'created', 'modified', etc.
+            if version_number in ['created', 'modified', 'unpublished']:
+                continue
             with suppress(InvalidVersion, IndexError, KeyError):
                 parsed_version = ParsedVersion(version_number).parse()
-                if not parsed_version.prerelease:
+                if not parsed_version.is_prerelease:
                     parsed_release_time = (
                         datetime.datetime.strptime(
                             release_time,
