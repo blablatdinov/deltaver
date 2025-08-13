@@ -78,6 +78,40 @@ class BetaCorrectVersion(SupportsStr):
 
 @final
 @attrs.define(frozen=True)
+class AlphaCorrectVersion(SupportsStr):
+    """Alpha correct version."""
+
+    _origin: SupportsStr
+
+    def __str__(self) -> str:
+        """Convert alpha version to semver format."""
+        origin = str(self._origin)
+        if '-a' in origin or 'a' not in origin:
+            return origin
+        return self._process_alpha_version(origin)
+
+    def _process_alpha_version(self, origin: str) -> str:
+        """Process alpha version by finding and replacing 'a' with '-a'."""
+        for index, current_char in enumerate(origin):
+            if self._is_valid_alpha_position(origin, index, current_char):
+                prefix = origin[:index]
+                suffix = origin[index + 1:]
+                return f'{prefix}-a{suffix}'
+        return origin
+
+    def _is_valid_alpha_position(self, origin: str, index: int, current_char: str) -> bool:
+        """Check if position is valid for alpha processing."""
+        if current_char != 'a' or index <= 0:
+            return False
+        if index + 1 >= len(origin):
+            return origin[index - 1].isdigit()
+        prev_char_is_digit = origin[index - 1].isdigit()
+        next_char_is_digit = origin[index + 1].isdigit()
+        return prev_char_is_digit and next_char_is_digit
+
+
+@final
+@attrs.define(frozen=True)
 class PostCorrectVersion(SupportsStr):
     """Post correct version."""
 
@@ -133,9 +167,11 @@ class ParsedVersion:
                 str(
                     ZeroBeforeIntCorrectVersion(
                         PostCorrectVersion(
-                            BetaCorrectVersion(
-                                DevCorrectVersion(
-                                    FkSupportsStr(origin),
+                            AlphaCorrectVersion(
+                                BetaCorrectVersion(
+                                    DevCorrectVersion(
+                                        FkSupportsStr(origin),
+                                    ),
                                 ),
                             ),
                         ),

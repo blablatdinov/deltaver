@@ -48,6 +48,11 @@ def test_dev() -> None:
     assert str(ParsedVersion('0.13.dev0').parse()) == '0.13.0-dev0'
 
 
+def test_alpha() -> None:
+    """Test alpha version parsing."""
+    assert str(ParsedVersion('1.0.0a').parse()) == '1.0.0-a'
+
+
 def test_beta() -> None:
     """Test beta version parsing."""
     assert str(ParsedVersion('0.15.0b1').parse()) == '0.15.0-b1'
