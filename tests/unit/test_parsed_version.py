@@ -1,6 +1,6 @@
 # The MIT License (MIT).
 #
-# Copyright (c) 2023-2025 Almaz Ilaletdinov <a.ilaletdinov@yandex.ru>
+# Copyright (c) 2018-2025 Almaz Ilaletdinov <a.ilaletdinov@yandex.ru>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,39 +20,27 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Days delta."""
+import pytest
 
-import datetime
-from typing import final
-
-import attrs
-from typing_extensions import override
-
-from deltaver.delta import Delta
 from deltaver.parsed_version import ParsedVersion
-from deltaver.version_list import VersionList
 
 
-@final
-@attrs.define(frozen=True)
-class DaysDelta(Delta):
-    """Days delta."""
+@pytest.mark.parametrize('version', [
+    '1.0.0',
+    '3.0.0-alpha9.5',
+])
+def test_correct(version: str) -> None:
+    parsed_version = ParsedVersion(version)
+    assert str(parsed_version.parse()) == version
 
-    _version: str
-    _packages: VersionList
-    _today: datetime.date
 
-    @override
-    def days(self) -> int:
-        """Days of delta."""
-        flag = False
-        next_version_release_date = datetime.date(1, 1, 1)
-        for package in self._packages.as_list():
-            if flag:
-                next_version_release_date = package.release_date()
-                break
-            if package.version() == ParsedVersion(self._version).parse():
-                flag = True
-        else:
-            return 0
-        return (self._today - next_version_release_date).days
+def test_v_prefix() -> None:
+    assert str(ParsedVersion('v2.0.0').parse()) == '2.0.0'
+
+
+def test_dev() -> None:
+    assert str(ParsedVersion('0.13.0.dev1').parse()) == '0.13.0-dev.1'
+
+
+def test_compare() -> None:
+    assert ParsedVersion('3.0.0-alpha9.5').parse() < ParsedVersion('3.0.0-alpha9.6').parse()

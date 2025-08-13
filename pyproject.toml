@@ -40,6 +40,7 @@ rich = "^14.0.0"
 toml = "^0.10.2"
 typing-extensions = "^4.9"
 pytz = "^2024.2"  # TODO define needed
+semver = "^3.0.4"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "8.4.1"

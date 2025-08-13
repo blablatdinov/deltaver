@@ -30,11 +30,11 @@ from typing import final
 import attrs
 import httpx
 from packaging.version import InvalidVersion
-from packaging.version import parse as version_parse
 from typing_extensions import override
 
 from deltaver.fk_package import FkPackage
 from deltaver.package import Package
+from deltaver.parsed_version import ParsedVersion
 from deltaver.version_list import VersionList
 
 
@@ -54,8 +54,8 @@ class NpmjsPackageList(VersionList):
         correct_versions = []
         for version_number, release_time in versions:
             with suppress(InvalidVersion, IndexError, KeyError):
-                parsed_version = version_parse(version_number)
-                if not parsed_version.is_prerelease and not parsed_version.is_devrelease:
+                parsed_version = ParsedVersion(version_number).parse()
+                if not parsed_version.prerelease:
                     parsed_release_time = (
                         datetime.datetime.strptime(
                             release_time,

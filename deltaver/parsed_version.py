@@ -1,6 +1,5 @@
-# The MIT License (MIT).
-#
-# Copyright (c) 2023-2025 Almaz Ilaletdinov <a.ilaletdinov@yandex.ru>
+# The MIT License (MIT).  #
+# Copyright (c) 2018-2025 Almaz Ilaletdinov <a.ilaletdinov@yandex.ru>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,39 +19,34 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Days delta."""
-
-import datetime
 from typing import final
 
 import attrs
-from typing_extensions import override
+from semver import VersionInfo
 
-from deltaver.delta import Delta
-from deltaver.parsed_version import ParsedVersion
-from deltaver.version_list import VersionList
+from deltaver.exceptions import InvalidVersionError
 
 
 @final
 @attrs.define(frozen=True)
-class DaysDelta(Delta):
-    """Days delta."""
+class ParsedVersion:
+    """Parsed version."""
 
     _version: str
-    _packages: VersionList
-    _today: datetime.date
 
-    @override
-    def days(self) -> int:
-        """Days of delta."""
-        flag = False
-        next_version_release_date = datetime.date(1, 1, 1)
-        for package in self._packages.as_list():
-            if flag:
-                next_version_release_date = package.release_date()
-                break
-            if package.version() == ParsedVersion(self._version).parse():
-                flag = True
-        else:
-            return 0
-        return (self._today - next_version_release_date).days
+    def origin(self) -> str:
+        """Original version."""
+        return self._version
+
+    def parse(self) -> VersionInfo:
+        """Parse version."""
+        origin = self._version
+        if origin.startswith('v'):
+            origin = origin[1:]
+        try:
+            return VersionInfo.parse(
+                origin
+                .replace('.dev', '-dev.')
+            )
+        except ValueError:
+            raise InvalidVersionError(self._version)
