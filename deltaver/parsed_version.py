@@ -1,4 +1,4 @@
-# The MIT License (MIT).  #
+# The MIT License (MIT).
 # Copyright (c) 2018-2025 Almaz Ilaletdinov <a.ilaletdinov@yandex.ru>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -43,7 +43,7 @@ class DevCorrectVersion(SupportsStr):
     _origin: SupportsStr
 
     def __str__(self) -> str:
-        """Return the version as a string."""
+        """Convert dev version to semver format."""
         origin = str(self._origin)
         if '.dev' not in origin:
             return origin
@@ -65,7 +65,7 @@ class BetaCorrectVersion(SupportsStr):
     _origin: SupportsStr
 
     def __str__(self) -> str:
-        """Return the version as a string."""
+        """Convert beta version to semver format."""
         origin = str(self._origin)
         if '-b' in origin or 'b' not in origin:
             return origin
@@ -84,11 +84,34 @@ class PostCorrectVersion(SupportsStr):
     _origin: SupportsStr
 
     def __str__(self) -> str:
-        """Return the version as a string."""
+        """Convert post-release version to semver format."""
         origin = str(self._origin)
         if '.post' in origin:
             origin = origin.replace('.post', '+post')
         return origin
+
+
+@final
+@attrs.define(frozen=True)
+class ZeroBeforeIntCorrectVersion(SupportsStr):
+    """Zero before int correct version."""
+
+    _origin: SupportsStr
+
+    def __str__(self) -> str:
+        """Normalize version by removing leading zeros."""
+        origin = str(self._origin)
+        # Split by dots and remove leading zeros from each part
+        parts = origin.split('.')
+        normalized_parts = [self._normalize_part(part) for part in parts]
+        return '.'.join(normalized_parts)
+
+    def _normalize_part(self, part: str) -> str:
+        """Normalize a version part by removing leading zeros."""
+        try:
+            return str(int(part))
+        except ValueError:
+            return part
 
 
 @final
@@ -108,10 +131,12 @@ class ParsedVersion:
         try:
             return VersionInfo.parse(
                 str(
-                    PostCorrectVersion(
-                        BetaCorrectVersion(
-                            DevCorrectVersion(
-                                FkSupportsStr(origin),
+                    ZeroBeforeIntCorrectVersion(
+                        PostCorrectVersion(
+                            BetaCorrectVersion(
+                                DevCorrectVersion(
+                                    FkSupportsStr(origin),
+                                ),
                             ),
                         ),
                     ),

@@ -1,3 +1,5 @@
+"""Module for supports string protocol."""
+
 from typing import Protocol
 
 

@@ -59,6 +59,11 @@ def test_post_release() -> None:
     assert str(ParsedVersion('4.6.2.post1').parse()) == '4.6.2+post1'
 
 
+def test_zero_before_int() -> None:
+    """Test zero before int."""
+    assert str(ParsedVersion('14.05.14').parse()) == '14.5.14'
+
+
 def test_compare() -> None:
     """Test version comparison."""
     assert ParsedVersion('3.0.0-alpha9.5').parse() < ParsedVersion('3.0.0-alpha9.6').parse()
