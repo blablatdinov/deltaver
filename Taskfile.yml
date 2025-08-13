@@ -25,21 +25,28 @@ tasks:
 
   fmt:
     cmds:
-      - poetry run isort deltaver tests
       - poetry run ruff check deltaver tests --fix --fix-only
 
   lint:
     cmds:
       - poetry run ruff check deltaver tests --select="F"
       - poetry run ruff check deltaver tests | poetry run ondivi
-      - ./lint-venv/bin/flake8 deltaver tests
+      - ./lint-venv/bin/flake8 deltaver tests | poetry run ondivi
+
+  syntax-check:
+    cmds:
+      - poetry run ruff check deltaver tests --select=F --ignore=F401,F841
+  
+  type-check:
+    cmds:
       - poetry run mypy deltaver tests
 
   test:
     env:
       TZ: UTC
+    deps: [syntax-check,type-check]
     cmds:
-      - poetry run pytest --cov=deltaver --cov-report=term-missing:skip-covered
+      - poetry run pytest {{.CLI_ARGS}} -s -vv --cov=deltaver --cov-report=term-missing:skip-covered
 
   clean:
     cmds:

@@ -28,11 +28,11 @@ from typing import final
 import attrs
 import httpx
 import pytz
-from packaging.version import Version
-from packaging.version import parse as version_parse
+from semver import VersionInfo
 from typing_extensions import override
 
 from deltaver.package import Package
+from deltaver.parsed_version import ParsedVersion
 from deltaver.version_list import VersionList
 
 
@@ -46,9 +46,9 @@ class PypiPackage(Package):
     _version_list: VersionList
 
     @override
-    def version(self) -> Version:
+    def version(self) -> VersionInfo:
         """Version."""
-        return version_parse(self._version)
+        return ParsedVersion(self._version).parse()
 
     @override
     def name(self) -> str:
