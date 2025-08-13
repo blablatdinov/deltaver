@@ -43,5 +43,10 @@ def test_dev() -> None:
     assert str(ParsedVersion('0.13.dev0').parse()) == '0.13.0-dev0'
 
 
+def test_beta() -> None:
+    assert str(ParsedVersion('0.15.0b1').parse()) == '0.15.0-b1'
+    assert str(ParsedVersion('0.15.0-b1').parse()) == '0.15.0-b1'
+
+
 def test_compare() -> None:
     assert ParsedVersion('3.0.0-alpha9.5').parse() < ParsedVersion('3.0.0-alpha9.6').parse()

@@ -43,6 +43,8 @@ class ParsedVersion:
         origin = self._version
         if origin.startswith('v'):
             origin = origin[1:]
+        
+        # Handle dev versions: 0.13.dev0 -> 0.13.0-dev0, 0.13.0.dev1 -> 0.13.0-dev1
         if '.dev' in origin:
             parts = origin.split('.dev')
             if len(parts) == 2:
@@ -53,6 +55,26 @@ class ParsedVersion:
                     origin = f"{version_part}.0-dev{dev_number}"
                 else:
                     origin = f"{version_part}-dev{dev_number}"
+        
+        # Handle PyPI beta versions: 0.15.0b1 -> 0.15.0-b1
+        if 'b' in origin and not origin.endswith('b') and not any(x in origin for x in ['-b', '-beta']):
+            # Find the position of 'b' that's not part of a larger word
+            for i, char in enumerate(origin):
+                if char == 'b' and i > 0 and origin[i-1].isdigit() and i+1 < len(origin) and origin[i+1].isdigit():
+                    origin = origin[:i] + '-b' + origin[i+1:]
+                    break
+        
+        # Handle PyPI alpha versions: 0.15.0a1 -> 0.15.0-a1
+        if 'a' in origin and not origin.endswith('a') and not any(x in origin for x in ['-a', '-alpha']):
+            for i, char in enumerate(origin):
+                if char == 'a' and i > 0 and origin[i-1].isdigit() and i+1 < len(origin) and origin[i+1].isdigit():
+                    origin = origin[:i] + '-a' + origin[i+1:]
+                    break
+        
+        # Handle PyPI rc versions: 0.15.0rc1 -> 0.15.0-rc1
+        if 'rc' in origin and not any(x in origin for x in ['-rc']):
+            origin = origin.replace('rc', '-rc')
+        
         try:
             return VersionInfo.parse(origin)
         except ValueError:
