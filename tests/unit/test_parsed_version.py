@@ -39,7 +39,8 @@ def test_v_prefix() -> None:
 
 
 def test_dev() -> None:
-    assert str(ParsedVersion('0.13.0.dev1').parse()) == '0.13.0-dev.1'
+    assert str(ParsedVersion('0.13.0.dev1').parse()) == '0.13.0-dev1'
+    assert str(ParsedVersion('0.13.dev0').parse()) == '0.13.0-dev0'
 
 
 def test_compare() -> None:

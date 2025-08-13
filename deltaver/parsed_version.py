@@ -43,10 +43,17 @@ class ParsedVersion:
         origin = self._version
         if origin.startswith('v'):
             origin = origin[1:]
+        if '.dev' in origin:
+            parts = origin.split('.dev')
+            if len(parts) == 2:
+                version_part = parts[0]
+                dev_number = parts[1]
+                version_parts = version_part.split('.')
+                if len(version_parts) == 2:
+                    origin = f"{version_part}.0-dev{dev_number}"
+                else:
+                    origin = f"{version_part}-dev{dev_number}"
         try:
-            return VersionInfo.parse(
-                origin
-                .replace('.dev', '-dev.')
-            )
+            return VersionInfo.parse(origin)
         except ValueError:
             raise InvalidVersionError(self._version)
