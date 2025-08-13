@@ -20,18 +20,46 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Dependencies file format."""
+"""Hex package."""
 
-from enum import Enum
+from datetime import date
+from typing import TYPE_CHECKING, final
+
+import attrs
+from typing_extensions import override
+
+from deltaver.package import Package
+from deltaver.version_list import VersionList
 
 
-class Formats(Enum):
-    """Dependencies file format."""
+@final
+@attrs.define(frozen=True)
+class HexPackage(Package):
+    """Hex package."""
 
-    pip_freeze = 'pip-freeze'
-    poetry_lock = 'poetry-lock'
-    npm_lock = 'npm-lock'
-    golang = 'golang'
-    mix_lock = 'mix-lock'
+    _name: str
+    _version: str
+    _package_list: VersionList
 
-    default = 'default'
+    @override
+    def name(self) -> str:
+        """Package name."""
+        return self._name
+
+    @override
+    def version(self) -> str:
+        """Package version."""
+        return self._version
+
+    @override
+    def package_list(self) -> VersionList:
+        """Package list."""
+        return self._package_list
+
+    @override
+    def release_date(self) -> date:
+        """Release date."""
+        # Для Hex пакетов мы можем получить дату релиза из API
+        # Пока что возвращаем минимальную дату, так как API Hex не предоставляет
+        # прямую информацию о дате релиза в простом формате
+        return date.min
