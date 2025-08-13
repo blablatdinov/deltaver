@@ -75,11 +75,10 @@ class ParsedVersion:
         # Handle alpha versions: 0.15.0a1 -> 0.15.0-a1
         origin = self._process_single_char_pre_release(origin, 'a', ['-a', '-alpha'])
         # Handle rc versions: 0.15.0rc1 -> 0.15.0-rc1
-        origin = self._process_rc_version(origin)
-        return origin
+        return self._process_rc_version(origin)
 
     def _process_single_char_pre_release(
-        self, origin: str, character: str, suffixes: list[str]
+        self, origin: str, character: str, suffixes: list[str],
     ) -> str:
         """Process single character pre-release version."""
         # Check if processing should be skipped
@@ -96,7 +95,7 @@ class ParsedVersion:
         return origin
 
     def _is_valid_pre_release_position(
-        self, origin: str, index: int, current_char: str, character: str
+        self, origin: str, index: int, current_char: str, character: str,
     ) -> bool:
         """Check if the current position is valid for pre-release processing."""
         if current_char != character or index <= 0:
