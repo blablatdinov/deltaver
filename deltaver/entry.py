@@ -49,6 +49,8 @@ from deltaver.formats import Formats
 from deltaver.freezed_reqs import FreezedReqs
 from deltaver.golang_package_list import GolangPackageList
 from deltaver.golang_reqs import GolangReqs
+from deltaver.hex_package_list import HexPackageList
+from deltaver.mix_lock_reqs import MixLockReqs
 from deltaver.npmjs_package_list import NpmjsPackageList
 from deltaver.package_lock_reqs import PackageLockReqs
 from deltaver.parsed_reqs import ParsedReqs
@@ -126,6 +128,7 @@ def logic(  # noqa: WPS210, WPS234. TODO: fix
         Formats.pip_freeze: FreezedReqs(requirements_file_content),
         Formats.poetry_lock: PoetryLockReqs(requirements_file_content),
         Formats.golang: GolangReqs(requirements_file_content),
+        Formats.mix_lock: MixLockReqs(requirements_file_content),
     }[file_format]
     dependencies = FileNotFoundSafeReqs(
         ExcludedReqs(
@@ -142,6 +145,7 @@ def logic(  # noqa: WPS210, WPS234. TODO: fix
             Formats.pip_freeze: PypiPackageList(name),
             Formats.poetry_lock: PypiPackageList(name),
             Formats.golang: GolangPackageList(name),
+            Formats.mix_lock: HexPackageList(name),
         }[file_format]
         delta = DaysDelta(
             version,

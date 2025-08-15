@@ -60,6 +60,22 @@ Run deltaver:
 deltaver requirements.txt
 ```
 
+#### Supported Formats
+
+Deltaver supports multiple dependency file formats:
+
+- **pip-freeze** (default): Python requirements.txt files
+- **poetry-lock**: Poetry lock files
+- **npm-lock**: npm package-lock.json files
+- **golang**: Go go.sum files
+- **mix-lock**: Elixir mix.lock files
+
+Example with specific format:
+
+```bash
+deltaver mix.lock --format mix-lock
+```
+
 ## License
 
 This project is licensed under the MIT [License](LICENSE) - see the LICENSE file for details.
