@@ -89,7 +89,7 @@ def test(current_dir: Path) -> None:
     (_version_from_lock('attrs'),),
     ('attrs', '-U'),
 
-    ('httpx==0.23.0',),
+    ('httpx==0.24.0',),
     (_version_from_lock('httpx'),),
     ('httpx', '-U'),
 

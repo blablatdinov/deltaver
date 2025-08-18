@@ -35,6 +35,7 @@ from deltaver.package import Package
 from deltaver.parsed_version import ParsedVersion
 from deltaver.pypi_package import PypiPackage
 from deltaver.version_list import VersionList
+from deltaver.exceptions import InvalidVersionError
 
 
 @final
@@ -53,7 +54,7 @@ class PypiPackageList(VersionList):
         for version_num, release_info in response.json()['releases'].items():
             if not release_info or release_info[0]['yanked']:
                 continue
-            with suppress(InvalidVersion):
+            with suppress(InvalidVersionError):
                 ParsedVersion(version_num).parse()
                 packages.append(PypiPackage(
                     self._name,

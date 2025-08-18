@@ -36,6 +36,7 @@ from deltaver.fk_package import FkPackage
 from deltaver.package import Package
 from deltaver.parsed_version import ParsedVersion
 from deltaver.version_list import VersionList
+from deltaver.exceptions import InvalidVersionError
 
 
 @final
@@ -56,7 +57,7 @@ class NpmjsPackageList(VersionList):
             # Skip non-version keys like 'created', 'modified', etc.
             if version_number in ['created', 'modified', 'unpublished']:
                 continue
-            with suppress(InvalidVersion, IndexError, KeyError):
+            with suppress(InvalidVersionError, IndexError, KeyError):
                 parsed_version = ParsedVersion(version_number).parse()
                 if not parsed_version.is_prerelease:
                     parsed_release_time = (
