@@ -25,7 +25,6 @@
 import datetime
 from typing import Protocol
 
-from semver import VersionInfo
 from packaging.version import Version
 
 

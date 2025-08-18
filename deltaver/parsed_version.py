@@ -41,11 +41,13 @@ class ParsedVersion:
         return self._version
 
     def valid(self) -> bool:
+        """Version valid."""
         try:
             self.parse()
-            return True
         except InvalidVersionError:
             return False
+        else:
+            return True
 
     def parse(self) -> packaging_version.Version:
         """Parse version."""

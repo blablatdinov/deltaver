@@ -28,13 +28,12 @@ from typing import final
 import attrs
 import httpx
 import pytz
-from semver import VersionInfo
+from packaging.version import Version
 from typing_extensions import override
 
 from deltaver.package import Package
 from deltaver.parsed_version import ParsedVersion
 from deltaver.version_list import VersionList
-from packaging.version import Version
 
 
 @final
