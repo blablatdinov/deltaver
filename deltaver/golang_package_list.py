@@ -28,11 +28,11 @@ from typing import final
 
 import attrs
 import httpx
-from packaging.version import parse as version_parse
 from typing_extensions import override
 
 from deltaver.fk_package import FkPackage
 from deltaver.package import Package
+from deltaver.parsed_version import ParsedVersion
 from deltaver.version_list import VersionList
 
 
@@ -48,14 +48,18 @@ class GolangPackageList(VersionList):
         """List representation."""
         response = httpx.get('https://proxy.golang.org/{0}/@v/list'.format(self._name))
         response.raise_for_status()
-        versions = response.text.splitlines()
+        versions = [
+            ParsedVersion(ver)
+            for ver in response.text.splitlines()
+        ]
         versions = sorted(
-            versions,
-            key=lambda ver: version_parse(ver[1:]),
+            [ver for ver in versions if ver.valid()],
+            key=lambda ver: ver.parse(),
         )
         packages = []
         for version in versions:
-            response = httpx.get('https://proxy.golang.org/{0}/@v/{1}.info'.format(self._name, version))
+            url = 'https://proxy.golang.org/{0}/@v/{1}.info'.format(self._name, version.origin())
+            response = httpx.get(url)
             if response.status_code == httpx.codes.NOT_FOUND:
                 # Request to get the list of versions for the module:
                 # https://proxy.golang.org/github.com/russross/blackfriday/v2/@v/list
@@ -72,7 +76,7 @@ class GolangPackageList(VersionList):
             response.raise_for_status()
             packages.append(FkPackage(
                 self._name,
-                version,
+                version.origin(),
                 (
                     datetime.datetime
                     .strptime(

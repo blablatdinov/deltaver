@@ -28,11 +28,11 @@ from typing import final
 
 import attrs
 import httpx
-from packaging.version import InvalidVersion
-from packaging.version import parse as version_parse
 from typing_extensions import override
 
+from deltaver.exceptions import InvalidVersionError
 from deltaver.package import Package
+from deltaver.parsed_version import ParsedVersion
 from deltaver.pypi_package import PypiPackage
 from deltaver.version_list import VersionList
 
@@ -53,8 +53,8 @@ class PypiPackageList(VersionList):
         for version_num, release_info in response.json()['releases'].items():
             if not release_info or release_info[0]['yanked']:
                 continue
-            with suppress(InvalidVersion):
-                version_parse(version_num)
+            with suppress(InvalidVersionError):
+                ParsedVersion(version_num).parse()
                 packages.append(PypiPackage(
                     self._name,
                     version_num,

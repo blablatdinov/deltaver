@@ -27,10 +27,10 @@ from typing import final
 
 import attrs
 from packaging.version import Version
-from packaging.version import parse as version_parse
 from typing_extensions import override
 
 from deltaver.package import Package
+from deltaver.parsed_version import ParsedVersion
 
 
 @final
@@ -45,7 +45,7 @@ class FkPackage(Package):
     @override
     def version(self) -> Version:
         """Version."""
-        return version_parse(self._version)
+        return ParsedVersion(self._version).parse()
 
     @override
     def name(self) -> str:

@@ -38,3 +38,8 @@ class VersionNotFoundError(Exception):
 @final
 class TargetGreaterLastError(Exception):
     """Target greater last error."""
+
+
+@final
+class InvalidVersionError(Exception):
+    """Invalid version."""
