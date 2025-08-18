@@ -20,18 +20,21 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Dependencies file format."""
+"""Integration test for mix.lock functionality."""
 
-from enum import Enum
+from pathlib import Path
+
+from deltaver.entry import logic
+from deltaver.formats import Formats
 
 
-class Formats(Enum):
-    """Dependencies file format."""
-
-    pip_freeze = 'pip-freeze'
-    poetry_lock = 'poetry-lock'
-    npm_lock = 'npm-lock'
-    golang = 'golang'
-    mix_lock = 'mix-lock'
-
-    default = 'default'
+def test_mix_lock_integration() -> None:
+    """Test integration with mix.lock file."""
+    packages, sum_delta, max_delta = logic(
+        Path('tests/fixtures/mix-example.lock').read_text(),
+        [],  # excluded packages
+        Formats.mix_lock,
+    )
+    assert len(packages) > 0
+    assert sum_delta >= 0
+    assert max_delta >= 0

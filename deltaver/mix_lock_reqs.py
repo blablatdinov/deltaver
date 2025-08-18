@@ -20,18 +20,30 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Dependencies file format."""
+"""Parsed mix.lock requirements file."""
 
-from enum import Enum
+import re
+from typing import final
+
+import attrs
+from typing_extensions import override
+
+from deltaver.parsed_reqs import ParsedReqs
 
 
-class Formats(Enum):
-    """Dependencies file format."""
+@final
+@attrs.define(frozen=True)
+class MixLockReqs(ParsedReqs):
+    """Parsed mix.lock requirements file."""
 
-    pip_freeze = 'pip-freeze'
-    poetry_lock = 'poetry-lock'
-    npm_lock = 'npm-lock'
-    golang = 'golang'
-    mix_lock = 'mix-lock'
+    _requirements_file_content: str
 
-    default = 'default'
+    @override
+    def reqs(self) -> list[tuple[str, str]]:
+        """Parsed mix.lock requirements file."""
+        dependencies = []
+        pattern = r'"([^"]+)":\s*\{:hex,\s*:[^,]+,\s*"([^"]+)"'
+        matches = re.findall(pattern, self._requirements_file_content)
+        for package_name, version in matches:
+            dependencies.append((package_name, version))
+        return dependencies
