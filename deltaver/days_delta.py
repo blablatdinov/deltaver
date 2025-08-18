@@ -26,10 +26,10 @@ import datetime
 from typing import final
 
 import attrs
-from packaging.version import parse as version_parse
 from typing_extensions import override
 
 from deltaver.delta import Delta
+from deltaver.parsed_version import ParsedVersion
 from deltaver.version_list import VersionList
 
 
@@ -51,7 +51,7 @@ class DaysDelta(Delta):
             if flag:
                 next_version_release_date = package.release_date()
                 break
-            if package.version() == version_parse(self._version):
+            if package.version() == ParsedVersion(self._version).parse():
                 flag = True
         else:
             return 0

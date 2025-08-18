@@ -1,6 +1,5 @@
 # The MIT License (MIT).
-#
-# Copyright (c) 2023-2025 Almaz Ilaletdinov <a.ilaletdinov@yandex.ru>
+# Copyright (c) 2018-2025 Almaz Ilaletdinov <a.ilaletdinov@yandex.ru>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,17 +19,40 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-attrs==25.3.0
-    # via wemake-python-styleguide
-flake8==7.3.0
-    # via wemake-python-styleguide
-mccabe==0.7.0
-    # via flake8
-pycodestyle==2.14.0
-    # via flake8
-pyflakes==3.4.0
-    # via flake8
-pygments==2.19.2
-    # via wemake-python-styleguide
-wemake-python-styleguide==1.3.0
-    # via -r lint-requirements.txt
+"""Module for parsing version strings into semantic version objects."""
+
+from typing import final
+
+import attrs
+from packaging import version as packaging_version
+
+from deltaver.exceptions import InvalidVersionError
+
+
+@final
+@attrs.define(frozen=True)
+class ParsedVersion:
+    """Parsed version."""
+
+    _version: str
+
+    def origin(self) -> str:
+        """Original version."""
+        return self._version
+
+    def valid(self) -> bool:
+        """Version valid."""
+        try:
+            self.parse()
+        except InvalidVersionError:
+            return False
+        else:
+            return True
+
+    def parse(self) -> packaging_version.Version:
+        """Parse version."""
+        origin = self._version.removeprefix('v')
+        try:
+            return packaging_version.parse(origin)
+        except packaging_version.InvalidVersion as err:
+            raise InvalidVersionError(self._version) from err
