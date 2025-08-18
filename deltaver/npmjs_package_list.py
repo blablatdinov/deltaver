@@ -29,14 +29,13 @@ from typing import final
 
 import attrs
 import httpx
-from packaging.version import InvalidVersion
 from typing_extensions import override
 
+from deltaver.exceptions import InvalidVersionError
 from deltaver.fk_package import FkPackage
 from deltaver.package import Package
 from deltaver.parsed_version import ParsedVersion
 from deltaver.version_list import VersionList
-from deltaver.exceptions import InvalidVersionError
 
 
 @final
