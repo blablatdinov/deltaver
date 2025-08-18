@@ -53,7 +53,7 @@ class GolangPackageList(VersionList):
             for ver in response.text.splitlines()
         ]
         versions = sorted(
-            versions,
+            [ver for ver in versions if ver.valid()],
             key=lambda ver: ver.parse(),
         )
         packages = []

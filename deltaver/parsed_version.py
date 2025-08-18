@@ -40,6 +40,13 @@ class ParsedVersion:
         """Original version."""
         return self._version
 
+    def valid(self) -> bool:
+        try:
+            self.parse()
+            return True
+        except InvalidVersionError:
+            return False
+
     def parse(self) -> packaging_version.Version:
         """Parse version."""
         origin = self._version.removeprefix('v')
