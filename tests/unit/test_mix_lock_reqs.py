@@ -22,55 +22,54 @@
 
 """Test mix.lock requirements file."""
 
-import pytest
 
 from deltaver.mix_lock_reqs import MixLockReqs
 
 
-def test_mix_lock_reqs():
+def test_mix_lock_reqs() -> None:
     """Test mix.lock requirements parsing."""
-    content = '''
-%{
-  "phoenix": {:hex, :phoenix, "1.8.0", "dc5d256bb253110266ded8c4a6a167e24fabde2e14b8e474d262840ae8d8ea18", [:mix], [{:bandit, "~> 1.0", [hex: :bandit, repo: "hexpm", optional: true]}, {:jason, "~> 1.0", [hex: :jason, repo: "hexpm", optional: true]}, {:phoenix_pubsub, "~> 2.1", [hex: :phoenix_pubsub, repo: "hexpm", optional: false]}, {:phoenix_template, "~> 1.0", [hex: :phoenix_template, repo: "hexpm", optional: false]}, {:phoenix_view, "~> 2.0", [hex: :phoenix_view, repo: "hexpm", optional: true]}, {:plug, "~> 1.14", [hex: :plug, repo: "hexpm", optional: false]}, {:plug_cowboy, "~> 2.7", [hex: :plug_cowboy, repo: "hexpm", optional: true]}, {:plug_crypto, "~> 1.2 or ~> 2.0", [hex: :plug_crypto, repo: "hexpm", optional: false]}, {:telemetry, "~> 0.4 or ~> 1.0", [hex: :telemetry, repo: "hexpm", optional: false]}, {:websock_adapter, "~> 0.5.3", [hex: :websock_adapter, repo: "hexpm", optional: false]}], "hexpm", "15f6e9cb76646ad8d9f2947240519666fc2c4f29f8a93ad9c7664916ab4c167b"},
-  "ecto": {:hex, :ecto, "3.13.2", "7d0c0863f3fc8d71d17fc3ad3b9424beae13f02712ad84191a826c7169484f01", [:mix], [{:decimal, "~> 2.0", [hex: :decimal, repo: "hexpm", optional: false]}, {:jason, "~> 1.0", [hex: :jason, repo: "hexpm", optional: true]}, {:telemetry, "~> 0.4 or ~> 1.0", [hex: :telemetry, repo: "hexpm", optional: false]}], "hexpm", "669d9291370513ff56e7b7e7081b7af3283d02e046cf3d403053c557894a0b3e"},
-}
-'''
-    
+    content = '\n'.join([
+        '%{'
+        '  "phoenix": {:hex, :phoenix, "1.8.0", "dc5d256bb253110266ded8c4a6a167e24fabde2e14b8e474d262840ae8d8ea18", [:mix], [{:bandit, "~> 1.0", [hex: :bandit, repo: "hexpm", optional: true]}, {:jason, "~> 1.0", [hex: :jason, repo: "hexpm", optional: true]}, {:phoenix_pubsub, "~> 2.1", [hex: :phoenix_pubsub, repo: "hexpm", optional: false]}, {:phoenix_template, "~> 1.0", [hex: :phoenix_template, repo: "hexpm", optional: false]}, {:phoenix_view, "~> 2.0", [hex: :phoenix_view, repo: "hexpm", optional: true]}, {:plug, "~> 1.14", [hex: :plug, repo: "hexpm", optional: false]}, {:plug_cowboy, "~> 2.7", [hex: :plug_cowboy, repo: "hexpm", optional: true]}, {:plug_crypto, "~> 1.2 or ~> 2.0", [hex: :plug_crypto, repo: "hexpm", optional: false]}, {:telemetry, "~> 0.4 or ~> 1.0", [hex: :telemetry, repo: "hexpm", optional: false]}, {:websock_adapter, "~> 0.5.3", [hex: :websock_adapter, repo: "hexpm", optional: false]}], "hexpm", "15f6e9cb76646ad8d9f2947240519666fc2c4f29f8a93ad9c7664916ab4c167b"},',  # noqa: E501
+        '  "ecto": {:hex, :ecto, "3.13.2", "7d0c0863f3fc8d71d17fc3ad3b9424beae13f02712ad84191a826c7169484f01", [:mix], [{:decimal, "~> 2.0", [hex: :decimal, repo: "hexpm", optional: false]}, {:jason, "~> 1.0", [hex: :jason, repo: "hexpm", optional: true]}, {:telemetry, "~> 0.4 or ~> 1.0", [hex: :telemetry, repo: "hexpm", optional: false]}], "hexpm", "669d9291370513ff56e7b7e7081b7af3283d02e046cf3d403053c557894a0b3e"},',  # noqa: E501
+        '}',
+    ])
+
     reqs = MixLockReqs(content)
     result = reqs.reqs()
-    
+
     expected = [
-        ("phoenix", "1.8.0"),
-        ("ecto", "3.13.2"),
+        ('phoenix', '1.8.0'),
+        ('ecto', '3.13.2'),
     ]
-    
+
     assert result == expected
 
 
-def test_mix_lock_reqs_empty():
+def test_mix_lock_reqs_empty() -> None:
     """Test mix.lock requirements parsing with empty content."""
     content = '%{}'
-    
+
     reqs = MixLockReqs(content)
     result = reqs.reqs()
-    
+
     assert result == []
 
 
-def test_mix_lock_reqs_with_git_deps():
+def test_mix_lock_reqs_with_git_deps() -> None:
     """Test mix.lock requirements parsing with git dependencies."""
-    content = '''
-%{
-  "phoenix": {:hex, :phoenix, "1.8.0", "dc5d256bb253110266ded8c4a6a167e24fabde2e14b8e474d262840ae8d8ea18", [:mix], [], "hexpm", "15f6e9cb76646ad8d9f2947240519666fc2c4f29f8a93ad9c7664916ab4c167b"},
-  "heroicons": {:git, "https://github.com/tailwindlabs/heroicons.git", "0435d4ca364a608cc75e2f8683d374e55abbae26", [tag: "v2.2.0", sparse: "optimized", depth: 1]},
-}
-'''
-    
+    content = '\n'.join([
+        '%{',
+        '  "phoenix": {:hex, :phoenix, "1.8.0", "dc5d256bb253110266ded8c4a6a167e24fabde2e14b8e474d262840ae8d8ea18", [:mix], [], "hexpm", "15f6e9cb76646ad8d9f2947240519666fc2c4f29f8a93ad9c7664916ab4c167b"},',  # noqa: E501
+        '  "heroicons": {:git, "https://github.com/tailwindlabs/heroicons.git", "0435d4ca364a608cc75e2f8683d374e55abbae26", [tag: "v2.2.0", sparse: "optimized", depth: 1]},',  # noqa: E501
+        '}',
+    ])
+
     reqs = MixLockReqs(content)
     result = reqs.reqs()
-    
+
     expected = [
-        ("phoenix", "1.8.0"),
+        ('phoenix', '1.8.0'),
     ]
-    
+
     assert result == expected

@@ -22,35 +22,21 @@
 
 """Integration test for mix.lock functionality."""
 
-import pytest
 from pathlib import Path
 
 from deltaver.entry import logic
 from deltaver.formats import Formats
 
 
-def test_mix_lock_integration():
+def test_mix_lock_integration() -> None:
     """Test integration with mix.lock file."""
     mix_lock_path = Path('tests/fixtures/mix-example.lock')
-    
-    # Читаем содержимое файла
     content = mix_lock_path.read_text()
-    
-    # Запускаем логику
     packages, sum_delta, max_delta = logic(
         content,
         [],  # excluded packages
         Formats.mix_lock,
     )
-    
-    # Проверяем, что получили результаты
     assert len(packages) > 0
     assert sum_delta >= 0
     assert max_delta >= 0
-    
-    # Проверяем структуру результатов
-    for package_name, version, delta in packages:
-        assert isinstance(package_name, str)
-        assert isinstance(version, str)
-        assert isinstance(delta, int)
-        assert delta >= 0

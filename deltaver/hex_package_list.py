@@ -33,10 +33,9 @@ from packaging.version import InvalidVersion
 from packaging.version import parse as version_parse
 from typing_extensions import override
 
-from deltaver.package import Package
-from deltaver.hex_package import HexPackage
-from deltaver.version_list import VersionList
 from deltaver.fk_package import FkPackage
+from deltaver.package import Package
+from deltaver.version_list import VersionList
 
 
 @final
@@ -61,7 +60,7 @@ class HexPackageList(VersionList):
             with suppress(InvalidVersion):
                 version_parse(version_num)
                 inserted_at = release.get('inserted_at', '')
-                release_date = datetime.datetime.strptime(inserted_at, '%Y-%m-%dT%H:%M:%S.%fZ').date()
+                release_date = datetime.datetime.strptime(inserted_at, '%Y-%m-%dT%H:%M:%S.%f%z').date()
                 packages.append(FkPackage(
                     self._name,
                     version_num,
