@@ -34,6 +34,7 @@ from typing_extensions import override
 from deltaver.package import Package
 from deltaver.parsed_version import ParsedVersion
 from deltaver.version_list import VersionList
+from packaging.version import Version
 
 
 @final
@@ -46,7 +47,7 @@ class PypiPackage(Package):
     _version_list: VersionList
 
     @override
-    def version(self) -> VersionInfo:
+    def version(self) -> Version:
         """Version."""
         return ParsedVersion(self._version).parse()
 

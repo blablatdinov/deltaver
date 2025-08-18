@@ -27,8 +27,6 @@ import attrs
 from packaging import version as packaging_version
 
 from deltaver.exceptions import InvalidVersionError
-from deltaver.fk_supports_str import FkSupportsStr
-from deltaver.supports_str import SupportsStr
 
 
 @final

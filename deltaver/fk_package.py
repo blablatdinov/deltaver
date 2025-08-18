@@ -26,7 +26,7 @@ import datetime
 from typing import final
 
 import attrs
-from semver import VersionInfo
+from packaging.version import Version
 from typing_extensions import override
 
 from deltaver.package import Package
@@ -43,7 +43,7 @@ class FkPackage(Package):
     _release_date: datetime.date
 
     @override
-    def version(self) -> VersionInfo:
+    def version(self) -> Version:
         """Version."""
         return ParsedVersion(self._version).parse()
 

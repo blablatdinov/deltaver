@@ -26,12 +26,13 @@ import datetime
 from typing import Protocol
 
 from semver import VersionInfo
+from packaging.version import Version
 
 
 class Package(Protocol):
     """Package."""
 
-    def version(self) -> VersionInfo:
+    def version(self) -> Version:
         """Version."""
 
     def name(self) -> str:
