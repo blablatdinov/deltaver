@@ -30,10 +30,8 @@ from deltaver.formats import Formats
 
 def test_mix_lock_integration() -> None:
     """Test integration with mix.lock file."""
-    mix_lock_path = Path('tests/fixtures/mix-example.lock')
-    content = mix_lock_path.read_text()
     packages, sum_delta, max_delta = logic(
-        content,
+        Path('tests/fixtures/mix-example.lock').read_text(),
         [],  # excluded packages
         Formats.mix_lock,
     )

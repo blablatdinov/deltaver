@@ -50,20 +50,17 @@ class HexPackageList(VersionList):
         """List representation."""
         response = httpx.get('https://hex.pm/api/packages/{0}'.format(self._name))
         response.raise_for_status()
+        releases = response.json().get('releases', [])
         packages = []
-        package_data = response.json()
-        releases = package_data.get('releases', [])
         for release in releases:
             version_num = release.get('version')
             if not version_num:
                 continue
             with suppress(InvalidVersion):
                 version_parse(version_num)
-                inserted_at = release.get('inserted_at', '')
-                release_date = datetime.datetime.strptime(inserted_at, '%Y-%m-%dT%H:%M:%S.%f%z').date()
                 packages.append(FkPackage(
                     self._name,
                     version_num,
-                    release_date,
+                    datetime.datetime.strptime(release.get('inserted_at', ''), '%Y-%m-%dT%H:%M:%S.%f%z').date(),
                 ))
         return packages
