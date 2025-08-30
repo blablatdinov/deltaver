@@ -74,7 +74,7 @@ def test(current_dir: Path) -> None:
     """Test run command."""
     Path('req.txt').write_text('httpx==0.25.0')
     got = subprocess.run(
-        ['venv/bin/deltaver_new', 'req.txt'],
+        ['venv/bin/deltaver', 'req.txt'],
         stdout=subprocess.PIPE,
         check=False,
     )
@@ -122,7 +122,7 @@ def test_versions(current_dir: Path, version: tuple[str, ...]) -> None:
     subprocess.run(['venv/bin/pip', 'install', *version], check=True)
     Path('req.txt').write_text('httpx==0.25.0')
     got = subprocess.run(
-        ['venv/bin/deltaver_new', 'req.txt'],
+        ['venv/bin/deltaver', 'req.txt'],
         stdout=subprocess.PIPE,
         check=False,
     )
@@ -136,7 +136,7 @@ def test_fail_on_avg(current_dir: Path) -> None:
     """Test deltaver fail on average."""
     Path('req.txt').write_text('httpx==0.25.0')
     got = subprocess.run(
-        ['venv/bin/deltaver_new', 'req.txt', '--fail-on-avg', '1'],
+        ['venv/bin/deltaver', 'req.txt', '--fail-on-avg', '1'],
         stdout=subprocess.PIPE,
         check=False,
     )
@@ -149,7 +149,7 @@ def test_fail_on_max(current_dir: Path) -> None:
     """Test deltaver fail on max."""
     Path('req.txt').write_text('httpx==0.25.0')
     got = subprocess.run(
-        ['venv/bin/deltaver_new', 'req.txt', '--fail-on-max', '1'],
+        ['venv/bin/deltaver', 'req.txt', '--fail-on-max', '1'],
         stdout=subprocess.PIPE,
         check=False,
     )
@@ -162,7 +162,7 @@ def test_poetry_lock(current_dir: Path) -> None:
     """Test poetry lock file."""
     copyfile((current_dir / 'tests/fixtures/poetry_lock_example.lock'), Path('poetry.lock'))
     got = subprocess.run(
-        ['venv/bin/deltaver_new', 'poetry.lock', '--format', 'poetry-lock'],
+        ['venv/bin/deltaver', 'poetry.lock', '--format', 'poetry-lock'],
         stdout=subprocess.PIPE,
         check=False,
     )
@@ -176,7 +176,7 @@ def test_golang(current_dir: Path) -> None:
     """Test go.sum file."""
     copyfile((current_dir / 'tests/fixtures/go.sum'), Path('go.sum'))
     got = subprocess.run(
-        ['venv/bin/deltaver_new', 'go.sum', '--format', 'golang'],
+        ['venv/bin/deltaver', 'go.sum', '--format', 'golang'],
         stdout=subprocess.PIPE,
         check=False,
     )
