@@ -37,8 +37,7 @@ jobs:
       matrix:
         python_version: [
           "3.9",
-          "3.12",
-          # "3.13",  TODO: uncomment
+          "3.13",
         ]
     runs-on: ubuntu-latest
     steps:
@@ -88,7 +87,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .venv
-          key: venv-3.12-${{ hashFiles('**/poetry.lock') }}
+          key: venv-3.13-${{ hashFiles('**/poetry.lock') }}
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --no-interaction
