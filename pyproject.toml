@@ -58,8 +58,7 @@ flake8-one-class = "^0.0.1"
 eo-styleguide = "0.0.1a16"
 
 [tool.poetry.scripts]
-deltaver = "deltaver.__main__:app"
-deltaver_new = "deltaver.entry:app"
+deltaver = "deltaver.entry:app"
 
 [build-system]
 requires = ["poetry-core"]
