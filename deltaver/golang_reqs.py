@@ -57,9 +57,21 @@ class GolangReqs(ParsedReqs):
                 splitted_line[0],
                 splitted_line[1],
             ))
-        res = sorted(res, key=lambda x: (x[0], ParsedVersion(x[1]).parse()))
+        return self._latest_version(res)
+
+    def _latest_version(
+        self,
+        packages: list[tuple[str, str]],
+    ) -> list[tuple[str, str]]:
+        groupped = groupby(
+            sorted(
+                packages,
+                key=lambda pkg_info: (pkg_info[0], ParsedVersion(pkg_info[1]).parse()),
+            ),
+            key=lambda pkg_info: pkg_info[0],
+        )
         actual = []
-        for k, g in groupby(res, key=lambda x: x[0]):
-            ver = list(g)[-1][-1]
-            actual.append((k, ver))
+        for _, pkg_versions in groupped:
+            ver = tuple(pkg_versions)[-1]
+            actual.append((ver[0], ver[1]))
         return actual

@@ -84,32 +84,35 @@ class GolangPackageList(VersionList):
     ) -> Package | None:
         """Fetch version info for a single version."""
         try:
-            response = await client.get(url)
-            if response.status_code == httpx.codes.NOT_FOUND:
-                # Request to get the list of versions for the module:
-                # https://proxy.golang.org/github.com/russross/blackfriday/v2/@v/list
-                # Response:
-                # v2.0.0
-                # v2.1.0-pre.1
-                # v2.1.0
-                # v2.0.1
-                #
-                # However, attempting to request information for a specific version, such as:
-                # https://proxy.golang.org/github.com/russross/blackfriday/v2/@v/v2.0.0.info
-                # will result in a 404 error (page not found).
-                return None
-            response.raise_for_status()
-            return FkPackage(
-                self._name,
-                version.origin(),
-                (
-                    datetime.datetime
-                    .strptime(
-                        response.json()['Time'],
-                        '%Y-%m-%dT%H:%M:%S%z',
-                    )
-                    .date()
-                ),
-            )
+            return await self._inner(client, url, version)
         except httpx.HTTPError:
             return None
+
+    async def _inner(self, client, url, version):
+        response = await client.get(url)
+        if response.status_code == httpx.codes.NOT_FOUND:
+            # Request to get the list of versions for the module:
+            # https://proxy.golang.org/github.com/russross/blackfriday/v2/@v/list
+            # Response:
+            # v2.0.0
+            # v2.1.0-pre.1
+            # v2.1.0
+            # v2.0.1
+            #
+            # However, attempting to request information for a specific version, such as:
+            # https://proxy.golang.org/github.com/russross/blackfriday/v2/@v/v2.0.0.info
+            # will result in a 404 error (page not found).
+            return None
+        response.raise_for_status()
+        return FkPackage(
+            self._name,
+            version.origin(),
+            (
+                datetime.datetime
+                .strptime(
+                    response.json()['Time'],
+                    '%Y-%m-%dT%H:%M:%S%z',
+                )
+                .date()
+            ),
+        )
