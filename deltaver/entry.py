@@ -40,6 +40,7 @@ from rich.progress import track
 from rich.table import Table
 
 from deltaver.cached_package_list import CachedPackageList
+from deltaver.cached_sorted_versions import CachedSortedVersions
 from deltaver.config import CliInputConfig, Config, PyprojectConfig
 from deltaver.days_delta import DaysDelta
 from deltaver.excluded_reqs import ExcludedReqs
@@ -149,12 +150,15 @@ def logic(  # noqa: WPS210, WPS234. TODO: fix
         }[file_format]
         delta = DaysDelta(
             version,
-            CachedPackageList.ctor(
-                SortedPackageList(
-                    FilteredPackageList(
-                        package_list,
+            CachedSortedVersions(
+                CachedPackageList.ctor(
+                    SortedPackageList(
+                        FilteredPackageList(
+                            package_list,
+                        ),
                     ),
-                ),
+                    ),
+                name,
             ),
             datetime.datetime.now(tz=pytz.UTC).date(),
         ).days()

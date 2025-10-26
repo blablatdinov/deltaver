@@ -22,6 +22,7 @@
 
 """Pypi package list."""
 
+import datetime
 from collections.abc import Sequence
 from contextlib import suppress
 from typing import final
@@ -31,9 +32,9 @@ import httpx
 from typing_extensions import override
 
 from deltaver.exceptions import InvalidVersionError
+from deltaver.fk_package import FkPackage
 from deltaver.package import Package
 from deltaver.parsed_version import ParsedVersion
-from deltaver.pypi_package import PypiPackage
 from deltaver.version_list import VersionList
 
 
@@ -55,9 +56,14 @@ class PypiPackageList(VersionList):
                 continue
             with suppress(InvalidVersionError):
                 ParsedVersion(version_num).parse()
-                packages.append(PypiPackage(
+                packages.append(FkPackage(
                     self._name,
                     version_num,
-                    self,
+                    (
+                        datetime.datetime
+                        .strptime(release_info[0]['upload_time'], '%Y-%m-%dT%H:%M:%S')
+                        .astimezone(tz=datetime.timezone.utc)
+                        .date()
+                    ),
                 ))
         return packages
