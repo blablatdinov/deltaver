@@ -99,7 +99,7 @@ def test(current_dir: Path) -> None:
         (_version_from_lock('packaging'),),
         ('packaging', '-U'),
 
-        ('typer==0.9.0',),
+        ('typer==0.13.0',),
         (_version_from_lock('typer'),),
         ('typer', '-U'),
 
