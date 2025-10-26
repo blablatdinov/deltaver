@@ -119,3 +119,9 @@ multiline-quotes = "double"
   "PLR0913", # Too many arguments to function call
   "INP001",  # Add an `__init__.py`. Tests is closed to import
 ]
+
+[tool.pytest.ini_options]
+markers = [
+  "slow: slow tests",
+]
+
