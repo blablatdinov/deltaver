@@ -71,7 +71,7 @@ include_trailing_comma = true
 
 [tool.ruff]
 line-length = 120
-target-version = "py39"
+target-version = "py310"
 output-format = "concise"
 
 [tool.ruff.lint]

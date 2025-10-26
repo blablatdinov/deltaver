@@ -30,9 +30,9 @@ from rich import print as rich_print
 from typing_extensions import override
 
 from deltaver.delta import Delta
+from deltaver.exceptions import InvalidVersionError
 from deltaver.parsed_version import ParsedVersion
 from deltaver.version_list import VersionList
-from deltaver.exceptions import InvalidVersionError
 
 
 @final

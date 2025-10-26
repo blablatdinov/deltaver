@@ -22,15 +22,15 @@
 
 """Parsed golang go.sum requirements file."""
 
-from typing import final
 from itertools import groupby
+from typing import final
 
 import attrs
 from typing_extensions import override
 
+from deltaver.exceptions import InvalidVersionError
 from deltaver.parsed_reqs import ParsedReqs
 from deltaver.parsed_version import ParsedVersion
-from deltaver.exceptions import InvalidVersionError
 
 
 @final

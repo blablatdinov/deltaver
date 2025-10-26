@@ -77,10 +77,10 @@ class GolangPackageList(VersionList):
             return [p for p in packages if not isinstance(p, BaseException)]
 
     async def _fetch_version_info(
-        self, 
-        client: httpx.AsyncClient, 
-        url: str, 
-        version: ParsedVersion
+        self,
+        client: httpx.AsyncClient,
+        url: str,
+        version: ParsedVersion,
     ) -> Package | None:
         """Fetch version info for a single version."""
         try:
