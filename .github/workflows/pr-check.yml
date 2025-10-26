@@ -36,8 +36,8 @@ jobs:
     strategy:
       matrix:
         python_version: [
-          "3.9",
-          "3.13",
+          "3.10",
+          "3.14",
         ]
     runs-on: ubuntu-latest
     steps:
