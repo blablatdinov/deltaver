@@ -70,8 +70,8 @@ class CachedSortedVersions(VersionList):
                 res.append(FkPackage(self._package_name, version_num, release_date))
             return res
         origin_val = self._origin.as_list()
-        res = []
-        for package in origin_val:
-            res.append({str(package.version()): package.release_date().strftime('%Y-%m-%dT%H:%M:%S')})
-        cache_path.write_text(json.dumps(res))
+        cache_path.write_text(json.dumps([
+            {str(package.version()): package.release_date().strftime('%Y-%m-%dT%H:%M:%S')}
+            for package in origin_val
+        ]))
         return origin_val

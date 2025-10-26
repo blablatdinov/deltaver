@@ -44,6 +44,7 @@ from deltaver.npmjs_versions_sorted_by_semver import NpmjsVersionsSortedBySemver
 from deltaver.pypi_version_delta import PypiVersionDelta
 from deltaver.pypi_versions_sorted_by_semver import PypiVersionsSortedBySemver
 from deltaver.versions_sorted_by_date import VersionsSortedByDate
+from deltaver.pypi_package_list import PypiPackageList
 
 
 @pytest.fixture
@@ -206,11 +207,11 @@ def exist_cache(tmp_path: Path, time_machine: TimeMachineFixture, _mock_pypi: No
 def test_cached_version_delta(other_dir: Path, time_machine: TimeMachineFixture, respx_mock: MockRouter) -> None:
     """Test cached version delta."""
     time_machine.move_to(datetime.datetime(2024, 2, 5, tzinfo=datetime.timezone.utc))
-    http_fetched_value = CachedSortedVersions(PypiVersionsSortedBySemver('https://pypi.org/', 'httpx'), 'httpx').fetch()
+    http_fetched_value = CachedSortedVersions(PypiPackageList('httpx'), 'httpx').as_list()
     def se(request: httpx.Request) -> None:
         raise AssertionError
     respx_mock.get('https://pypi.org/pypi/httpx/json').mock(side_effect=se)
-    got = CachedSortedVersions(PypiVersionsSortedBySemver('https://pypi.org/', 'httpx'), 'httpx').fetch()
+    got = CachedSortedVersions(PypiPackageList('httpx'), 'httpx').as_list()
 
     assert len(list(other_dir.glob('**/*'))) == 3
     assert other_dir / '.deltaver_cache/httpx/2024-02-05.json' in other_dir.glob('**/*')
@@ -220,11 +221,11 @@ def test_cached_version_delta(other_dir: Path, time_machine: TimeMachineFixture,
 def test_remove_old_cache(exist_cache: Path, time_machine: TimeMachineFixture, respx_mock: MockRouter) -> None:
     """Test remove old cache."""
     time_machine.move_to(datetime.datetime(2024, 2, 6, tzinfo=datetime.timezone.utc))
-    CachedSortedVersions(PypiVersionsSortedBySemver('https://pypi.org/', 'httpx'), 'httpx').fetch()
+    CachedSortedVersions(PypiPackageList('httpx'), 'httpx').as_list()
     def se(request: httpx.Request) -> None:
         raise AssertionError
     respx_mock.get('https://pypi.org/pypi/httpx/json').mock(side_effect=se)
-    CachedSortedVersions(PypiVersionsSortedBySemver('https://pypi.org/', 'httpx'), 'httpx').fetch()
+    CachedSortedVersions(PypiPackageList('httpx'), 'httpx').as_list()
 
     assert len(list(exist_cache.glob('**/*'))) == 3
     assert exist_cache / '.deltaver_cache/httpx/2024-02-05.json' not in exist_cache.glob('**/*')
