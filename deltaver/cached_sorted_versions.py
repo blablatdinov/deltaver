@@ -26,24 +26,28 @@ import datetime
 import json
 from pathlib import Path
 from typing import final
+from collections.abc import Sequence
 
+from deltaver.package import Package
 import attrs
 from typing_extensions import override
 
 from deltaver.sorted_versions import SortedVersions
 from deltaver.version_delta import SortedVersionsList
+from deltaver.version_list import VersionList
+from deltaver.fk_package import FkPackage
 
 
 @final
 @attrs.define(frozen=True)
-class CachedSortedVersions(SortedVersions):
+class CachedSortedVersions(VersionList):
     """Cached sorted versions."""
 
-    _origin: SortedVersions
+    _origin: VersionList
     _package_name: str
 
     @override
-    def fetch(self) -> SortedVersionsList:  # noqa: WPS210. Simplify later
+    def as_list(self) -> Sequence[Package]:  # noqa: WPS210. Simplify later
         """Sorted versions list."""
         cache_dir = Path('.deltaver_cache')
         (cache_dir / self._package_name).mkdir(exist_ok=True, parents=True)
@@ -65,15 +69,11 @@ class CachedSortedVersions(SortedVersions):
                     next(iter(package_info.values())),
                     '%Y-%m-%dT%H:%M:%S',
                 ).astimezone(datetime.timezone.utc).date()
-                res.append({version_num: release_date})
+                res.append(FkPackage(self._package_name, version_num, release_date))
             return res
-        origin_val = self._origin.fetch()
-        cache_path.write_text(json.dumps([
-            {
-                next(iter(dict_.keys())): next(
-                    iter(dict_.values()),
-                ).strftime('%Y-%m-%dT%H:%M:%S'),
-            }
-            for dict_ in origin_val
-        ]))
+        origin_val = self._origin.as_list()
+        res = []
+        for package in origin_val:
+            res.append({str(package.version()): package.release_date().strftime('%Y-%m-%dT%H:%M:%S')})
+        cache_path.write_text(json.dumps(res))
         return origin_val

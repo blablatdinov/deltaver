@@ -34,6 +34,7 @@ from typing_extensions import override
 from deltaver.package import Package
 from deltaver.parsed_version import ParsedVersion
 from deltaver.version_list import VersionList
+from deltaver.fk_package import FkPackage
 
 
 @final
@@ -59,9 +60,12 @@ class PypiPackage(Package):
     def release_date(self) -> datetime.date:
         """Release date."""
         response = httpx.get('https://pypi.org/pypi/{0}/json'.format(self._name))
-        version_str = str(self.version())
+        releases = {
+            str(ParsedVersion(v).parse()): info
+            for v, info in response.json()['releases'].items()
+        }
         response.raise_for_status()
         return datetime.datetime.strptime(
-            response.json()['releases'][version_str][0]['upload_time'],
+            releases[str(self.version())][0]['upload_time'],
             '%Y-%m-%dT%H:%M:%S',
         ).astimezone(pytz.UTC).date()

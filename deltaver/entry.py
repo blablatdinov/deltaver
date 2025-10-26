@@ -58,6 +58,7 @@ from deltaver.poetry_lock_reqs import PoetryLockReqs
 from deltaver.pypi_package_list import PypiPackageList
 from deltaver.sorted_package_list import SortedPackageList
 from deltaver.version_list import VersionList
+from deltaver.cached_sorted_versions import CachedSortedVersions
 
 app = typer.Typer()
 
@@ -149,12 +150,15 @@ def logic(  # noqa: WPS210, WPS234. TODO: fix
         }[file_format]
         delta = DaysDelta(
             version,
-            CachedPackageList.ctor(
-                SortedPackageList(
-                    FilteredPackageList(
-                        package_list,
+            CachedSortedVersions(
+                CachedPackageList.ctor(
+                    SortedPackageList(
+                        FilteredPackageList(
+                            package_list,
+                        ),
                     ),
-                ),
+                    ),
+                name,
             ),
             datetime.datetime.now(tz=pytz.UTC).date(),
         ).days()
