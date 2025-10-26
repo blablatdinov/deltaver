@@ -48,7 +48,7 @@ class DaysDelta(Delta):
     def days(self) -> int:
         """Days of delta."""
         flag = False
-        next_version_release_date = datetime.date(1, 1, 1)
+        next_version_release_date = datetime.date.min
         try:
             target_version = ParsedVersion(self._version).parse()
         except InvalidVersionError:

@@ -58,7 +58,6 @@ class GolangReqs(ParsedReqs):
                 splitted_line[1],
             ))
         res = sorted(res, key=lambda x: (x[0], ParsedVersion(x[1]).parse()))
-        from pprint import pprint
         actual = []
         for k, g in groupby(res, key=lambda x: x[0]):
             ver = list(g)[-1][-1]
