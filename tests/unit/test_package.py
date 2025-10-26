@@ -60,15 +60,6 @@ def test() -> None:
     assert package.release_date() == datetime.date(2023, 11, 24)
 
 
-@pytest.mark.skip
-def test_package_list() -> None:
-    """Test package list.
-
-    TODO: implement mock and write assert
-    """
-    PypiPackageList('httpx').as_list()
-
-
 def test_filtered_package_list() -> None:
     """Test filtered package list."""
     package_list = FilteredPackageList(
