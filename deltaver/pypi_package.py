@@ -60,8 +60,8 @@ class PypiPackage(Package):
         """Release date."""
         response = httpx.get('https://pypi.org/pypi/{0}/json'.format(self._name))
         releases = {
-            str(ParsedVersion(v).parse()): info
-            for v, info in response.json()['releases'].items()
+            str(ParsedVersion(ver).parse()): pkg_info
+            for ver, pkg_info in response.json()['releases'].items()
         }
         response.raise_for_status()
         return datetime.datetime.strptime(
