@@ -22,6 +22,7 @@
 
 """Golang package list."""
 
+import asyncio
 import datetime
 from collections.abc import Sequence
 from typing import final
@@ -46,20 +47,44 @@ class GolangPackageList(VersionList):
     @override
     def as_list(self) -> Sequence[Package]:
         """List representation."""
-        response = httpx.get('https://proxy.golang.org/{0}/@v/list'.format(self._name))
-        response.raise_for_status()
-        versions = [
-            ParsedVersion(ver)
-            for ver in response.text.splitlines()
-        ]
-        versions = sorted(
-            [ver for ver in versions if ver.valid()],
-            key=lambda ver: ver.parse(),
-        )
-        packages = []
-        for version in versions:
-            url = 'https://proxy.golang.org/{0}/@v/{1}.info'.format(self._name, version.origin())
-            response = httpx.get(url)
+        return asyncio.run(self._async_as_list())
+
+    async def _async_as_list(self) -> Sequence[Package]:
+        """Async list representation with parallel requests."""
+        async with httpx.AsyncClient() as client:
+            response = await client.get('https://proxy.golang.org/{0}/@v/list'.format(self._name))
+            response.raise_for_status()
+            versions = [
+                ParsedVersion(ver)
+                for ver in response.text.splitlines()
+            ]
+            versions = sorted(
+                [ver for ver in versions if ver.valid()],
+                key=lambda ver: ver.parse(),
+            )
+            tasks = []
+            for version in versions:
+                url = 'https://proxy.golang.org/{0}/@v/{1}.info'.format(self._name, version.origin())
+                task = self._fetch_version_info(client, url, version)
+                tasks.append(task)
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            packages = []
+            for result in results:
+                if isinstance(result, Exception):
+                    continue
+                if result is not None:
+                    packages.append(result)
+            return [p for p in packages if not isinstance(p, BaseException)]
+
+    async def _fetch_version_info(
+        self, 
+        client: httpx.AsyncClient, 
+        url: str, 
+        version: ParsedVersion
+    ) -> Package | None:
+        """Fetch version info for a single version."""
+        try:
+            response = await client.get(url)
             if response.status_code == httpx.codes.NOT_FOUND:
                 # Request to get the list of versions for the module:
                 # https://proxy.golang.org/github.com/russross/blackfriday/v2/@v/list
@@ -72,9 +97,9 @@ class GolangPackageList(VersionList):
                 # However, attempting to request information for a specific version, such as:
                 # https://proxy.golang.org/github.com/russross/blackfriday/v2/@v/v2.0.0.info
                 # will result in a 404 error (page not found).
-                continue
+                return None
             response.raise_for_status()
-            packages.append(FkPackage(
+            return FkPackage(
                 self._name,
                 version.origin(),
                 (
@@ -85,5 +110,6 @@ class GolangPackageList(VersionList):
                     )
                     .date()
                 ),
-            ))
-        return packages
+            )
+        except httpx.HTTPError:
+            return None

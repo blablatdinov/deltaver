@@ -23,11 +23,14 @@
 """Parsed golang go.sum requirements file."""
 
 from typing import final
+from itertools import groupby
 
 import attrs
 from typing_extensions import override
 
 from deltaver.parsed_reqs import ParsedReqs
+from deltaver.parsed_version import ParsedVersion
+from deltaver.exceptions import InvalidVersionError
 
 
 @final
@@ -42,12 +45,22 @@ class GolangReqs(ParsedReqs):
         """Parsed golang go.sum requirements file."""
         lines = self._go_sum_content.strip().splitlines()
         res = []
-        for idx, line in enumerate(lines):
-            if idx % 2 == 1:
+        for line in lines:
+            if '/go.mod' in line:
                 continue
             splitted_line = line.split(' ')
+            try:
+                ParsedVersion(splitted_line[1]).parse()
+            except InvalidVersionError:
+                continue
             res.append((
                 splitted_line[0],
                 splitted_line[1],
             ))
-        return res
+        res = sorted(res, key=lambda x: (x[0], ParsedVersion(x[1]).parse()))
+        from pprint import pprint
+        actual = []
+        for k, g in groupby(res, key=lambda x: x[0]):
+            ver = list(g)[-1][-1]
+            actual.append((k, ver))
+        return actual
