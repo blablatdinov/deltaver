@@ -70,6 +70,7 @@ def _version_from_lock(package_name: str) -> str:
 
 
 @pytest.mark.usefixtures('_tmp_directory')
+@pytest.mark.slow
 def test(current_dir: Path) -> None:
     """Test run command."""
     Path('req.txt').write_text('httpx==0.25.0')
@@ -121,6 +122,7 @@ def test(current_dir: Path) -> None:
     ],
     ids=lambda x: ' '.join(x),
 )
+@pytest.mark.slow
 def test_versions(current_dir: Path, version: tuple[str, ...]) -> None:
     """Test run command."""
     subprocess.run(['venv/bin/pip', 'install', *version], check=True)
@@ -136,6 +138,7 @@ def test_versions(current_dir: Path, version: tuple[str, ...]) -> None:
 
 
 @pytest.mark.usefixtures('_tmp_directory')
+@pytest.mark.slow
 def test_fail_on_avg(current_dir: Path) -> None:
     """Test deltaver fail on average."""
     Path('req.txt').write_text('httpx==0.25.0')
@@ -149,6 +152,7 @@ def test_fail_on_avg(current_dir: Path) -> None:
 
 
 @pytest.mark.usefixtures('_tmp_directory')
+@pytest.mark.slow
 def test_fail_on_max(current_dir: Path) -> None:
     """Test deltaver fail on max."""
     Path('req.txt').write_text('httpx==0.25.0')
@@ -162,6 +166,7 @@ def test_fail_on_max(current_dir: Path) -> None:
 
 
 @pytest.mark.usefixtures('_tmp_directory')
+@pytest.mark.slow
 def test_poetry_lock(current_dir: Path) -> None:
     """Test poetry lock file."""
     copyfile((current_dir / 'tests/fixtures/poetry_lock_example.lock'), Path('poetry.lock'))
@@ -176,6 +181,7 @@ def test_poetry_lock(current_dir: Path) -> None:
 
 
 @pytest.mark.usefixtures('_tmp_directory')
+@pytest.mark.slow
 def test_golang(current_dir: Path) -> None:
     """Test go.sum file."""
     copyfile((current_dir / 'tests/fixtures/go.sum'), Path('go.sum'))

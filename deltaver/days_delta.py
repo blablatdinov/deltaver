@@ -26,9 +26,11 @@ import datetime
 from typing import final
 
 import attrs
+from rich import print as rich_print
 from typing_extensions import override
 
 from deltaver.delta import Delta
+from deltaver.exceptions import InvalidVersionError
 from deltaver.parsed_version import ParsedVersion
 from deltaver.version_list import VersionList
 
@@ -46,12 +48,17 @@ class DaysDelta(Delta):
     def days(self) -> int:
         """Days of delta."""
         flag = False
-        next_version_release_date = datetime.date(1, 1, 1)
+        next_version_release_date = datetime.date.min
+        try:
+            target_version = ParsedVersion(self._version).parse()
+        except InvalidVersionError:
+            rich_print(f'[yellow]Version {self._version} can not been parsed')
+            return 0
         for package in self._packages.as_list():
             if flag:
                 next_version_release_date = package.release_date()
                 break
-            if package.version() == ParsedVersion(self._version).parse():
+            if package.version() == target_version:
                 flag = True
         else:
             return 0

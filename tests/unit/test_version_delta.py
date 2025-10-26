@@ -41,10 +41,10 @@ from deltaver.decr_delta import DecrDelta
 from deltaver.exceptions import TargetGreaterLastError
 from deltaver.fk_version_delta import FkVersionDelta
 from deltaver.npmjs_versions_sorted_by_semver import NpmjsVersionsSortedBySemver
+from deltaver.pypi_package_list import PypiPackageList
 from deltaver.pypi_version_delta import PypiVersionDelta
 from deltaver.pypi_versions_sorted_by_semver import PypiVersionsSortedBySemver
 from deltaver.versions_sorted_by_date import VersionsSortedByDate
-from deltaver.pypi_package_list import PypiPackageList
 
 
 @pytest.fixture

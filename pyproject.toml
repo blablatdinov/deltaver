@@ -71,7 +71,7 @@ include_trailing_comma = true
 
 [tool.ruff]
 line-length = 120
-target-version = "py39"
+target-version = "py310"
 output-format = "concise"
 
 [tool.ruff.lint]
@@ -102,9 +102,6 @@ ignore = [
   "UP004",   # Class `PrayerReaction` inherits from `object`
   "TD",      # "todo" formats
   "PLR630",  # We disrespect staticmethods
-  "TC001",
-  "TC002",
-  "TC003",  # Move standard library import `...` into a type-checking block
 ]
 
 [tool.ruff.lint.flake8-quotes]
