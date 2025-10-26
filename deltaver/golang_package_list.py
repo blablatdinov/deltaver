@@ -49,7 +49,7 @@ class GolangPackageList(VersionList):
         """List representation."""
         return asyncio.run(self._async_as_list())
 
-    async def _async_as_list(self) -> Sequence[Package]:
+    async def _async_as_list(self) -> Sequence[Package]:  # noqa: WPS210
         """Async list representation with parallel requests."""
         async with httpx.AsyncClient() as client:
             response = await client.get('https://proxy.golang.org/{0}/@v/list'.format(self._name))
@@ -58,17 +58,16 @@ class GolangPackageList(VersionList):
                 ParsedVersion(ver)
                 for ver in response.text.splitlines()
             ]
-            versions = sorted(
-                [ver for ver in versions if ver.valid()],
-                key=lambda ver: ver.parse(),
-            )
             tasks = [
                 self._fetch_version_info(
                     client,
                     'https://proxy.golang.org/{0}/@v/{1}.info'.format(self._name, version.origin()),
                     version,
                 )
-                for version in versions
+                for version in sorted(
+                    [ver for ver in versions if ver.valid()],
+                    key=lambda ver: ver.parse(),
+                )
             ]
             packages = []
             for pkg in await asyncio.gather(*tasks, return_exceptions=True):
@@ -90,7 +89,7 @@ class GolangPackageList(VersionList):
         except httpx.HTTPError:
             return None
 
-    async def _inner(self, client, url, version) -> Package | None:
+    async def _inner(self, client: httpx.AsyncClient, url: str, version: ParsedVersion) -> Package | None:
         response = await client.get(url)
         if response.status_code == httpx.codes.NOT_FOUND:
             # Request to get the list of versions for the module:
