@@ -83,40 +83,48 @@ def test(current_dir: Path) -> None:
     assert got.returncode == 0, got.stderr or stdout
 
 
+def idfn(x):
+    return x[0]
+
+
 @pytest.mark.usefixtures('_tmp_directory')
-@pytest.mark.parametrize('version', [
-    ('attrs==23.1.0',),
-    (_version_from_lock('attrs'),),
-    ('attrs', '-U'),
+@pytest.mark.parametrize(
+    'version',
+    [
+        ('attrs==23.1.0',),
+        (_version_from_lock('attrs'),),
+        ('attrs', '-U'),
 
-    ('httpx==0.24.0',),
-    (_version_from_lock('httpx'),),
-    ('httpx', '-U'),
+        ('httpx==0.23.3',),
+        (_version_from_lock('httpx'),),
+        ('httpx', '-U'),
 
-    ('packaging==23.0',),
-    (_version_from_lock('packaging'),),
-    ('packaging', '-U'),
+        ('packaging==23.0',),
+        (_version_from_lock('packaging'),),
+        ('packaging', '-U'),
 
-    ('typer==0.9.0',),
-    (_version_from_lock('typer'),),
-    ('typer', '-U'),
+        ('typer==0.9.0',),
+        (_version_from_lock('typer'),),
+        ('typer', '-U'),
 
-    ('rich==13.0.0',),
-    (_version_from_lock('rich'),),
-    ('rich', '-U'),
+        ('rich==13.0.0',),
+        (_version_from_lock('rich'),),
+        ('rich', '-U'),
 
-    ('toml==0.10.2',),
-    (_version_from_lock('toml'),),
-    ('toml', '-U'),
+        ('toml==0.10.2',),
+        (_version_from_lock('toml'),),
+        ('toml', '-U'),
 
-    ('pytz==2024.2',),
-    (_version_from_lock('pytz'),),
-    ('pytz', '-U'),
+        ('pytz==2018.4',),
+        (_version_from_lock('pytz'),),
+        ('pytz', '-U'),
 
-    ('typing-extensions==4.9.0',),
-    (_version_from_lock('typing-extensions'),),
-    ('typing-extensions', '-U'),
-])
+        ('typing-extensions==4.9.0',),
+        (_version_from_lock('typing-extensions'),),
+        ('typing-extensions', '-U'),
+    ],
+    ids=lambda x: ' '.join(x),
+)
 def test_versions(current_dir: Path, version: tuple[str, ...]) -> None:
     """Test run command."""
     subprocess.run(['venv/bin/pip', 'install', *version], check=True)
