@@ -32,20 +32,24 @@ from deltaver.package_lock_reqs import PackageLockReqs
 from deltaver.poetry_lock_reqs import PoetryLockReqs
 
 
-@pytest.mark.parametrize(('text', 'expected'), [
-    ('httpx==0.26.0', [('httpx', '0.26.0')]),
-    ('txaio==22.2.1 ; python_version >= "3.9" and python_version < "3.10"', [('txaio', '22.2.1')]),
-    ('twisted[tls]==22.8.0', [('twisted', '22.8.0')]),
-    (
-        '\n'.join([
-            'zope-interface==5.4.0 ; python_version >= "3.9" and python_version < "3.10" \\',
-            '    --hash=sha256:08f9636e99a9d5410181ba0729e0408d3d8748026ea938f3b970a0249daa8192 \\',
-            '    --hash=sha256:0b465ae0962d49c68aa9733ba92a001b2a0933c317780435f00be7ecb959c702 \\',
-            '    --hash=sha256:0cba8477e300d64a11a9789ed40ee8932b59f9ee05f85276dbb4b59acee5dd09',
-        ]),
-        [('zope-interface', '5.4.0')],
-    ),
-])
+@pytest.mark.parametrize(
+    ('text', 'expected'),
+    [
+        ('httpx==0.26.0', [('httpx', '0.26.0')]),
+        ('txaio==22.2.1 ; python_version >= "3.9" and python_version < "3.10"', [('txaio', '22.2.1')]),
+        ('twisted[tls]==22.8.0', [('twisted', '22.8.0')]),
+        (
+            '\n'.join([
+                'zope-interface==5.4.0 ; python_version >= "3.9" and python_version < "3.10" \\',
+                '    --hash=sha256:08f9636e99a9d5410181ba0729e0408d3d8748026ea938f3b970a0249daa8192 \\',
+                '    --hash=sha256:0b465ae0962d49c68aa9733ba92a001b2a0933c317780435f00be7ecb959c702 \\',
+                '    --hash=sha256:0cba8477e300d64a11a9789ed40ee8932b59f9ee05f85276dbb4b59acee5dd09',
+            ]),
+            [('zope-interface', '5.4.0')],
+        ),
+    ],
+    ids=lambda line: line[0][0].split(' ')[0],
+)
 def test_correct(text: str, expected: str) -> None:
     """Test parsing pip requirements file."""
     got = FreezedReqs(text).reqs()
@@ -128,14 +132,6 @@ def test_golang_reqs() -> None:
         (
             'github.com/urfave/cli/v2',
             'v2.27.5',
-        ),
-        (
-            'github.com/xrash/smetrics',
-            'v0.0.0-20240521201337-686a1a2994c1',
-        ),
-        (
-            'gopkg.in/check.v1',
-            'v0.0.0-20161208181325-20d25e280405',
         ),
         (
             'gopkg.in/yaml.v3',

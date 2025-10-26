@@ -24,10 +24,13 @@
 
 from pathlib import Path
 
+import pytest
+
 from deltaver.entry import logic
 from deltaver.formats import Formats
 
 
+@pytest.mark.slow
 def test_mix_lock_integration() -> None:
     """Test integration with mix.lock file."""
     packages, sum_delta, max_delta = logic(

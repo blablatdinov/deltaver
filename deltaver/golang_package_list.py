@@ -62,19 +62,21 @@ class GolangPackageList(VersionList):
                 [ver for ver in versions if ver.valid()],
                 key=lambda ver: ver.parse(),
             )
-            tasks = []
-            for version in versions:
-                url = 'https://proxy.golang.org/{0}/@v/{1}.info'.format(self._name, version.origin())
-                task = self._fetch_version_info(client, url, version)
-                tasks.append(task)
-            results = await asyncio.gather(*tasks, return_exceptions=True)
+            tasks = [
+                self._fetch_version_info(
+                    client,
+                    'https://proxy.golang.org/{0}/@v/{1}.info'.format(self._name, version.origin()),
+                    version,
+                )
+                for version in versions
+            ]
             packages = []
-            for result in results:
-                if isinstance(result, Exception):
+            for pkg in await asyncio.gather(*tasks, return_exceptions=True):
+                if isinstance(pkg, BaseException):
                     continue
-                if result is not None:
-                    packages.append(result)
-            return [p for p in packages if not isinstance(p, BaseException)]
+                if pkg is not None:
+                    packages.append(pkg)
+            return packages
 
     async def _fetch_version_info(
         self,
@@ -88,7 +90,7 @@ class GolangPackageList(VersionList):
         except httpx.HTTPError:
             return None
 
-    async def _inner(self, client, url, version):
+    async def _inner(self, client, url, version) -> Package | None:
         response = await client.get(url)
         if response.status_code == httpx.codes.NOT_FOUND:
             # Request to get the list of versions for the module:
