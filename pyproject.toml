@@ -22,7 +22,7 @@
 
 [tool.poetry]
 name = "deltaver"
-version = "0.2.3"
+version = "1.0.0"
 description = ""
 packages = [
   {include = "deltaver"}
