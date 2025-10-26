@@ -59,11 +59,11 @@ class PypiPackageList(VersionList):
                 packages.append(FkPackage(
                     self._name,
                     version_num,
-                    datetime.datetime.strptime(release_info[0]['upload_time'], '%Y-%m-%dT%H:%M:%S').date(),
-                ))
-                # packages.append(PypiPackage(
-                #     self._name,
-                #     version_num,
-                #     self,
-                # ))
+                    (
+                        datetime.datetime
+                        .strptime(release_info[0]['upload_time'], '%Y-%m-%dT%H:%M:%S')
+                        .astimezone(tz=datetime.UTC))
+                        .date(),
+                    ),
+                )
         return packages
