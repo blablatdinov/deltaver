@@ -83,10 +83,6 @@ def test(current_dir: Path) -> None:
     assert got.returncode == 0, got.stderr or stdout
 
 
-def idfn(x):
-    return x[0]
-
-
 @pytest.mark.usefixtures('_tmp_directory')
 @pytest.mark.parametrize(
     'version',
