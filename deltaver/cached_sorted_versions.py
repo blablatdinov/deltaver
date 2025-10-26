@@ -24,18 +24,16 @@
 
 import datetime
 import json
+from collections.abc import Sequence
 from pathlib import Path
 from typing import final
-from collections.abc import Sequence
 
-from deltaver.package import Package
 import attrs
 from typing_extensions import override
 
-from deltaver.sorted_versions import SortedVersions
-from deltaver.version_delta import SortedVersionsList
-from deltaver.version_list import VersionList
 from deltaver.fk_package import FkPackage
+from deltaver.package import Package
+from deltaver.version_list import VersionList
 
 
 @final

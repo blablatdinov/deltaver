@@ -40,6 +40,7 @@ from rich.progress import track
 from rich.table import Table
 
 from deltaver.cached_package_list import CachedPackageList
+from deltaver.cached_sorted_versions import CachedSortedVersions
 from deltaver.config import CliInputConfig, Config, PyprojectConfig
 from deltaver.days_delta import DaysDelta
 from deltaver.excluded_reqs import ExcludedReqs
@@ -58,7 +59,6 @@ from deltaver.poetry_lock_reqs import PoetryLockReqs
 from deltaver.pypi_package_list import PypiPackageList
 from deltaver.sorted_package_list import SortedPackageList
 from deltaver.version_list import VersionList
-from deltaver.cached_sorted_versions import CachedSortedVersions
 
 app = typer.Typer()
 
