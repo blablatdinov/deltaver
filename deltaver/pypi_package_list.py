@@ -62,7 +62,7 @@ class PypiPackageList(VersionList):
                     (
                         datetime.datetime
                         .strptime(release_info[0]['upload_time'], '%Y-%m-%dT%H:%M:%S')
-                        .astimezone(tz=datetime.utc)
+                        .astimezone(tz=datetime.timezone.utc)
                         .date()
                     ),
                 ))
