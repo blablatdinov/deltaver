@@ -43,3 +43,8 @@ class TargetGreaterLastError(Exception):
 @final
 class InvalidVersionError(Exception):
     """Invalid version."""
+
+
+@final
+class ThresholdReachedError(Exception):
+    """Threshold Reached Error."""

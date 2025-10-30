@@ -163,6 +163,7 @@ def test_fail_on_max(current_dir: Path) -> None:
     )
 
     assert got.returncode == 1, (got.stderr or got.stdout).decode()
+    assert not 'Traceback' in got.stdout
 
 
 @pytest.mark.usefixtures('_tmp_directory')
