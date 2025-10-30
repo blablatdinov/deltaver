@@ -43,6 +43,7 @@ from deltaver.cached_package_list import CachedPackageList
 from deltaver.cached_sorted_versions import CachedSortedVersions
 from deltaver.config import CliInputConfig, Config, PyprojectConfig
 from deltaver.days_delta import DaysDelta
+from deltaver.exceptions import ThresholdReachedError
 from deltaver.excluded_reqs import ExcludedReqs
 from deltaver.file_not_foudn_safe_reqs import FileNotFoundSafeReqs
 from deltaver.filtered_package_list import FilteredPackageList
@@ -209,10 +210,10 @@ def cli(  # noqa: WPS210, WPS213. TODO: fix
     rich_print('Average delta: {0}'.format(average_delta))
     if config['fail_on_avg'] > -1 and float(average_delta) >= config['fail_on_avg']:  # noqa: WPS221, WPS333. TODO: fix
         rich_print('\n[red]Error: average delta greater than available[/red]')
-        raise typer.Exit(code=1)
+        raise ThresholdReachedError
     if config['fail_on_max'] > -1 and max_delta >= config['fail_on_max']:  # noqa: WPS333. TODO: fix
         rich_print('\n[red]Error: max delta greater than available[/red]')
-        raise typer.Exit(code=1)
+        raise ThresholdReachedError
 
 
 @app.command()
@@ -236,6 +237,8 @@ def main(
     """Python project designed to calculate the lag or delay in dependencies in terms of days."""
     try:
         cli(path_to_file, file_format, fail_on_average, fail_on_max, exclude_deps)
+    except ThresholdReachedError as err:
+        raise typer.Exit(1) from err
     except Exception as err:  # noqa: BLE001. Application entrypoint
         sys.stdout.write('\n'.join([
             'Deltaver fail with: "{0}"'.format(err),
