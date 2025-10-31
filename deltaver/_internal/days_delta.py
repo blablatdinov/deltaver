@@ -20,42 +20,46 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Unit test of delta."""
+"""Days delta."""
 
 import datetime
+from typing import final
 
-import pytest
+import attrs
+from rich import print as rich_print
+from typing_extensions import override
 
-from deltaver._internal.days_delta import DaysDelta
-from deltaver._internal.fk_package import FkPackage
-from deltaver._internal.fk_version_list import FkVersionList
+from deltaver._internal.delta import Delta
+from deltaver._internal.exceptions import InvalidVersionError
+from deltaver._internal.parsed_version import ParsedVersion
 from deltaver._internal.version_list import VersionList
 
 
-@pytest.fixture
-def packages() -> VersionList:
-    """Fake packages."""
-    return FkVersionList([
-        FkPackage(
-            'httpx',
-            '0.25.2',
-            datetime.date(2023, 11, 24),
-        ),
-        FkPackage(
-            'httpx',
-            '0.26.0',
-            datetime.date(2023, 12, 20),
-        ),
-    ])
+@final
+@attrs.define(frozen=True)
+class DaysDelta(Delta):
+    """Days delta."""
 
+    _version: str
+    _packages: VersionList
+    _today: datetime.date
 
-def test(packages: VersionList) -> None:
-    """Test DaysDelta class.
-
-    https://www.timeanddate.com/date/durationresult.html?d1=20&m1=12&y1=2023&d2=28&m2=6&y2=2024
-    """
-    assert DaysDelta(
-        '0.25.2',
-        packages,
-        datetime.date(2024, 6, 28),
-    ).days() == 191
+    @override
+    def days(self) -> int:
+        """Days of delta."""
+        flag = False
+        next_version_release_date = datetime.date.min
+        try:
+            target_version = ParsedVersion(self._version).parse()
+        except InvalidVersionError:
+            rich_print(f'[yellow]Version {self._version} can not been parsed')
+            return 0
+        for package in self._packages.as_list():
+            if flag:
+                next_version_release_date = package.release_date()
+                break
+            if package.version() == target_version:
+                flag = True
+        else:
+            return 0
+        return (self._today - next_version_release_date).days

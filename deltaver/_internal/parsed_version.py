@@ -1,6 +1,5 @@
 # The MIT License (MIT).
-#
-# Copyright (c) 2023-2025 Almaz Ilaletdinov <a.ilaletdinov@yandex.ru>
+# Copyright (c) 2018-2025 Almaz Ilaletdinov <a.ilaletdinov@yandex.ru>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,42 +19,40 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Unit test of delta."""
+"""Module for parsing version strings into semantic version objects."""
 
-import datetime
+from typing import final
 
-import pytest
+import attrs
+from packaging import version as packaging_version
 
-from deltaver._internal.days_delta import DaysDelta
-from deltaver._internal.fk_package import FkPackage
-from deltaver._internal.fk_version_list import FkVersionList
-from deltaver._internal.version_list import VersionList
+from deltaver._internal.exceptions import InvalidVersionError
 
 
-@pytest.fixture
-def packages() -> VersionList:
-    """Fake packages."""
-    return FkVersionList([
-        FkPackage(
-            'httpx',
-            '0.25.2',
-            datetime.date(2023, 11, 24),
-        ),
-        FkPackage(
-            'httpx',
-            '0.26.0',
-            datetime.date(2023, 12, 20),
-        ),
-    ])
+@final
+@attrs.define(frozen=True)
+class ParsedVersion:
+    """Parsed version."""
 
+    _version: str
 
-def test(packages: VersionList) -> None:
-    """Test DaysDelta class.
+    def origin(self) -> str:
+        """Original version."""
+        return self._version
 
-    https://www.timeanddate.com/date/durationresult.html?d1=20&m1=12&y1=2023&d2=28&m2=6&y2=2024
-    """
-    assert DaysDelta(
-        '0.25.2',
-        packages,
-        datetime.date(2024, 6, 28),
-    ).days() == 191
+    def valid(self) -> bool:
+        """Version valid."""
+        try:
+            self.parse()
+        except InvalidVersionError:
+            return False
+        else:
+            return True
+
+    def parse(self) -> packaging_version.Version:
+        """Parse version."""
+        origin = self._version.removeprefix('v')
+        try:
+            return packaging_version.parse(origin)
+        except packaging_version.InvalidVersion as err:
+            raise InvalidVersionError(self._version) from err

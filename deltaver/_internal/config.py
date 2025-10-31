@@ -20,42 +20,46 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Unit test of delta."""
+"""Config dict."""
 
-import datetime
+# noqa: FOC100. Data structures
 
-import pytest
+from __future__ import annotations
 
-from deltaver._internal.days_delta import DaysDelta
-from deltaver._internal.fk_package import FkPackage
-from deltaver._internal.fk_version_list import FkVersionList
-from deltaver._internal.version_list import VersionList
+from pathlib import Path
+from typing import TypedDict, final
 
-
-@pytest.fixture
-def packages() -> VersionList:
-    """Fake packages."""
-    return FkVersionList([
-        FkPackage(
-            'httpx',
-            '0.25.2',
-            datetime.date(2023, 11, 24),
-        ),
-        FkPackage(
-            'httpx',
-            '0.26.0',
-            datetime.date(2023, 12, 20),
-        ),
-    ])
+from deltaver._internal.formats import Formats
 
 
-def test(packages: VersionList) -> None:
-    """Test DaysDelta class.
+@final
+class CliInputConfig(TypedDict):
+    """Structure description for CLI input."""
 
-    https://www.timeanddate.com/date/durationresult.html?d1=20&m1=12&y1=2023&d2=28&m2=6&y2=2024
-    """
-    assert DaysDelta(
-        '0.25.2',
-        packages,
-        datetime.date(2024, 6, 28),
-    ).days() == 191
+    path_to_file: Path
+    file_format: Formats
+    excluded: list[str]
+    fail_on_avg: int | None
+    fail_on_max: int | None
+
+
+@final
+class PyprojectConfig(TypedDict):
+    """Structure description for pyproject input."""
+
+    path_to_file: Path | None
+    file_format: Formats | None
+    excluded: list[str]
+    fail_on_avg: int | None
+    fail_on_max: int | None
+
+
+@final
+class Config(TypedDict):
+    """Config dict."""
+
+    path_to_file: Path
+    file_format: Formats
+    excluded: list[str]
+    fail_on_avg: int
+    fail_on_max: int

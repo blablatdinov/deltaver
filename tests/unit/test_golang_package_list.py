@@ -29,8 +29,8 @@ import pytest
 from httpx import Response
 from respx.router import MockRouter
 
-from deltaver.fk_package import FkPackage
-from deltaver.golang_package_list import GolangPackageList
+from deltaver._internal.fk_package import FkPackage
+from deltaver._internal.golang_package_list import GolangPackageList
 
 
 @pytest.fixture

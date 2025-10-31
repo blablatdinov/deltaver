@@ -20,42 +20,28 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Unit test of delta."""
+"""Decrement delta."""
 
 import datetime
+from typing import final
 
-import pytest
+import attrs
+from typing_extensions import override
 
-from deltaver._internal.days_delta import DaysDelta
-from deltaver._internal.fk_package import FkPackage
-from deltaver._internal.fk_version_list import FkVersionList
-from deltaver._internal.version_list import VersionList
-
-
-@pytest.fixture
-def packages() -> VersionList:
-    """Fake packages."""
-    return FkVersionList([
-        FkPackage(
-            'httpx',
-            '0.25.2',
-            datetime.date(2023, 11, 24),
-        ),
-        FkPackage(
-            'httpx',
-            '0.26.0',
-            datetime.date(2023, 12, 20),
-        ),
-    ])
+from deltaver._internal.version_delta import VersionDelta
 
 
-def test(packages: VersionList) -> None:
-    """Test DaysDelta class.
+@final
+@attrs.define(frozen=True)
+class DecrDelta(VersionDelta):
+    """Decrement delta."""
 
-    https://www.timeanddate.com/date/durationresult.html?d1=20&m1=12&y1=2023&d2=28&m2=6&y2=2024
-    """
-    assert DaysDelta(
-        '0.25.2',
-        packages,
-        datetime.date(2024, 6, 28),
-    ).days() == 191
+    _origin: VersionDelta
+    _for_date: datetime.date
+
+    @override
+    def days(self) -> int:
+        """Delta in days."""
+        today = datetime.datetime.now(tz=datetime.timezone.utc).date()
+        recalculated_days = self._origin.days() - (today - self._for_date).days
+        return max(recalculated_days, 0)

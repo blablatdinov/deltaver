@@ -20,42 +20,29 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Unit test of delta."""
+"""Sorted package list."""
 
-import datetime
+from collections.abc import Sequence
+from typing import final
 
-import pytest
+import attrs
+from typing_extensions import override
 
-from deltaver._internal.days_delta import DaysDelta
-from deltaver._internal.fk_package import FkPackage
-from deltaver._internal.fk_version_list import FkVersionList
+from deltaver._internal.package import Package
 from deltaver._internal.version_list import VersionList
 
 
-@pytest.fixture
-def packages() -> VersionList:
-    """Fake packages."""
-    return FkVersionList([
-        FkPackage(
-            'httpx',
-            '0.25.2',
-            datetime.date(2023, 11, 24),
-        ),
-        FkPackage(
-            'httpx',
-            '0.26.0',
-            datetime.date(2023, 12, 20),
-        ),
-    ])
+@final
+@attrs.define(frozen=True)
+class SortedPackageList(VersionList):
+    """Sorted package list."""
 
+    _origin: VersionList
 
-def test(packages: VersionList) -> None:
-    """Test DaysDelta class.
-
-    https://www.timeanddate.com/date/durationresult.html?d1=20&m1=12&y1=2023&d2=28&m2=6&y2=2024
-    """
-    assert DaysDelta(
-        '0.25.2',
-        packages,
-        datetime.date(2024, 6, 28),
-    ).days() == 191
+    @override
+    def as_list(self) -> Sequence[Package]:
+        """List representation."""
+        return sorted(
+            self._origin.as_list(),
+            key=lambda pkg: pkg.version(),
+        )

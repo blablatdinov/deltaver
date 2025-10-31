@@ -20,42 +20,47 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Unit test of delta."""
+"""Hex package list."""
 
 import datetime
+from collections.abc import Sequence
+from contextlib import suppress
+from typing import final
 
-import pytest
+import attrs
+import httpx
+from packaging.version import InvalidVersion
+from packaging.version import parse as version_parse
+from typing_extensions import override
 
-from deltaver._internal.days_delta import DaysDelta
 from deltaver._internal.fk_package import FkPackage
-from deltaver._internal.fk_version_list import FkVersionList
+from deltaver._internal.package import Package
 from deltaver._internal.version_list import VersionList
 
 
-@pytest.fixture
-def packages() -> VersionList:
-    """Fake packages."""
-    return FkVersionList([
-        FkPackage(
-            'httpx',
-            '0.25.2',
-            datetime.date(2023, 11, 24),
-        ),
-        FkPackage(
-            'httpx',
-            '0.26.0',
-            datetime.date(2023, 12, 20),
-        ),
-    ])
+@final
+@attrs.define(frozen=True)
+class HexPackageList(VersionList):
+    """Hex package list."""
 
+    _name: str
 
-def test(packages: VersionList) -> None:
-    """Test DaysDelta class.
-
-    https://www.timeanddate.com/date/durationresult.html?d1=20&m1=12&y1=2023&d2=28&m2=6&y2=2024
-    """
-    assert DaysDelta(
-        '0.25.2',
-        packages,
-        datetime.date(2024, 6, 28),
-    ).days() == 191
+    @override
+    def as_list(self) -> Sequence[Package]:
+        """List representation."""
+        response = httpx.get('https://hex.pm/api/packages/{0}'.format(self._name))
+        response.raise_for_status()
+        releases = response.json().get('releases', [])
+        packages = []
+        for release in releases:
+            version_num = release.get('version')
+            if not version_num:
+                continue
+            with suppress(InvalidVersion):
+                version_parse(version_num)
+                packages.append(FkPackage(
+                    self._name,
+                    version_num,
+                    datetime.datetime.strptime(release.get('inserted_at', ''), '%Y-%m-%dT%H:%M:%S.%f%z').date(),
+                ))
+        return packages

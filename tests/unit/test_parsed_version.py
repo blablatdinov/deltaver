@@ -24,7 +24,7 @@
 
 import pytest
 
-from deltaver.parsed_version import ParsedVersion
+from deltaver._internal.parsed_version import ParsedVersion
 
 
 @pytest.mark.parametrize('version', [

@@ -39,27 +39,27 @@ from rich.console import Console
 from rich.progress import track
 from rich.table import Table
 
-from deltaver.cached_package_list import CachedPackageList
-from deltaver.cached_sorted_versions import CachedSortedVersions
-from deltaver.config import CliInputConfig, Config, PyprojectConfig
-from deltaver.days_delta import DaysDelta
-from deltaver.exceptions import ThresholdReachedError
-from deltaver.excluded_reqs import ExcludedReqs
-from deltaver.file_not_foudn_safe_reqs import FileNotFoundSafeReqs
-from deltaver.filtered_package_list import FilteredPackageList
-from deltaver.formats import Formats
-from deltaver.freezed_reqs import FreezedReqs
-from deltaver.golang_package_list import GolangPackageList
-from deltaver.golang_reqs import GolangReqs
-from deltaver.hex_package_list import HexPackageList
-from deltaver.mix_lock_reqs import MixLockReqs
-from deltaver.npmjs_package_list import NpmjsPackageList
-from deltaver.package_lock_reqs import PackageLockReqs
-from deltaver.parsed_reqs import ParsedReqs
-from deltaver.poetry_lock_reqs import PoetryLockReqs
-from deltaver.pypi_package_list import PypiPackageList
-from deltaver.sorted_package_list import SortedPackageList
-from deltaver.version_list import VersionList
+from deltaver._internal.cached_package_list import CachedPackageList
+from deltaver._internal.cached_sorted_versions import CachedSortedVersions
+from deltaver._internal.config import CliInputConfig, Config, PyprojectConfig
+from deltaver._internal.days_delta import DaysDelta
+from deltaver._internal.exceptions import ThresholdReachedError
+from deltaver._internal.excluded_reqs import ExcludedReqs
+from deltaver._internal.file_not_foudn_safe_reqs import FileNotFoundSafeReqs
+from deltaver._internal.filtered_package_list import FilteredPackageList
+from deltaver._internal.formats import Formats
+from deltaver._internal.freezed_reqs import FreezedReqs
+from deltaver._internal.golang_package_list import GolangPackageList
+from deltaver._internal.golang_reqs import GolangReqs
+from deltaver._internal.hex_package_list import HexPackageList
+from deltaver._internal.mix_lock_reqs import MixLockReqs
+from deltaver._internal.npmjs_package_list import NpmjsPackageList
+from deltaver._internal.package_lock_reqs import PackageLockReqs
+from deltaver._internal.parsed_reqs import ParsedReqs
+from deltaver._internal.poetry_lock_reqs import PoetryLockReqs
+from deltaver._internal.pypi_package_list import PypiPackageList
+from deltaver._internal.sorted_package_list import SortedPackageList
+from deltaver._internal.version_list import VersionList
 
 app = typer.Typer()
 

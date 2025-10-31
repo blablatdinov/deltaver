@@ -20,42 +20,51 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Unit test of delta."""
+"""Pypi package list."""
 
 import datetime
+from typing import final
 
-import pytest
+import attrs
+import httpx
+import pytz
+from packaging.version import Version
+from typing_extensions import override
 
-from deltaver._internal.days_delta import DaysDelta
-from deltaver._internal.fk_package import FkPackage
-from deltaver._internal.fk_version_list import FkVersionList
+from deltaver._internal.package import Package
+from deltaver._internal.parsed_version import ParsedVersion
 from deltaver._internal.version_list import VersionList
 
 
-@pytest.fixture
-def packages() -> VersionList:
-    """Fake packages."""
-    return FkVersionList([
-        FkPackage(
-            'httpx',
-            '0.25.2',
-            datetime.date(2023, 11, 24),
-        ),
-        FkPackage(
-            'httpx',
-            '0.26.0',
-            datetime.date(2023, 12, 20),
-        ),
-    ])
+@final
+@attrs.define(frozen=True)
+class PypiPackage(Package):
+    """Pypi package list."""
 
+    _name: str
+    _version: str
+    _version_list: VersionList
 
-def test(packages: VersionList) -> None:
-    """Test DaysDelta class.
+    @override
+    def version(self) -> Version:
+        """Version."""
+        return ParsedVersion(self._version).parse()
 
-    https://www.timeanddate.com/date/durationresult.html?d1=20&m1=12&y1=2023&d2=28&m2=6&y2=2024
-    """
-    assert DaysDelta(
-        '0.25.2',
-        packages,
-        datetime.date(2024, 6, 28),
-    ).days() == 191
+    @override
+    def name(self) -> str:
+        """Name."""
+        return self._name
+
+    @override
+    def release_date(self) -> datetime.date:
+        """Release date."""
+        response = httpx.get('https://pypi.org/pypi/{0}/json'.format(self._name))
+        releases = {
+            str(ParsedVersion(ver).parse()): pkg_info
+            for ver, pkg_info in response.json()['releases'].items()
+        }
+        response.raise_for_status()
+        return datetime.datetime.strptime(
+            releases[str(self.version())][0]['upload_time'],
+            '%Y-%m-%dT%H:%M:%S',
+        ).astimezone(pytz.UTC).date()

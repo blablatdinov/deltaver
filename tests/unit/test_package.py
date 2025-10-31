@@ -29,12 +29,12 @@ import httpx
 import pytest
 import respx
 
-from deltaver.filtered_package_list import FilteredPackageList
-from deltaver.fk_package import FkPackage
-from deltaver.fk_version_list import FkVersionList
-from deltaver.pypi_package import PypiPackage
-from deltaver.pypi_package_list import PypiPackageList
-from deltaver.sorted_package_list import SortedPackageList
+from deltaver._internal.filtered_package_list import FilteredPackageList
+from deltaver._internal.fk_package import FkPackage
+from deltaver._internal.fk_version_list import FkVersionList
+from deltaver._internal.pypi_package import PypiPackage
+from deltaver._internal.pypi_package_list import PypiPackageList
+from deltaver._internal.sorted_package_list import SortedPackageList
 
 
 @pytest.fixture
