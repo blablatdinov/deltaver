@@ -25,8 +25,8 @@
 from pathlib import Path
 
 from deltaver._internal.config import PyprojectConfig
-from deltaver.entry import config_ctor, config_from_cli
 from deltaver._internal.formats import Formats
+from deltaver.entry import config_ctor, config_from_cli
 
 
 def test_cli_only() -> None:

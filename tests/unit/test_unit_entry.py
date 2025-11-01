@@ -31,9 +31,9 @@ import pytest
 import respx
 from time_machine import TimeMachineFixture
 
-from deltaver.entry import logic
 from deltaver._internal.formats import Formats
 from deltaver._internal.package_lock_reqs import PackageLockReqs
+from deltaver.entry import logic
 
 
 @pytest.fixture
@@ -63,7 +63,8 @@ def _mock_npmjs(respx_mock: respx.router.MockRouter, tmp_path: Path) -> None:
 
 @pytest.mark.usefixtures('_mock_pypi')
 @pytest.mark.slow  # TODO: optimize
-def test(time_machine: TimeMachineFixture) -> None:  # noqa: WPS210. TODO: fix
+# TODO: fix
+def test(time_machine: TimeMachineFixture) -> None:  # noqa: WPS210
     """Test logic function."""
     time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
     packages, sum_delta, max_delta = logic(
@@ -93,7 +94,8 @@ def test(time_machine: TimeMachineFixture) -> None:  # noqa: WPS210. TODO: fix
 @pytest.mark.usefixtures('_mock_pypi')
 @respx.mock(assert_all_mocked=False)
 @pytest.mark.slow  # TODO: optimize
-def test_excluded(time_machine: TimeMachineFixture) -> None:  # noqa: WPS210. TODO: fix
+# TODO: fix
+def test_excluded(time_machine: TimeMachineFixture) -> None:  # noqa: WPS210
     """Test excluded param."""
     time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
     packages, sum_delta, max_delta = logic(
@@ -120,7 +122,8 @@ def test_excluded(time_machine: TimeMachineFixture) -> None:  # noqa: WPS210. TO
 
 @pytest.mark.usefixtures('_mock_npmjs')
 @pytest.mark.slow
-def test_package_lock(time_machine: TimeMachineFixture) -> None:  # noqa: WPS210. TODO
+# TODO: fix
+def test_package_lock(time_machine: TimeMachineFixture) -> None:  # noqa: WPS210
     """Test npmjs."""
     time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
     packages, sum_delta, max_delta = logic(

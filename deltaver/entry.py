@@ -20,8 +20,6 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-# flake8: noqa: WPS226. Found string literal over-use
-
 """Python project designed to calculate the lag or delay in dependencies in terms of days."""
 
 import datetime
@@ -118,7 +116,8 @@ def config_ctor(
     return config
 
 
-def logic(  # noqa: WPS210, WPS234. TODO: fix
+# TODO: fix
+def logic(  # noqa: WPS210, WPS234
     requirements_file_content: str,
     excluded_reqs: list[str],
     file_format: Formats,
@@ -170,7 +169,8 @@ def logic(  # noqa: WPS210, WPS234. TODO: fix
     return packages, sum_delta, max_delta
 
 
-def cli(  # noqa: WPS210, WPS213. TODO: fix
+# TODO: fix
+def cli(  # noqa: WPS210, WPS213
     path_to_file: Path,
     file_format: Formats,
     fail_on_average: int,
@@ -208,38 +208,42 @@ def cli(  # noqa: WPS210, WPS213. TODO: fix
         average_delta = '0'
     rich_print('Max delta: {0}'.format(max_delta))
     rich_print('Average delta: {0}'.format(average_delta))
-    if config['fail_on_avg'] > -1 and float(average_delta) >= config['fail_on_avg']:  # noqa: WPS221, WPS333. TODO: fix
+    # TODO: fix
+    if config['fail_on_avg'] > -1 and float(average_delta) >= config['fail_on_avg']:  # noqa: WPS221, WPS333
         rich_print('\n[red]Error: average delta greater than available[/red]')
         raise ThresholdReachedError
-    if config['fail_on_max'] > -1 and max_delta >= config['fail_on_max']:  # noqa: WPS333. TODO: fix
+    # TODO: fix
+    if config['fail_on_max'] > -1 and max_delta >= config['fail_on_max']:  # noqa: WPS333
         rich_print('\n[red]Error: max delta greater than available[/red]')
         raise ThresholdReachedError
 
 
 @app.command()
 def main(
-    path_to_file: Path = typer.Argument(help='\n\n'.join([  # noqa: B008, WPS404. Typer API
+    # disable lint because Typer API
+    path_to_file: Path = typer.Argument(help='\n\n'.join([  # noqa: B008, WPS404
         'Path to file which specified project dependencies.',
         'Examples:',
         ' - requirements.txt',
         ' - ./poetry.lock',
         ' - /home/user/code/deltaver/poetry.lock',
     ])),
-    file_format: Formats = typer.Option(  # noqa: B008, WPS404. Typer API
+    file_format: Formats = typer.Option(  # noqa: B008, WPS404
         Formats.default.value,
         '--format',
         help='Dependencies file format (default: "pip-freeze")',
     ),
     fail_on_average: Annotated[int, typer.Option('--fail-on-avg')] = -1,
     fail_on_max: Annotated[int, typer.Option('--fail-on-max')] = -1,
-    exclude_deps: Annotated[list[str], typer.Option('--exclude')] = [],  # noqa: B006, WPS404. Typer API
+    exclude_deps: Annotated[list[str], typer.Option('--exclude')] = [],  # noqa: B006, WPS404
 ) -> None:
     """Python project designed to calculate the lag or delay in dependencies in terms of days."""
     try:
         cli(path_to_file, file_format, fail_on_average, fail_on_max, exclude_deps)
     except ThresholdReachedError as err:
         raise typer.Exit(1) from err
-    except Exception as err:  # noqa: BLE001. Application entrypoint
+    # Application entrypoint
+    except Exception as err:  # noqa: BLE001
         sys.stdout.write('\n'.join([
             'Deltaver fail with: "{0}"'.format(err),
             'Please submit it to https://github.com/blablatdinov/deltaver/issues',

@@ -20,8 +20,6 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-# flake8: noqa: WPS202. TODO
-
 """Test version delta."""
 
 import datetime
@@ -32,6 +30,8 @@ from shutil import copyfile
 
 import httpx
 import pytest
+from deltaver._internal.pypi_version_delta import PypiVersionDelta
+from deltaver._internal.pypi_versions_sorted_by_semver import PypiVersionsSortedBySemver
 from httpx import Response
 from respx.router import MockRouter
 from time_machine import TimeMachineFixture
@@ -42,8 +42,6 @@ from deltaver._internal.exceptions import TargetGreaterLastError
 from deltaver._internal.fk_version_delta import FkVersionDelta
 from deltaver._internal.npmjs_versions_sorted_by_semver import NpmjsVersionsSortedBySemver
 from deltaver._internal.pypi_package_list import PypiPackageList
-from deltaver._internal.pypi_version_delta import PypiVersionDelta
-from deltaver._internal.pypi_versions_sorted_by_semver import PypiVersionsSortedBySemver
 from deltaver._internal.versions_sorted_by_date import VersionsSortedByDate
 
 
