@@ -26,10 +26,10 @@ from pathlib import Path
 
 import pytest
 
-from deltaver.freezed_reqs import FreezedReqs
-from deltaver.golang_reqs import GolangReqs
-from deltaver.package_lock_reqs import PackageLockReqs
-from deltaver.poetry_lock_reqs import PoetryLockReqs
+from deltaver._internal.freezed_reqs import FreezedReqs
+from deltaver._internal.golang_reqs import GolangReqs
+from deltaver._internal.package_lock_reqs import PackageLockReqs
+from deltaver._internal.poetry_lock_reqs import PoetryLockReqs
 
 
 @pytest.mark.parametrize(

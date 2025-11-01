@@ -36,15 +36,15 @@ from httpx import Response
 from respx.router import MockRouter
 from time_machine import TimeMachineFixture
 
-from deltaver.cached_sorted_versions import CachedSortedVersions
-from deltaver.decr_delta import DecrDelta
-from deltaver.exceptions import TargetGreaterLastError
-from deltaver.fk_version_delta import FkVersionDelta
-from deltaver.npmjs_versions_sorted_by_semver import NpmjsVersionsSortedBySemver
-from deltaver.pypi_package_list import PypiPackageList
-from deltaver.pypi_version_delta import PypiVersionDelta
-from deltaver.pypi_versions_sorted_by_semver import PypiVersionsSortedBySemver
-from deltaver.versions_sorted_by_date import VersionsSortedByDate
+from deltaver._internal.cached_sorted_versions import CachedSortedVersions
+from deltaver._internal.decr_delta import DecrDelta
+from deltaver._internal.exceptions import TargetGreaterLastError
+from deltaver._internal.fk_version_delta import FkVersionDelta
+from deltaver._internal.npmjs_versions_sorted_by_semver import NpmjsVersionsSortedBySemver
+from deltaver._internal.pypi_package_list import PypiPackageList
+from deltaver._internal.pypi_version_delta import PypiVersionDelta
+from deltaver._internal.pypi_versions_sorted_by_semver import PypiVersionsSortedBySemver
+from deltaver._internal.versions_sorted_by_date import VersionsSortedByDate
 
 
 @pytest.fixture

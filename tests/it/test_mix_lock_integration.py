@@ -27,7 +27,7 @@ from pathlib import Path
 import pytest
 
 from deltaver.entry import logic
-from deltaver.formats import Formats
+from deltaver._internal.formats import Formats
 
 
 @pytest.mark.slow

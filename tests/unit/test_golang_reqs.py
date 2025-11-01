@@ -22,7 +22,7 @@
 
 """Test GolangReqs."""
 
-from deltaver.golang_reqs import GolangReqs
+from deltaver._internal.golang_reqs import GolangReqs
 
 
 def test_version_number() -> None:

@@ -20,42 +20,30 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Unit test of delta."""
+"""Parsed mix.lock requirements file."""
 
-import datetime
+import re
+from typing import final
 
-import pytest
+import attrs
+from typing_extensions import override
 
-from deltaver._internal.days_delta import DaysDelta
-from deltaver._internal.fk_package import FkPackage
-from deltaver._internal.fk_version_list import FkVersionList
-from deltaver._internal.version_list import VersionList
-
-
-@pytest.fixture
-def packages() -> VersionList:
-    """Fake packages."""
-    return FkVersionList([
-        FkPackage(
-            'httpx',
-            '0.25.2',
-            datetime.date(2023, 11, 24),
-        ),
-        FkPackage(
-            'httpx',
-            '0.26.0',
-            datetime.date(2023, 12, 20),
-        ),
-    ])
+from deltaver._internal.parsed_reqs import ParsedReqs
 
 
-def test(packages: VersionList) -> None:
-    """Test DaysDelta class.
+@final
+@attrs.define(frozen=True)
+class MixLockReqs(ParsedReqs):
+    """Parsed mix.lock requirements file."""
 
-    https://www.timeanddate.com/date/durationresult.html?d1=20&m1=12&y1=2023&d2=28&m2=6&y2=2024
-    """
-    assert DaysDelta(
-        '0.25.2',
-        packages,
-        datetime.date(2024, 6, 28),
-    ).days() == 191
+    _requirements_file_content: str
+
+    @override
+    def reqs(self) -> list[tuple[str, str]]:
+        """Parsed mix.lock requirements file."""
+        dependencies = []
+        pattern = r'"([^"]+)":\s*\{:hex,\s*:[^,]+,\s*"([^"]+)"'
+        matches = re.findall(pattern, self._requirements_file_content)
+        for package_name, version in matches:
+            dependencies.append((package_name, version))
+        return dependencies

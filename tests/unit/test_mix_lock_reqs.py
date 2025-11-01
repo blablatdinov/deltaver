@@ -23,7 +23,7 @@
 """Test mix.lock requirements file."""
 
 
-from deltaver.mix_lock_reqs import MixLockReqs
+from deltaver._internal.mix_lock_reqs import MixLockReqs
 
 
 def test_mix_lock_reqs() -> None:
