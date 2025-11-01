@@ -104,6 +104,7 @@ ignore = [
   "PLR630",  # We disrespect staticmethods
   "TC001",   # Move application import `deltaver._internal.parsed_reqs.ParsedReqs` into a type-checking block
 ]
+external = [ "WPS", "PEO" ]
 
 [tool.ruff.lint.flake8-quotes]
 docstring-quotes = "double"

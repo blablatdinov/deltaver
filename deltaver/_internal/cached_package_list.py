@@ -34,7 +34,8 @@ from deltaver._internal.version_list import VersionList
 
 @final
 @attrs.define
-class CachedPackageList(VersionList):  # noqa: PEO200. Class for caching
+# Class for caching
+class CachedPackageList(VersionList):  # noqa: PEO200
     """Cached packages list."""
 
     _origin: VersionList

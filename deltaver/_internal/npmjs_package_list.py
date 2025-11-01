@@ -46,7 +46,8 @@ class NpmjsPackageList(VersionList):
     _name: str
 
     @override
-    def as_list(self) -> Sequence[Package]:  # noqa: WPS210. TODO: minimize variables
+    # TODO: minimize variables
+    def as_list(self) -> Sequence[Package]:  # noqa: WPS210
         """List representation."""
         response = httpx.get(httpx.URL('https://registry.npmjs.org').join(self._name))
         response.raise_for_status()

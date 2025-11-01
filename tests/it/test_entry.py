@@ -45,7 +45,6 @@ def current_dir() -> Path:
     return Path().absolute()
 
 
-# flake8: noqa: S603, S607. Not a production code
 @pytest.fixture(scope='module')
 def _tmp_directory(tmpdir_factory: TempdirFactory, current_dir: str) -> Generator[None, None, None]:
     """Temporary directory for test."""

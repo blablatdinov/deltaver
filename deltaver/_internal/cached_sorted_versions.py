@@ -45,7 +45,8 @@ class CachedSortedVersions(VersionList):
     _package_name: str
 
     @override
-    def as_list(self) -> Sequence[Package]:  # noqa: WPS210. Simplify later
+    # TODO: fix
+    def as_list(self) -> Sequence[Package]:  # noqa: WPS210
         """Sorted versions list."""
         cache_dir = Path('.deltaver_cache')
         (cache_dir / self._package_name).mkdir(exist_ok=True, parents=True)
