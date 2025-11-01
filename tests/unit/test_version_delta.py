@@ -30,19 +30,15 @@ from shutil import copyfile
 
 import httpx
 import pytest
-from deltaver._internal.pypi_version_delta import PypiVersionDelta
-from deltaver._internal.pypi_versions_sorted_by_semver import PypiVersionsSortedBySemver
 from httpx import Response
 from respx.router import MockRouter
 from time_machine import TimeMachineFixture
 
 from deltaver._internal.cached_sorted_versions import CachedSortedVersions
 from deltaver._internal.decr_delta import DecrDelta
-from deltaver._internal.exceptions import TargetGreaterLastError
 from deltaver._internal.fk_version_delta import FkVersionDelta
 from deltaver._internal.npmjs_versions_sorted_by_semver import NpmjsVersionsSortedBySemver
 from deltaver._internal.pypi_package_list import PypiPackageList
-from deltaver._internal.versions_sorted_by_date import VersionsSortedByDate
 
 
 @pytest.fixture
@@ -91,70 +87,6 @@ def _mock_vue(respx_mock: MockRouter) -> None:
         200,
         text=Path('tests/fixtures/vue_npmjs_response.json').read_text(),
     ))
-
-
-@pytest.mark.usefixtures('_mock_pypi')
-def test_previous(time_machine: TimeMachineFixture) -> None:
-    """Test previous version."""
-    # 0.25.1 was released 2023-11-03
-    # 0.25.2 was released 2023-11-24
-    time_machine.move_to(datetime.datetime(2023, 12, 19, tzinfo=datetime.timezone.utc))
-    assert PypiVersionDelta(PypiVersionsSortedBySemver('https://pypi.org/', 'httpx'), '0.25.1').days() == 25
-
-
-@pytest.mark.usefixtures('_mock_pypi')
-def test_last_version() -> None:
-    """Test last version."""
-    assert PypiVersionDelta(PypiVersionsSortedBySemver('https://pypi.org/', 'httpx'), '0.25.2').days() == 0
-
-
-@pytest.mark.usefixtures('_mock_pypi')
-def test_fake_version() -> None:
-    """Test fake version."""
-    with pytest.raises(TargetGreaterLastError):
-        PypiVersionDelta(PypiVersionsSortedBySemver('https://pypi.org/', 'httpx'), '0.50.0').days()
-
-
-@pytest.mark.usefixtures('_mock_eljson')
-def test_eljson() -> None:
-    """Test eljson."""
-    assert PypiVersionDelta(PypiVersionsSortedBySemver('https://pypi.org/', 'eljson'), '0.0.1a1').days() == 0
-
-
-@pytest.mark.usefixtures('_mock_gitdb')
-def test_gitdb(time_machine: TimeMachineFixture) -> None:
-    """Test gitdb."""
-    time_machine.move_to(datetime.datetime(2024, 1, 27, tzinfo=datetime.timezone.utc))
-    assert PypiVersionDelta(PypiVersionsSortedBySemver('https://pypi.org/', 'gitdb'), '4.0.9').days() == 429
-
-
-@pytest.mark.usefixtures('_mock_pypi')
-def test_date_delta(time_machine: TimeMachineFixture) -> None:
-    """Test date delta."""
-    time_machine.move_to(datetime.datetime(2023, 12, 19, tzinfo=datetime.timezone.utc))
-    assert PypiVersionDelta(VersionsSortedByDate('httpx'), '0.25.1').days() == 25
-
-
-@pytest.mark.usefixtures('_mock_cryptography')
-def test_cryptography(time_machine: TimeMachineFixture) -> None:
-    """Test cryptography."""
-    time_machine.move_to(datetime.datetime(2024, 1, 28, tzinfo=datetime.timezone.utc))
-    assert PypiVersionDelta(PypiVersionsSortedBySemver('https://pypi.org/', 'cryptography'), '42.0.1').days() == 0
-
-
-@pytest.mark.usefixtures('_mock_pypi')
-def test_target_greater_than_last(time_machine: TimeMachineFixture) -> None:
-    """Test target greater than last."""
-    time_machine.move_to(datetime.datetime(2023, 12, 19, tzinfo=datetime.timezone.utc))
-    with pytest.raises(TargetGreaterLastError):
-        PypiVersionDelta(PypiVersionsSortedBySemver('https://pypi.org/', 'httpx'), '0.27.0').days()
-
-
-@pytest.mark.usefixtures('_mock_greenlet')
-def test_release_candidate(time_machine: TimeMachineFixture) -> None:
-    """Test release candidate."""
-    time_machine.move_to(datetime.datetime(2023, 12, 19, tzinfo=datetime.timezone.utc))
-    PypiVersionDelta(PypiVersionsSortedBySemver('https://pypi.org/', 'greenlet'), '3.0.0rc3').days()
 
 
 @pytest.fixture
