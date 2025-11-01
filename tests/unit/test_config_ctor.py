@@ -25,7 +25,7 @@
 from pathlib import Path
 
 from deltaver._internal.config import PyprojectConfig
-from deltaver._internal import config_ctor, config_from_cli
+from deltaver.entry import config_ctor, config_from_cli
 from deltaver._internal.formats import Formats
 
 

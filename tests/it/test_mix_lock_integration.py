@@ -26,7 +26,7 @@ from pathlib import Path
 
 import pytest
 
-from deltaver._internal import logic
+from deltaver.entry import logic
 from deltaver._internal.formats import Formats
 
 

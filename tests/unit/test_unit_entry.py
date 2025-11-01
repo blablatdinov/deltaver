@@ -31,7 +31,7 @@ import pytest
 import respx
 from time_machine import TimeMachineFixture
 
-from deltaver._internal import logic
+from deltaver.entry import logic
 from deltaver._internal.formats import Formats
 from deltaver._internal.package_lock_reqs import PackageLockReqs
 
