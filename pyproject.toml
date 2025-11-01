@@ -102,6 +102,7 @@ ignore = [
   "UP004",   # Class `PrayerReaction` inherits from `object`
   "TD",      # "todo" formats
   "PLR630",  # We disrespect staticmethods
+  "TC001",   # Move application import `deltaver._internal.parsed_reqs.ParsedReqs` into a type-checking block
 ]
 
 [tool.ruff.lint.flake8-quotes]
