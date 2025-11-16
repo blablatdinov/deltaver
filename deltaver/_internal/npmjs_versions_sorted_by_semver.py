@@ -44,7 +44,8 @@ class NpmjsVersionsSortedBySemver(SortedVersions):
     _package_name: str
 
     @override
-    def fetch(self) -> SortedVersionsList:  # noqa: WPS210, WPS210. TODO
+    # TODO: fix
+    def fetch(self) -> SortedVersionsList:  # noqa: WPS210, WPS210
         """Sorted versions list."""
         response = httpx.get(
             httpx.URL(self._artifactory_domain).join(self._package_name),
