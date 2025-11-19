@@ -183,19 +183,21 @@ toml = ["tomli ; python_full_version <= \"3.11.0a6\""]
 
 [[package]]
 name = "eo-styleguide"
-version = "0.1.0"
+version = "0.1.1"
 description = "Pyeo is an advanced static analysis tool tailored specifically to enforce the principles advocated by Elegant Objects (elegantobjects.org) in Python projects. It serves as a quality control instrument to ensure that your Python code adheres to the core tenets of elegance, simplicity, and maintainability."
 optional = false
-python-versions = "<4.0,>=3.9"
+python-versions = "<4.0,>=3.10"
 groups = ["dev"]
 files = [
-    {file = "eo_styleguide-0.1.0-py3-none-any.whl", hash = "sha256:9616b7dacfe68cc61b27e346d3f3f8b90fd7a86df1539b717734740de5f8d3ed"},
-    {file = "eo_styleguide-0.1.0.tar.gz", hash = "sha256:ced0a8377cb8ea54ee1e237b78abd969cfe2ed3b56dffb207ec60a359973083d"},
+    {file = "eo_styleguide-0.1.1-py3-none-any.whl", hash = "sha256:96760b1f3727b151ee55cce514d286478ff4468d906b1f11b2b0c593691173a0"},
+    {file = "eo_styleguide-0.1.1.tar.gz", hash = "sha256:8c681325a7c2a4f7f8ee2d41ba5f06fff93cfaa23698d26de52f2b3a5c2bd2a8"},
 ]
 
 [package.dependencies]
 flake8 = ">=7.1,<8.0"
 flake8-final = "*"
+flake8-no-private-methods = "*"
+flake8-one-class = "*"
 flake8-override = "*"
 
 [[package]]
@@ -248,6 +250,21 @@ files = [
 
 [package.dependencies]
 flake8 = ">=7.1,<8.0"
+
+[[package]]
+name = "flake8-no-private-methods"
+version = "0.0.1"
+description = "This is how python package should look like!"
+optional = false
+python-versions = "<4.0,>=3.9"
+groups = ["dev"]
+files = [
+    {file = "flake8_no_private_methods-0.0.1-py3-none-any.whl", hash = "sha256:224bccd71b245b0069c694b95d267aede04eb757614b2ecd644fc5418e3f10c3"},
+    {file = "flake8_no_private_methods-0.0.1.tar.gz", hash = "sha256:7cf9bbd191a879e3ebd9654f0eb97f04a02a3da60754e545320008bcc4f73d64"},
+]
+
+[package.dependencies]
+flake8 = ">=5.0.0"
 
 [[package]]
 name = "flake8-one-class"
@@ -1067,4 +1084,4 @@ tomli = {version = ">=1.1.0", markers = "python_version < \"3.11\""}
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "299732e7d9d7a66d5fa5d0c2a6c7a9a7a115d8813e320a66028629325642e875"
+content-hash = "c7f052731ec3e93b2c974e3fc61c6f361a19f83367a11ac20bcd2db207cfe0c5"
