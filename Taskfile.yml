@@ -2,11 +2,17 @@
 # SPDX-License-Identifier: MIT
 ---
 version: 3
+
 tasks:
+
+  rs-run:
+    cmds:
+      - cargo run
 
   fmt:
     cmds:
       - poetry run ruff check deltaver tests --fix --fix-only
+      - cargo fmt --all
 
   lint:
     cmds:
