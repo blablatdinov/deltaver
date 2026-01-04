@@ -2,7 +2,12 @@
 # SPDX-License-Identifier: MIT
 ---
 version: 3
+
 tasks:
+
+  rs-run:
+    cmds:
+      - cargo run
 
   fmt:
     cmds:

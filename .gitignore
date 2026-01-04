@@ -230,3 +230,14 @@ tags
 # End of https://www.toptal.com/developers/gitignore/api/python,macos,vim
 
 .deltaver_cache
+
+# Added by cargo
+
+/target
+
+
+# Added by cargo
+#
+# already existing elements were commented out
+
+#/target
