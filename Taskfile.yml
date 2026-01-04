@@ -12,6 +12,7 @@ tasks:
   fmt:
     cmds:
       - poetry run ruff check deltaver tests --fix --fix-only
+      - cargo fmt --all
 
   lint:
     cmds:

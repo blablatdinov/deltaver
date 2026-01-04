@@ -2,9 +2,7 @@ use deltaver::cli;
 
 fn main() {
     match cli::run() {
-        Ok(()) => {
-
-        },
+        Ok(()) => {}
         Err(err) => {
             eprintln!("Error: {}", err);
             for cause in err.chain().skip(1) {

@@ -1,8 +1,8 @@
+use anyhow::{Context, Result};
 use std::env;
 use std::fs;
-use anyhow::{Context, Result};
 
-use crate::parsers::{RequirementsParser, Parser};
+use crate::parsers::{Parser, RequirementsParser};
 
 pub fn run() -> Result<()> {
     let args: Vec<String> = env::args().collect();

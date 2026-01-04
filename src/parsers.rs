@@ -16,7 +16,9 @@ impl Parser for RequirementsParser {
         for line in content.lines() {
             if let Some((name, version)) = basic::parse_dependency_line(line) {
                 let package = Package::new(
-                    name, version, chrono::NaiveDate::from_ymd_opt(2023, 1, 1).unwrap(),
+                    name,
+                    version,
+                    chrono::NaiveDate::from_ymd_opt(2023, 1, 1).unwrap(),
                 );
                 packages.push(package)
             }
@@ -28,6 +30,6 @@ impl Parser for RequirementsParser {
 pub fn create_parser(format: &str) -> Option<Box<dyn Parser>> {
     match format {
         "requirements" => Some(Box::new(RequirementsParser)),
-        _ => None
+        _ => None,
     }
 }

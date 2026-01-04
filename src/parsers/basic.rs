@@ -10,7 +10,7 @@ pub fn parse_dependency_line(line: &str) -> Option<(String, String)> {
     let name = parts[0].trim().to_string();
     let version = parts[1].trim().to_string();
     if name.is_empty() || version.is_empty() {
-        return None
+        return None;
     }
     Some((name, version))
 }

@@ -10,7 +10,9 @@ pub struct Package {
 impl Package {
     pub fn new(name: String, version: String, release_date: chrono::NaiveDate) -> Self {
         Self {
-            name, version, release_date
+            name,
+            version,
+            release_date,
         }
     }
 
