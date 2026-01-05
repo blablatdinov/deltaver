@@ -23,7 +23,7 @@ reqwest = { version = "0.13", features = ["json", "blocking"] }
 tokio = { version = "1.0", features = ["full"] }
 semver = "1.0"
 chrono = "0.4"
-dirs = "5.0"
+dirs = "6.0"
 indicatif = "0.18"
 console = "0.15"
 rayon = "1.7"
