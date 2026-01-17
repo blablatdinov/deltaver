@@ -7,7 +7,7 @@ pub struct PyprojectTool {
     deltaver: Option<DeltaverConfig>
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct DeltaverConfig {
     pub path_to_file: Option<PathBuf>,
     pub file_format: Option<String>,
@@ -23,9 +23,6 @@ pub struct Config {
     pub excluded: Vec<String>,
     pub fail_on_avg: Option<u32>,
     pub fail_on_max: Option<u32>,
-    pub json_output: bool,
-    pub quiet: bool,
-    pub verbose: bool,
 }
 
 impl Config {
@@ -37,15 +34,16 @@ impl Config {
             cli.exclude_deps.clone()
         } else {
             pyproject_config
-                .and_then(|c| c.excluded)
+                .as_ref()
+                .and_then(|c| c.excluded.clone())
                 .unwrap_or_default()
         };
 
         let fail_on_avg = cli.fail_on_average
-            .or_else(|| pyproject_config.and_then(|c| c.fail_on_avg));
+            .or_else(|| pyproject_config.as_ref().and_then(|c| c.fail_on_avg));
         
         let fail_on_max = cli.fail_on_max
-            .or_else(|| pyproject_config.and_then(|c| c.fail_on_max));
+            .or_else(|| pyproject_config.as_ref().and_then(|c| c.fail_on_max));
 
         Config {
             path_to_file: cli.path_to_file.clone(),
@@ -53,9 +51,6 @@ impl Config {
             excluded,
             fail_on_avg,
             fail_on_max,
-            json_output: cli.json,
-            quiet: cli.quiet,
-            verbose: cli.verbose,
         }
     }
 

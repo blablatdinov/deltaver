@@ -1,8 +1,8 @@
-mod config;
-use deltaver::cli;
+use clap::Parser;
+use deltaver::{cli, config};
 
 fn main() {
-    let cfg = config::Config::from_cli(cli::Cli::parse());
+    let cfg = config::Config::from_cli(&cli::Cli::parse());
     match cli::run(cfg) {
         Ok(()) => {}
         Err(err) => {

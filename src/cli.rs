@@ -1,9 +1,10 @@
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use std::env;
 use std::fs;
 use std::path::PathBuf;
 
-use crate::parsers::{Parser, RequirementsParser};
+use crate::config::Config;
+use crate::parsers::parsed_reqs::{ParsedReqs, create_parser};
 
 use clap::{ValueEnum, Parser as ClapParser};
 
@@ -68,7 +69,7 @@ pub struct Cli {
 
 }
 
-pub fn run() -> Result<()> {
+pub fn run(cfg: Config) -> Result<()> {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
         println!("Использование: deltaver <файл>");
@@ -78,8 +79,13 @@ pub fn run() -> Result<()> {
     let filename = &args[1];
     let content = fs::read_to_string(filename)
         .with_context(|| format!("File content not available: {}", filename))?;
-    let parser = RequirementsParser;
-    let packages = parser.parse(&content)?;
+    let parser = match create_parser(cfg.file_format, &content) {
+        Some(p) => p,
+        None => {
+            bail!("Error on read file content");
+        }
+    };
+    let packages = parser.reqs()?;
     println!("Packages found: {}", packages.len());
     for package in packages {
         println!("  - {}", package)
