@@ -1,4 +1,4 @@
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use std::env;
 use std::fs;
 use std::path::PathBuf;
@@ -6,7 +6,7 @@ use std::path::PathBuf;
 use crate::config::Config;
 use crate::parsers::parsed_reqs::{ParsedReqs, create_parser};
 
-use clap::{ValueEnum, Parser as ClapParser};
+use clap::{Parser as ClapParser, ValueEnum};
 
 #[derive(Debug, Clone, ValueEnum)]
 pub enum Formats {
@@ -66,7 +66,6 @@ pub struct Cli {
 
     #[arg(long = "exclude", value_delimiter = ',')]
     pub exclude_deps: Vec<String>,
-
 }
 
 pub fn run(cfg: Config) -> Result<()> {

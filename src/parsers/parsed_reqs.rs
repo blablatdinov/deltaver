@@ -1,10 +1,10 @@
 use crate::cli::Formats;
-use crate::parsers::basic;
 use crate::core::Package;
+use crate::parsers::basic;
+use crate::parsers::parser::Parser;
 use anyhow::{Context, Result};
 use chrono::{DateTime, NaiveDateTime};
 use serde::{Deserialize, Serialize};
-use crate::parsers::parser::Parser;
 use std::time::Duration;
 
 #[derive(Debug, Default)]
@@ -58,10 +58,9 @@ struct PypiRelease {
     upload_time: String,
 }
 
-
 #[derive(Debug, Serialize, Deserialize)]
 struct PypiResponse {
-    releases: std::collections::HashMap<String, Vec<PypiRelease>>
+    releases: std::collections::HashMap<String, Vec<PypiRelease>>,
 }
 
 async fn package_release_date(
@@ -80,7 +79,8 @@ async fn package_release_date(
         let package = match package {
             Ok(pkg) => pkg,
             Err(err) => {
-                let retryable = err.is_timeout() || err.is_connect() || err.is_request() || err.is_decode();
+                let retryable =
+                    err.is_timeout() || err.is_connect() || err.is_request() || err.is_decode();
                 let err = anyhow::Error::new(err).context("Failed to decode PyPI response");
                 if retryable && attempt < 3 {
                     last_err = Some(err);
@@ -92,19 +92,19 @@ async fn package_release_date(
         };
         for (key, value) in &package.releases {
             if version == key.as_str() {
-                let last_package = value.iter().max_by(|a, b| {
-                    a.upload_time.cmp(&b.upload_time)
-                });
-                let latest_release = match last_package  {
+                let last_package = value
+                    .iter()
+                    .max_by(|a, b| a.upload_time.cmp(&b.upload_time));
+                let latest_release = match last_package {
                     Some(r) => r.upload_time.clone(),
-                    None => anyhow::bail!("Err") // TODO: describe error
+                    None => anyhow::bail!("Err"), // TODO: describe error
                 };
                 if let Ok(parsed) = DateTime::parse_from_rfc3339(&latest_release) {
                     return Ok(parsed.date_naive());
                 }
                 let parsed = NaiveDateTime::parse_from_str(&latest_release, "%Y-%m-%dT%H:%M:%S")
                     .with_context(|| format!("Invalid release date: {}", latest_release))?;
-                return Ok(parsed.date())
+                return Ok(parsed.date());
             }
         }
         anyhow::bail!(String::from("Release date not found"))

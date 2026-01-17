@@ -1,10 +1,10 @@
+use crate::cli::Formats;
 use serde::Deserialize;
 use std::path::PathBuf;
-use crate::cli::Formats;
 
 #[derive(Debug, Deserialize)]
 pub struct PyprojectTool {
-    deltaver: Option<DeltaverConfig>
+    deltaver: Option<DeltaverConfig>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -28,7 +28,7 @@ pub struct Config {
 impl Config {
     pub fn from_cli(cli: &crate::cli::Cli) -> Self {
         let pyproject_config = Self::load_pyproject_config();
-        
+
         let file_format = cli.file_format.clone();
         let excluded = if !cli.exclude_deps.is_empty() {
             cli.exclude_deps.clone()
@@ -39,10 +39,12 @@ impl Config {
                 .unwrap_or_default()
         };
 
-        let fail_on_avg = cli.fail_on_average
+        let fail_on_avg = cli
+            .fail_on_average
             .or_else(|| pyproject_config.as_ref().and_then(|c| c.fail_on_avg));
-        
-        let fail_on_max = cli.fail_on_max
+
+        let fail_on_max = cli
+            .fail_on_max
             .or_else(|| pyproject_config.as_ref().and_then(|c| c.fail_on_max));
 
         Config {
