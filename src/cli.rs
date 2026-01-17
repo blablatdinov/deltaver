@@ -8,8 +8,7 @@ use crate::parsers::parsed_reqs::create_parser;
 
 use clap::{Parser as ClapParser, ValueEnum};
 
-#[derive(Debug, Clone, ValueEnum)]
-#[derive(Default)]
+#[derive(Debug, Clone, ValueEnum, Default)]
 pub enum Formats {
     #[default]
     PipFreeze,
