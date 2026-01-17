@@ -4,23 +4,19 @@ use std::fs;
 use std::path::PathBuf;
 
 use crate::config::Config;
-use crate::parsers::parsed_reqs::{ParsedReqs, create_parser};
+use crate::parsers::parsed_reqs::create_parser;
 
 use clap::{Parser as ClapParser, ValueEnum};
 
 #[derive(Debug, Clone, ValueEnum)]
+#[derive(Default)]
 pub enum Formats {
+    #[default]
     PipFreeze,
     NpmLock,
     PoetryLock,
     Golang,
     MixLock,
-}
-
-impl Default for Formats {
-    fn default() -> Self {
-        Self::PipFreeze
-    }
 }
 
 impl std::fmt::Display for Formats {
