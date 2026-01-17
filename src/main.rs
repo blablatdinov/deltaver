@@ -1,7 +1,9 @@
+mod config;
 use deltaver::cli;
 
 fn main() {
-    match cli::run() {
+    let cfg = config::Config::from_cli(cli::Cli::parse());
+    match cli::run(cfg) {
         Ok(()) => {}
         Err(err) => {
             eprintln!("Error: {}", err);
