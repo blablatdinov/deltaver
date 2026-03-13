@@ -270,7 +270,6 @@ dependencies = [
  "encode_unicode",
  "libc",
  "once_cell",
- "unicode-width",
  "windows-sys 0.59.0",
 ]
 
@@ -345,7 +344,7 @@ dependencies = [
  "anyhow",
  "chrono",
  "clap",
- "console 0.15.11",
+ "console 0.16.2",
  "dirs",
  "indicatif",
  "insta",
