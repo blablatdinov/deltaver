@@ -845,14 +845,14 @@ files = [
 
 [[package]]
 name = "respx"
-version = "0.22.0"
+version = "0.23.0"
 description = "A utility for mocking out the Python HTTPX and HTTP Core libraries."
 optional = false
 python-versions = ">=3.8"
 groups = ["dev"]
 files = [
-    {file = "respx-0.22.0-py2.py3-none-any.whl", hash = "sha256:631128d4c9aba15e56903fb5f66fb1eff412ce28dd387ca3a81339e52dbd3ad0"},
-    {file = "respx-0.22.0.tar.gz", hash = "sha256:3c8924caa2a50bd71aefc07aa812f2466ff489f1848c96e954a5362d17095d91"},
+    {file = "respx-0.23.0-py2.py3-none-any.whl", hash = "sha256:7c5be720f91849cd015b1cb9c45cea3cb98ea36614fc570c4a658f5102adfa5d"},
+    {file = "respx-0.23.0.tar.gz", hash = "sha256:501540d8df8ff77f95d895a59cdcde7ad7db6c359cb22ca4ff51de72d0fc6f51"},
 ]
 
 [package.dependencies]
@@ -1170,4 +1170,4 @@ tomli = {version = ">=1.1.0", markers = "python_version < \"3.11\""}
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "dc964356e17de16d016dfd0b5f5bebd5cd919765e9dff77f732b2d37e4af74b5"
+content-hash = "33e8c3a110cc3e02acdfd3edf9eb86822e3e6386f5a311f24e8280731ec4ed37"
