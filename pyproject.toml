@@ -23,7 +23,7 @@ typing-extensions = "^4.9"
 pytz = ">=2018.4"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "9.0.2"
+pytest = "9.0.3"
 respx = "0.23.0"
 time-machine = "3.2.0"
 pytest-cov = "7.1.0"
