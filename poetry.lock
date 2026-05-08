@@ -1138,14 +1138,14 @@ files = [
 
 [[package]]
 name = "types-toml"
-version = "0.10.8.20260408"
+version = "0.10.8.20260508"
 description = "Typing stubs for toml"
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "types_toml-0.10.8.20260408-py3-none-any.whl", hash = "sha256:e958d4c660385e548705a298f17dc162baf44c8b6d6aff79aeefe75f4f77ac87"},
-    {file = "types_toml-0.10.8.20260408.tar.gz", hash = "sha256:6b30b031235565a12febb1388900b129f1adeabfcfa594da46d0372b2ac107ad"},
+    {file = "types_toml-0.10.8.20260508-py3-none-any.whl", hash = "sha256:144d615419051493ab1e5e71b6477f7c56fadc78f0856407775e75c8e2916140"},
+    {file = "types_toml-0.10.8.20260508.tar.gz", hash = "sha256:93aaa72365bd9bc8c2ce1ca3502b0470d8d428376bada020e1a4956b8b82fdda"},
 ]
 
 [[package]]
@@ -1178,4 +1178,4 @@ tomli = {version = ">=1.1.0", markers = "python_version < \"3.11\""}
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "82408b7c886bef4f4e4641a36865f99e9b3982ddcb868a2214776b4669dc5fdf"
+content-hash = "3d43e30de16aaf9ab89c97f5043346bc6f358d1dddb89379dc757dd74f4e3174"
