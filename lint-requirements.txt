@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2023-2026 Almaz Ilaletdinov <a.ilaletdinov@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-attrs==25.4.0
+attrs==26.1.0
     # via wemake-python-styleguide
 flake8==7.3.0
     # via wemake-python-styleguide
