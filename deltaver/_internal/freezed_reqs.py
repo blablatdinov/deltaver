@@ -26,10 +26,17 @@ class FreezedReqs(ParsedReqs):
         lines = self._requirements_file_content.splitlines()
         expected_splitted_line_len = 2
         for line in lines:
-            splitted_line = line.split(';')[0].split('==')
+            if line.strip().startswith('#'):
+                continue
+            stripped = line.rstrip('\\').strip()
+            line_without_env = stripped.split(';')[0]
+            splitted_line = line_without_env.split('==')
             if len(splitted_line) != expected_splitted_line_len:
                 continue
             package, version = splitted_line
             package = re.sub(r'\[.*?\]', '', package)
-            res.append((package, version.strip()))
+            package = package.strip()
+            version = version.strip()
+            if version and not version.startswith('--hash'):
+                res.append((package, version))
         return res
