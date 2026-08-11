@@ -3,8 +3,6 @@
 
 """Config dict."""
 
-# noqa: FOC100. Data structures
-
 from __future__ import annotations
 
 from pathlib import Path
