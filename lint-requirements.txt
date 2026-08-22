@@ -13,5 +13,5 @@ pyflakes==3.4.0
     # via flake8
 pygments==2.21.0
     # via wemake-python-styleguide
-wemake-python-styleguide==1.7.1
+wemake-python-styleguide==1.8.0
     # via -r lint-requirements.txt
