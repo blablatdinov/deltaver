@@ -36,7 +36,7 @@ ondivi = "0.7.3"
 types-pytz = "2026.6.0.20261031"
 vulture = "2.16"
 flake8-one-class = "^0.0.1"
-eo-styleguide = "0.1.1"
+eo-styleguide = "0.2.0"
 
 [tool.poetry.scripts]
 deltaver = "deltaver.entry:app"
