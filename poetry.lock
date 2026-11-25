@@ -1235,14 +1235,14 @@ shellingham = ">=1.3.0"
 
 [[package]]
 name = "types-pytz"
-version = "2026.6.0.20261031"
+version = "2026.6.0.20261122"
 description = "Typing stubs for pytz"
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "types_pytz-2026.6.0.20261031-py3-none-any.whl", hash = "sha256:d0d4fbe482edfb263440421866cba41d25daba37e5584e0cff6712a3b5a9d9e9"},
-    {file = "types_pytz-2026.6.0.20261031.tar.gz", hash = "sha256:8b559955f0c628f68159865c6f24835f4323c407a4408365b3676a074b524261"},
+    {file = "types_pytz-2026.6.0.20261122-py3-none-any.whl", hash = "sha256:44f1e8a1b4f29669a13c8c5a4b93d6920cd43879889bd5a7c65181218e5ab171"},
+    {file = "types_pytz-2026.6.0.20261122.tar.gz", hash = "sha256:863e808dbabce6050733a89315d506f7cc4eca2f1e95dd4fa2a83c3f9416aa4c"},
 ]
 
 [[package]]
@@ -1287,4 +1287,4 @@ tomli = {version = ">=1.1.0", markers = "python_version < \"3.11\""}
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "b2d41f4e1042d274dd6dbd27398713b41a56e2d12dbb1cec79d2962275031bef"
+content-hash = "a38e29de7013c3664cb076d10abab74d5b7892c6a89d768f3dbc8201181e1b64"
